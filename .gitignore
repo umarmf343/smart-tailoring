@@ -1,0 +1,16 @@
+# Sensitive configuration
+config/db.php
+
+# User uploaded content
+uploads/profiles/*
+uploads/shops/*
+!uploads/profiles/.gitkeep
+!uploads/shops/.gitkeep
+
+# System files
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+.vscode/
+.idea/
