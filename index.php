@@ -540,7 +540,7 @@ require_once 'config/db.php';
                         </li>
                         <li>
                             <i class="fas fa-envelope"></i>
-                            <span>info@smarttailoring.com</span>
+                            <span>anupamkushwaha639@gmail.com</span>
                         </li>
                         <li>
                             <i class="fas fa-map-marker-alt"></i>
@@ -553,10 +553,10 @@ require_once 'config/db.php';
                 <div class="footer-column">
                     <h3 class="footer-heading">Follow Us</h3>
                     <ul class="footer-social">
-                        <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
-                        <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
-                        <li><a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
-                        <li><a href="#"><i class="fab fa-github"></i> Github</a></li>
+                        <li><a href="https://fb.com/anupam kushwaha"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="https://instagram.com/anupam_kushwaha_85"><i class="fab fa-instagram"></i> Instagram</a></li>
+                        <li><a href="www.linkedin.com/in/anupamkushwaha85"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+                        <li><a href="https://github.com/anupamkushwaha85"><i class="fab fa-github"></i> Github</a></li>
                     </ul>
                 </div>
             </div>

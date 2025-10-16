@@ -167,6 +167,10 @@ function createTailorCard(tailor) {
 
     // Prepare services array
     const services = tailor.services_offered ? tailor.services_offered.split(',').slice(0, 3) : [];
+    card.style.cursor = 'pointer';
+    card.onclick = () => {
+        window.location.href = `/smart/smart-tailoring/view_tailor.php?id=${tailor.id}`;
+    };
 
     card.innerHTML = `
         <div class="tailor-card-header">
@@ -175,12 +179,12 @@ function createTailorCard(tailor) {
                    alt="${tailor.shop_name}"
                    class="tailor-card-avatar"
                    style="width: 100%; height: 100%; object-fit: cover;">`
-                : `<div class="tailor-card-avatar" style="display: flex; align-items: center;  justify-content: center; 
+            : `<div class="tailor-card-avatar" style="display: flex; align-items: center;  justify-content: center; 
                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                    color: white; font-size: 2.5rem; font-weight: 700;">
                    ${tailor.shop_name.charAt(0).toUpperCase()}
                </div>`
-            }
+        }
             
             <div class="tailor-card-info">
                 <div class="tailor-card-title">
@@ -213,6 +217,16 @@ function createTailorCard(tailor) {
             <div class="tailor-detail-item">
                 <i class="fas fa-rupee-sign"></i>
                 <span class="price-range-display">${formatPriceRange(tailor.price_range)}</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+                <div style="color: #ffd700; font-size: 1.2rem;">
+                    ${generateStars(tailor.rating || 0)}
+                </div>
+                <span style="color: #666; font-size: 0.9rem;">
+                    ${tailor.rating ? Number(tailor.rating).toFixed(1) : '0.0'} 
+                    (${tailor.total_reviews || 0} reviews)
+                </span>
             </div>
             
             <div class="tailor-services-section">
@@ -747,6 +761,26 @@ function handleRegister() {
 
 
 console.log('Authentication system initialized!');
+
+// Helper function to generate star icons
+function generateStars(rating) {
+    let stars = '';
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    
+    for (let i = 1; i <= 5; i++) {
+        if (i <= fullStars) {
+            stars += '<i class="fas fa-star"></i>';
+        } else if (i === fullStars + 1 && hasHalfStar) {
+            stars += '<i class="fas fa-star-half-alt"></i>';
+        } else {
+            stars += '<i class="far fa-star"></i>';
+        }
+    }
+    
+    return stars;
+}
+
 
 // ============================================
 // ORDER MODAL FUNCTIONS
