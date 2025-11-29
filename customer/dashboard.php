@@ -266,6 +266,228 @@ db_close();
             margin-bottom: 0.5rem;
             display: block;
         }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+
+            /* Hide welcome text in navbar on mobile */
+            .welcome-text {
+                display: none !important;
+            }
+
+            /* Make logout button icon-only on mobile */
+            .btn-logout .btn-text {
+                display: none;
+            }
+
+            .btn-logout {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+            }
+
+            .btn-logout i {
+                margin: 0;
+                font-size: 1.1rem;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .dashboard-container {
+                padding: 0 1rem;
+                margin-top: 1rem;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+            }
+
+            .welcome-section h1 {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+
+            .stat-card {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .stat-content h3 {
+                font-size: 1.5rem;
+            }
+
+            .stat-content p {
+                font-size: 0.75rem;
+            }
+
+            .dashboard-section {
+                padding: 1.25rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.25rem;
+            }
+
+            /* Quick Actions Grid on Mobile */
+            .quick-actions {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+                margin-top: 1rem;
+            }
+
+            .action-btn {
+                padding: 1rem 0.5rem;
+                font-size: 0.85rem;
+                display: flex !important;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 100px;
+                aspect-ratio: 1 / 1;
+            }
+
+            .action-btn i {
+                font-size: 1.8rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .action-btn strong {
+                font-size: 0.7rem;
+                line-height: 1.2;
+                word-wrap: break-word;
+                white-space: normal;
+            }
+
+            /* Reorder sections */
+            .dashboard-container {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                order: 1;
+            }
+
+            .dashboard-section:has(.quick-actions) {
+                order: 2;
+            }
+
+            .dashboard-section:has(.profile-card) {
+                order: 3;
+            }
+
+            .profile-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+                justify-items: center;
+                gap: 1rem;
+            }
+
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+
+            .info-row {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-container {
+                padding: 0 0.75rem;
+            }
+
+            .dashboard-header {
+                padding: 1.25rem 1rem;
+            }
+
+            .welcome-section h1 {
+                font-size: 1.25rem;
+            }
+
+            .welcome-section p {
+                font-size: 0.9rem;
+            }
+
+            .stats-grid {
+                gap: 0.4rem;
+            }
+
+            .stat-card {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .stat-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+
+            .stat-content h3 {
+                font-size: 1.25rem;
+            }
+
+            .stat-content p {
+                font-size: 0.7rem;
+            }
+
+            .dashboard-section {
+                padding: 1rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.1rem;
+            }
+
+            .action-btn {
+                padding: 0.75rem 0.4rem;
+                min-height: 90px;
+            }
+
+            .action-btn i {
+                font-size: 1.5rem;
+            }
+
+            .action-btn strong {
+                font-size: 0.65rem;
+            }
+
+            .profile-avatar {
+                width: 70px;
+                height: 70px;
+                font-size: 1.75rem;
+            }
+
+            .profile-details h3 {
+                font-size: 1.25rem;
+            }
+
+            .info-row {
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 
@@ -276,7 +498,7 @@ db_close();
         <div class="nav-container">
             <!-- Logo -->
             <div class="nav-logo">
-                <img src="../assets/images/logo.jpg" alt="Smart Tailoring Service Logo">
+                <img src="../assets/images/logo.png" alt="Smart Tailoring Service Logo">
                 <span class="logo-text">Smart Tailoring Service</span>
             </div>
 
@@ -285,14 +507,15 @@ db_close();
                 <li><a href="../index.php" class="nav-link">Home</a></li>
                 <li><a href="dashboard.php" class="nav-link active">Dashboard</a></li>
                 <li><a href="orders.php" class="nav-link">My Orders</a></li>
+                <li><a href="measurements.php" class="nav-link">Measurements</a></li>
                 <li><a href="profile.php" class="nav-link">Profile</a></li>
             </ul>
 
             <!-- User Info -->
             <div class="nav-auth">
-                <span style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($customer['full_name']); ?>!</span>
-                <button class="btn-login-register" onclick="window.location.href='../auth/logout.php'">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <span class="welcome-text" style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($customer['full_name']); ?>!</span>
+                <button class="btn-logout" onclick="window.location.href='../auth/logout.php'">
+                    <i class="fas fa-sign-out-alt"></i> <span class="btn-text">Logout</span>
                 </button>
             </div>
         </div>
@@ -307,9 +530,6 @@ db_close();
                 <h1>Welcome back, <?php echo htmlspecialchars($customer['full_name']); ?>!</h1>
                 <p>Manage your orders and find the best tailors in Satna</p>
             </div>
-            <button class="logout-btn" onclick="window.location.href='../auth/logout.php'">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
         </div>
 
         <!-- Stats Grid -->
@@ -396,6 +616,11 @@ db_close();
             </div>
 
             <div class="quick-actions">
+                <a href="../index.php" class="action-btn">
+                    <i class="fas fa-home"></i>
+                    <strong>Home</strong>
+                </a>
+
                 <a href="../index.php#tailors" class="action-btn">
                     <i class="fas fa-search"></i>
                     <strong>Find Tailors</strong>
@@ -404,6 +629,11 @@ db_close();
                 <a href="orders.php" class="action-btn">
                     <i class="fas fa-shopping-bag"></i>
                     <strong>My Orders</strong>
+                </a>
+
+                <a href="measurements.php" class="action-btn">
+                    <i class="fas fa-ruler"></i>
+                    <strong>Measurements</strong>
                 </a>
 
                 <a href="profile.php" class="action-btn">

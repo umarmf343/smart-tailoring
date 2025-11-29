@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tailor Orders Page
  * Displays all orders received by the logged-in tailor
@@ -19,23 +20,24 @@ $shop_name = $_SESSION['shop_name'];
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orders - Smart Tailoring Service</title>
-    
+
     <link rel="icon" type="image/jpg" href="../assets/images/STP-favicon.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    
+
     <style>
         .orders-container {
             max-width: 1400px;
             margin: 2rem auto;
             padding: 0 2rem;
         }
-        
+
         .page-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: var(--white);
@@ -43,19 +45,19 @@ $shop_name = $_SESSION['shop_name'];
             border-radius: var(--radius-lg);
             margin-bottom: 2rem;
         }
-        
+
         .page-header h1 {
             margin: 0;
             font-size: 2rem;
         }
-        
+
         .filter-tabs {
             display: flex;
             gap: 1rem;
             margin-bottom: 2rem;
             flex-wrap: wrap;
         }
-        
+
         .filter-btn {
             padding: 0.75rem 1.5rem;
             border: 2px solid var(--border-color);
@@ -65,22 +67,22 @@ $shop_name = $_SESSION['shop_name'];
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .filter-btn:hover {
             border-color: var(--primary-color);
         }
-        
+
         .filter-btn.active {
             background: var(--primary-color);
             color: var(--white);
             border-color: var(--primary-color);
         }
-        
+
         .orders-grid {
             display: grid;
             gap: 1.5rem;
         }
-        
+
         .order-card {
             background: var(--white);
             border-radius: var(--radius-lg);
@@ -89,12 +91,12 @@ $shop_name = $_SESSION['shop_name'];
             border: 2px solid var(--border-color);
             transition: all 0.3s ease;
         }
-        
+
         .order-card:hover {
             border-color: var(--primary-color);
             box-shadow: var(--shadow-lg);
         }
-        
+
         .order-header {
             display: flex;
             justify-content: space-between;
@@ -103,64 +105,128 @@ $shop_name = $_SESSION['shop_name'];
             padding-bottom: 1rem;
             border-bottom: 2px solid var(--light-bg);
         }
-        
+
         .order-number {
             font-size: 1.25rem;
             font-weight: 700;
             color: var(--text-dark);
         }
-        
+
         .order-status {
             padding: 0.5rem 1rem;
             border-radius: 50px;
             font-weight: 600;
             font-size: 0.9rem;
         }
-        
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-accepted { background: #dbeafe; color: #1e40af; }
-        .status-in_progress { background: #e0e7ff; color: #4338ca; }
-        .status-ready { background: #d1fae5; color: #065f46; }
-        .status-completed { background: #d1fae5; color: #065f46; }
-        .status-cancelled { background: #fee2e2; color: #991b1b; }
-        
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-booked {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-cutting {
+            background: #e9d5ff;
+            color: #6b21a8;
+        }
+
+        .status-stitching {
+            background: #ddd6fe;
+            color: #5b21b6;
+        }
+
+        .status-first_fitting {
+            background: #fbcfe8;
+            color: #9f1239;
+        }
+
+        .status-alterations {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .status-final_fitting {
+            background: #cffafe;
+            color: #155e75;
+        }
+
+        .status-ready_for_pickup {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-delivered {
+            background: #a7f3d0;
+            color: #065f46;
+        }
+
+        .status-completed {
+            background: #86efac;
+            color: #14532d;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Legacy status support */
+        .status-accepted {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-in_progress {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .status-ready {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
         .order-body {
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 2rem;
         }
-        
+
         .order-details {
             display: grid;
             gap: 0.75rem;
         }
-        
+
         .detail-row {
             display: flex;
             gap: 0.5rem;
         }
-        
+
         .detail-label {
             font-weight: 600;
             color: var(--text-light);
             min-width: 150px;
         }
-        
+
         .detail-value {
             color: var(--text-dark);
         }
-        
+
         .customer-info {
             background: var(--light-bg);
             padding: 1.5rem;
             border-radius: var(--radius-md);
         }
-        
+
         .customer-info h4 {
             margin: 0 0 1rem 0;
             color: var(--text-dark);
         }
-        
+
         .order-actions {
             display: flex;
             gap: 1rem;
@@ -169,7 +235,7 @@ $shop_name = $_SESSION['shop_name'];
             border-top: 2px solid var(--light-bg);
             flex-wrap: wrap;
         }
-        
+
         .btn-action {
             padding: 0.75rem 1.5rem;
             border: none;
@@ -181,62 +247,62 @@ $shop_name = $_SESSION['shop_name'];
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .btn-accept {
             background: #10b981;
             color: var(--white);
         }
-        
+
         .btn-accept:hover {
             background: #059669;
         }
-        
+
         .btn-progress {
             background: #3b82f6;
             color: var(--white);
         }
-        
+
         .btn-progress:hover {
             background: #2563eb;
         }
-        
+
         .btn-ready {
             background: #8b5cf6;
             color: var(--white);
         }
-        
+
         .btn-ready:hover {
             background: #7c3aed;
         }
-        
+
         .btn-complete {
             background: #10b981;
             color: var(--white);
         }
-        
+
         .btn-complete:hover {
             background: #059669;
         }
-        
+
         .btn-reject {
             background: #ef4444;
             color: var(--white);
         }
-        
+
         .btn-reject:hover {
             background: #dc2626;
         }
-        
+
         .btn-contact {
             background: var(--light-bg);
             color: var(--text-dark);
             border: 2px solid var(--border-color);
         }
-        
+
         .btn-contact:hover {
             border-color: var(--primary-color);
         }
-        
+
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
@@ -244,35 +310,219 @@ $shop_name = $_SESSION['shop_name'];
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
         }
-        
+
         .empty-state i {
             font-size: 4rem;
             color: var(--primary-color);
             margin-bottom: 1rem;
         }
+
+        @media (max-width: 768px) {
+
+            /* Hide welcome text in navbar on mobile */
+            .welcome-text {
+                display: none !important;
+            }
+
+            /* Hide navigation menu on mobile */
+            .nav-menu {
+                display: none;
+            }
+
+            /* Make dashboard and logout buttons icon-only on mobile */
+            .btn-dashboard .btn-text,
+            .btn-logout .btn-text {
+                display: none;
+            }
+
+            .btn-dashboard,
+            .btn-logout {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                margin-left: 0.5rem;
+            }
+
+            .btn-dashboard i,
+            .btn-logout i {
+                margin: 0;
+                font-size: 1.1rem;
+            }
+
+            .orders-container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .page-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .filter-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 0.5rem;
+                margin: 0 -1rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            .filter-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+                white-space: nowrap;
+            }
+
+            .orders-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .order-card {
+                padding: 1rem;
+            }
+
+            .order-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+
+            .order-number {
+                font-size: 1rem;
+            }
+
+            .order-status {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.85rem;
+            }
+
+            .order-body {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .detail-label {
+                min-width: auto;
+                font-size: 0.85rem;
+            }
+
+            .detail-value {
+                font-size: 0.95rem;
+                font-weight: 500;
+            }
+
+            .customer-info {
+                padding: 1rem;
+            }
+
+            .customer-info h4 {
+                font-size: 1rem;
+            }
+
+            .order-actions {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .orders-container {
+                padding: 0 0.75rem;
+            }
+
+            .page-header {
+                padding: 1.25rem 0.85rem;
+                margin-bottom: 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.25rem;
+            }
+
+            .filter-btn {
+                padding: 0.45rem 0.85rem;
+                font-size: 0.8rem;
+            }
+
+            .order-card {
+                padding: 0.85rem;
+            }
+
+            .order-number {
+                font-size: 0.9rem;
+            }
+
+            .order-status {
+                font-size: 0.75rem;
+                padding: 0.35rem 0.75rem;
+            }
+
+            .detail-label {
+                font-size: 0.8rem;
+            }
+
+            .detail-value {
+                font-size: 0.9rem;
+            }
+
+            .customer-info {
+                padding: 0.85rem;
+            }
+
+            .btn-action {
+                padding: 0.65rem;
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <img src="../assets/images/logo.jpg" alt="Logo">
+                <img src="../assets/images/logo.png" alt="Logo">
                 <span class="logo-text">Smart Tailoring Service</span>
             </div>
-            
+
             <ul class="nav-menu">
                 <li><a href="../index.php" class="nav-link">Home</a></li>
                 <li><a href="dashboard.php" class="nav-link">Dashboard</a></li>
                 <li><a href="orders.php" class="nav-link active">Orders</a></li>
+
                 <li><a href="profile.php" class="nav-link">Shop Profile</a></li>
             </ul>
-            
+
             <div class="nav-auth">
-                <span style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($tailor_name); ?>!</span>
-                <button class="btn-login-register" onclick="window.location.href='../auth/logout.php'">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <span class="welcome-text" style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($tailor_name); ?>!</span>
+                <a href="dashboard.php" class="btn-dashboard" title="Dashboard">
+                    <i class="fas fa-tachometer-alt"></i> <span class="btn-text">Dashboard</span>
+                </a>
+                <button class="btn-logout" onclick="window.location.href='../auth/logout.php'">
+                    <i class="fas fa-sign-out-alt"></i> <span class="btn-text">Logout</span>
                 </button>
             </div>
         </div>
@@ -280,7 +530,7 @@ $shop_name = $_SESSION['shop_name'];
 
     <!-- Orders Container -->
     <div class="orders-container">
-        
+
         <!-- Page Header -->
         <div class="page-header">
             <h1><i class="fas fa-inbox"></i> Order Management</h1>
@@ -295,17 +545,29 @@ $shop_name = $_SESSION['shop_name'];
             <button class="filter-btn" data-status="pending" onclick="filterOrders('pending')">
                 <i class="fas fa-clock"></i> Pending
             </button>
-            <button class="filter-btn" data-status="accepted" onclick="filterOrders('accepted')">
-                <i class="fas fa-check"></i> Accepted
+            <button class="filter-btn" data-status="booked" onclick="filterOrders('booked')">
+                <i class="fas fa-check-circle"></i> Booked
             </button>
-            <button class="filter-btn" data-status="in_progress" onclick="filterOrders('in_progress')">
-                <i class="fas fa-tasks"></i> In Progress
+            <button class="filter-btn" data-status="cutting" onclick="filterOrders('cutting')">
+                <i class="fas fa-cut"></i> Cutting
             </button>
-            <button class="filter-btn" data-status="ready" onclick="filterOrders('ready')">
-                <i class="fas fa-box"></i> Ready
+            <button class="filter-btn" data-status="stitching" onclick="filterOrders('stitching')">
+                <i class="fas fa-sewing-machine"></i> Stitching
+            </button>
+            <button class="filter-btn" data-status="first_fitting" onclick="filterOrders('first_fitting')">
+                <i class="fas fa-user-check"></i> First Fitting
+            </button>
+            <button class="filter-btn" data-status="alterations" onclick="filterOrders('alterations')">
+                <i class="fas fa-tools"></i> Alterations
+            </button>
+            <button class="filter-btn" data-status="final_fitting" onclick="filterOrders('final_fitting')">
+                <i class="fas fa-user-tie"></i> Final Fitting
+            </button>
+            <button class="filter-btn" data-status="ready_for_pickup" onclick="filterOrders('ready_for_pickup')">
+                <i class="fas fa-box-open"></i> Ready
             </button>
             <button class="filter-btn" data-status="completed" onclick="filterOrders('completed')">
-                <i class="fas fa-check-circle"></i> Completed
+                <i class="fas fa-check-double"></i> Completed
             </button>
         </div>
 
@@ -361,13 +623,13 @@ $shop_name = $_SESSION['shop_name'];
         // Filter orders by status
         function filterOrders(status) {
             currentFilter = status;
-            
+
             // Update active button
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             document.querySelector(`[data-status="${status}"]`).classList.add('active');
-            
+
             // Filter and display
             if (status === 'all') {
                 displayOrders(allOrders);
@@ -380,7 +642,7 @@ $shop_name = $_SESSION['shop_name'];
         // Display orders
         function displayOrders(orders) {
             const grid = document.getElementById('ordersGrid');
-            
+
             if (orders.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
@@ -391,7 +653,7 @@ $shop_name = $_SESSION['shop_name'];
                 `;
                 return;
             }
-            
+
             grid.innerHTML = orders.map(order => createOrderCard(order)).join('');
         }
 
@@ -399,39 +661,76 @@ $shop_name = $_SESSION['shop_name'];
         function createOrderCard(order) {
             const statusClass = `status-${order.order_status}`;
             const statusText = order.order_status.replace('_', ' ').toUpperCase();
-            
+
             // Determine which action buttons to show
             let actionButtons = '';
-            
+
+            // New 11-status workflow
             if (order.order_status === 'pending') {
                 actionButtons = `
-                    <button class="btn-action btn-accept" onclick="updateOrderStatus(${order.id}, 'accepted')">
-                        <i class="fas fa-check"></i> Accept Order
+                    <button class="btn-action btn-accept" onclick="updateOrderStatus(${order.id}, 'booked')">
+                        <i class="fas fa-check"></i> Accept & Book Order
                     </button>
                     <button class="btn-action btn-reject" onclick="updateOrderStatus(${order.id}, 'cancelled')">
                         <i class="fas fa-times"></i> Reject
                     </button>
                 `;
-            } else if (order.order_status === 'accepted') {
+            } else if (order.order_status === 'booked') {
                 actionButtons = `
-                    <button class="btn-action btn-progress" onclick="updateOrderStatus(${order.id}, 'in_progress')">
-                        <i class="fas fa-play"></i> Start Work
+                    <button class="btn-action btn-progress" onclick="updateOrderStatus(${order.id}, 'cutting')">
+                        <i class="fas fa-cut"></i> Start Cutting
                     </button>
                 `;
-            } else if (order.order_status === 'in_progress') {
+            } else if (order.order_status === 'cutting') {
                 actionButtons = `
-                    <button class="btn-action btn-ready" onclick="updateOrderStatus(${order.id}, 'ready')">
-                        <i class="fas fa-box"></i> Mark as Ready
+                    <button class="btn-action btn-progress" onclick="updateOrderStatus(${order.id}, 'stitching')">
+                        <i class="fas fa-sewing-machine"></i> Start Stitching
                     </button>
                 `;
-            } else if (order.order_status === 'ready') {
+            } else if (order.order_status === 'stitching') {
+                actionButtons = `
+                    <button class="btn-action btn-progress" onclick="updateOrderStatus(${order.id}, 'first_fitting')">
+                        <i class="fas fa-user-check"></i> Schedule First Fitting
+                    </button>
+                `;
+            } else if (order.order_status === 'first_fitting') {
+                actionButtons = `
+                    <button class="btn-action btn-progress" onclick="updateOrderStatus(${order.id}, 'alterations')">
+                        <i class="fas fa-tools"></i> Needs Alterations
+                    </button>
+                    <button class="btn-action btn-success" onclick="updateOrderStatus(${order.id}, 'final_fitting')">
+                        <i class="fas fa-user-tie"></i> Proceed to Final Fitting
+                    </button>
+                `;
+            } else if (order.order_status === 'alterations') {
+                actionButtons = `
+                    <button class="btn-action btn-progress" onclick="updateOrderStatus(${order.id}, 'final_fitting')">
+                        <i class="fas fa-user-tie"></i> Schedule Final Fitting
+                    </button>
+                `;
+            } else if (order.order_status === 'final_fitting') {
+                actionButtons = `
+                    <button class="btn-action btn-progress" onclick="updateOrderStatus(${order.id}, 'alterations')">
+                        <i class="fas fa-tools"></i> More Alterations Needed
+                    </button>
+                    <button class="btn-action btn-ready" onclick="updateOrderStatus(${order.id}, 'ready_for_pickup')">
+                        <i class="fas fa-box-open"></i> Ready for Pickup
+                    </button>
+                `;
+            } else if (order.order_status === 'ready_for_pickup') {
+                actionButtons = `
+                    <button class="btn-action btn-complete" onclick="updateOrderStatus(${order.id}, 'delivered')">
+                        <i class="fas fa-truck"></i> Mark as Delivered
+                    </button>
+                `;
+            } else if (order.order_status === 'delivered') {
                 actionButtons = `
                     <button class="btn-action btn-complete" onclick="updateOrderStatus(${order.id}, 'completed')">
                         <i class="fas fa-check-circle"></i> Complete Order
                     </button>
                 `;
             }
-            
+
             return `
                 <div class="order-card" data-status="${order.order_status}">
                     <div class="order-header">
@@ -506,6 +805,9 @@ $shop_name = $_SESSION['shop_name'];
                     
                     <div class="order-actions">
                         ${actionButtons}
+                        <button class="btn-action btn-info" onclick="showTailorOrderDetailsModal(${order.id})" style="background: #8b5cf6;">
+                            <i class="fas fa-info-circle"></i> View Full Details
+                        </button>
                         <button class="btn-action btn-contact" onclick="contactCustomer('${order.customer_info.phone}')">
                             <i class="fas fa-phone"></i> Contact Customer
                         </button>
@@ -523,32 +825,32 @@ $shop_name = $_SESSION['shop_name'];
                 'completed': 'Complete',
                 'cancelled': 'Reject'
             };
-            
+
             if (!confirm(`Are you sure you want to ${statusNames[newStatus]} this order?`)) {
                 return;
             }
-            
+
             const formData = new FormData();
             formData.append('order_id', orderId);
             formData.append('status', newStatus);
-            
+
             fetch('../api/orders/update_status.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Order status updated successfully!');
-                    loadOrders(); // Reload orders
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to update order status');
-            });
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Order status updated successfully!');
+                        loadOrders(); // Reload orders
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update order status');
+                });
         }
 
         // Contact customer
@@ -560,13 +862,17 @@ $shop_name = $_SESSION['shop_name'];
         function formatDate(dateString) {
             if (!dateString) return 'N/A';
             const date = new Date(dateString);
-            return date.toLocaleDateString('en-IN', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
+            return date.toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
             });
         }
     </script>
 
+    <!-- Include Enhanced Order Modal JavaScript -->
+    <script src="../assets/js/tailor-order-enhancements.js"></script>
+
 </body>
+
 </html>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * API: Get Tailors
  * Fetches all tailors from database
@@ -15,7 +16,7 @@ require_once '../config/db.php';
 header('Content-Type: application/json');
 
 try {
-    // Query to fetch all active tailors
+    // Query to fetch all active tailors (including location data)
     $query = "SELECT 
                 id, 
                 shop_name, 
@@ -32,17 +33,20 @@ try {
                 total_reviews, 
                 total_orders, 
                 shop_image, 
-                is_verified, 
+                is_verified,
+                latitude,
+                longitude,
+                location_updated_at,
                 created_at 
               FROM tailors 
               WHERE is_active = 1 
               ORDER BY is_verified DESC, rating DESC, total_orders DESC";
-    
+
     $result = db_query($query);
-    
+
     if ($result) {
         $tailors = [];
-        
+
         while ($row = $result->fetch_assoc()) {
             $tailors[] = [
                 'id' => (int)$row['id'],
@@ -61,10 +65,13 @@ try {
                 'total_orders' => (int)$row['total_orders'],
                 'shop_image' => $row['shop_image'],
                 'is_verified' => (int)$row['is_verified'],
+                'latitude' => $row['latitude'] ? (float)$row['latitude'] : null,
+                'longitude' => $row['longitude'] ? (float)$row['longitude'] : null,
+                'location_updated_at' => $row['location_updated_at'],
                 'created_at' => $row['created_at']
             ];
         }
-        
+
         echo json_encode([
             'success' => true,
             'count' => count($tailors),
@@ -73,7 +80,6 @@ try {
     } else {
         throw new Exception('Database query failed');
     }
-    
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
@@ -85,4 +91,3 @@ try {
 
 // Close database connection
 db_close();
-?>

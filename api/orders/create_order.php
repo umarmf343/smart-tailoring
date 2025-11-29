@@ -1,4 +1,5 @@
 <?php
+
 /**
  * API: Create Order
  * POST /api/orders/create_order.php
@@ -36,7 +37,7 @@ require_once '../../config/db.php';
 require_once '../../services/OrderService.php';
 
 try {
-    // Get POST data
+    // Get POST data (supporting both old and new fields)
     $orderData = [
         'customer_id' => $_SESSION['user_id'],
         'tailor_id' => $_POST['tailor_id'] ?? null,
@@ -48,19 +49,62 @@ try {
         'estimated_price' => $_POST['estimated_price'] ?? 0,
         'delivery_date' => $_POST['delivery_date'] ?? null
     ];
-    
+
+    // Add new enhanced workflow fields if provided
+    if (isset($_POST['fabric_type'])) {
+        $orderData['fabric_type'] = $_POST['fabric_type'];
+    }
+
+    if (isset($_POST['fabric_color'])) {
+        $orderData['fabric_color'] = $_POST['fabric_color'];
+    }
+
+    if (isset($_POST['measurement_id'])) {
+        $orderData['measurement_id'] = $_POST['measurement_id'];
+    }
+
+    if (isset($_POST['deadline'])) {
+        $orderData['deadline'] = $_POST['deadline'];
+    }
+
+    if (isset($_POST['deposit_amount'])) {
+        $orderData['deposit_amount'] = $_POST['deposit_amount'];
+    }
+
+    if (isset($_POST['source_order_id'])) {
+        $orderData['source_order_id'] = $_POST['source_order_id'];
+    }
+
+    // Handle design_specifications (can be JSON string or array)
+    if (isset($_POST['design_specifications'])) {
+        $orderData['design_specifications'] = $_POST['design_specifications'];
+    }
+
+    // Handle measurements_snapshot (can be JSON string or array)
+    if (isset($_POST['measurements_snapshot'])) {
+        $orderData['measurements_snapshot'] = $_POST['measurements_snapshot'];
+    }
+
     // Create service instance
     $orderService = new OrderService($conn);
-    
-    // Create order
-    $result = $orderService->createOrder($orderData);
-    
+
+    // Decide which method to use based on whether enhanced fields are present
+    $hasEnhancedFields = isset($_POST['fabric_type']) || isset($_POST['measurement_id']) ||
+        isset($_POST['deadline']) || isset($_POST['design_specifications']);
+
+    if ($hasEnhancedFields) {
+        // Use new enhanced method
+        $result = $orderService->createOrderWithMeasurements($orderData);
+    } else {
+        // Use legacy method for backward compatibility
+        $result = $orderService->createOrder($orderData);
+    }
+
     // Set HTTP status code
     http_response_code($result['success'] ? 201 : 400);
-    
+
     // Return response
     echo json_encode($result);
-    
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
@@ -71,4 +115,3 @@ try {
 
 // Close database connection
 db_close();
-?>

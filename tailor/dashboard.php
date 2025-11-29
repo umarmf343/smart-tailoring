@@ -291,6 +291,223 @@ db_close();
             margin-bottom: 0.5rem;
             display: block;
         }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+
+            /* Hide welcome text in navbar on mobile */
+            .welcome-text {
+                display: none !important;
+            }
+
+            /* Hide navigation menu on mobile */
+            .nav-menu {
+                display: none;
+            }
+
+            /* Make dashboard and logout buttons icon-only on mobile */
+            .btn-dashboard .btn-text,
+            .btn-logout .btn-text {
+                display: none;
+            }
+
+            .btn-dashboard,
+            .btn-logout {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                margin-left: 0.5rem;
+            }
+
+            .btn-dashboard i,
+            .btn-logout i {
+                margin: 0;
+                font-size: 1.1rem;
+            }
+
+            .dashboard-container {
+                padding: 1rem;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Reorder sections for mobile */
+            .dashboard-header {
+                order: 0;
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+                padding: 1.5rem;
+            }
+
+            .dashboard-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .dashboard-header .logout-btn {
+                display: none;
+            }
+
+            .stats-grid {
+                order: 1;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+
+            /* Quick Actions section comes before Profile on mobile */
+            .dashboard-section:has(.quick-actions) {
+                order: 2;
+            }
+
+            .dashboard-section:has(.shop-card) {
+                order: 3;
+            }
+
+            .stat-card {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .stat-content h3 {
+                font-size: 1.5rem;
+            }
+
+            .stat-content p {
+                font-size: 0.75rem;
+            }
+
+            .shop-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+                justify-items: center;
+                gap: 1rem;
+            }
+
+            .shop-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+
+            .shop-details h3 {
+                font-size: 1.3rem;
+            }
+
+            .shop-info {
+                gap: 0.5rem;
+            }
+
+            .info-row {
+                font-size: 0.9rem;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .action-btn {
+                padding: 1rem 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .action-btn i {
+                font-size: 1.5rem;
+            }
+
+            .action-btn strong {
+                font-size: 0.85rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .dashboard-section {
+                padding: 1.5rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-container {
+                padding: 0 0.75rem;
+            }
+
+            .dashboard-header {
+                padding: 1.25rem 1rem;
+            }
+
+            .dashboard-header h1 {
+                font-size: 1.25rem;
+            }
+
+            .stats-grid {
+                gap: 0.4rem;
+            }
+
+            .stat-card {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .stat-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+
+            .stat-content h3 {
+                font-size: 1.25rem;
+            }
+
+            .stat-content p {
+                font-size: 0.7rem;
+            }
+
+            .shop-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+
+            .shop-details h3 {
+                font-size: 1.15rem;
+            }
+
+            .info-row {
+                font-size: 0.85rem;
+            }
+
+            .dashboard-section {
+                padding: 1rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.15rem;
+            }
+
+            .action-btn {
+                padding: 0.85rem 0.4rem;
+            }
+
+            .action-btn i {
+                font-size: 1.3rem;
+            }
+
+            .action-btn strong {
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 
@@ -301,7 +518,7 @@ db_close();
         <div class="nav-container">
             <!-- Logo -->
             <div class="nav-logo">
-                <img src="../assets/images/logo.jpg" alt="Smart Tailoring Service Logo">
+                <img src="../assets/images/logo.png" alt="Smart Tailoring Service Logo">
                 <span class="logo-text">Smart Tailoring Service</span>
             </div>
 
@@ -310,14 +527,18 @@ db_close();
                 <li><a href="../index.php" class="nav-link">Home</a></li>
                 <li><a href="dashboard.php" class="nav-link active">Dashboard</a></li>
                 <li><a href="orders.php" class="nav-link">Orders</a></li>
+
                 <li><a href="profile.php" class="nav-link">Shop Profile</a></li>
             </ul>
 
             <!-- User Info -->
             <div class="nav-auth">
-                <span style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($tailor['owner_name']); ?>!</span>
-                <button class="btn-login-register" onclick="window.location.href='../auth/logout.php'">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <span class="welcome-text" style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($tailor['owner_name']); ?>!</span>
+                <a href="dashboard.php" class="btn-dashboard" title="Dashboard">
+                    <i class="fas fa-tachometer-alt"></i> <span class="btn-text">Dashboard</span>
+                </a>
+                <button class="btn-logout" onclick="window.location.href='../auth/logout.php'">
+                    <i class="fas fa-sign-out-alt"></i> <span class="btn-text">Logout</span>
                 </button>
             </div>
         </div>
@@ -448,6 +669,11 @@ db_close();
             </div>
 
             <div class="quick-actions">
+                <a href="../index.php" class="action-btn">
+                    <i class="fas fa-home"></i>
+                    <strong>Home</strong>
+                </a>
+
                 <a href="orders.php" class="action-btn">
                     <i class="fas fa-inbox"></i>
                     <strong>View Orders</strong>
@@ -456,11 +682,6 @@ db_close();
                 <a href="profile.php" class="action-btn">
                     <i class="fas fa-edit"></i>
                     <strong>Edit Shop Profile</strong>
-                </a>
-
-                <a href="#settings" class="action-btn">
-                    <i class="fas fa-cog"></i>
-                    <strong>Settings</strong>
                 </a>
 
                 <a href="../index.php#tailors" class="action-btn">

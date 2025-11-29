@@ -1,11 +1,20 @@
-# Sensitive configuration
+# Sensitive configuration files (DO NOT COMMIT)
 config/db.php
+config/email.php
+
+# Example files are safe to commit
+# config/config.example.php
+# config/email.example.php
 
 # User uploaded content
 uploads/profiles/*
 uploads/shops/*
 !uploads/profiles/.gitkeep
 !uploads/shops/.gitkeep
+
+# Composer dependencies (optional - uncomment if using composer)
+vendor/
+composer.lock
 
 # System files
 .DS_Store
@@ -14,3 +23,24 @@ Thumbs.db
 *.tmp
 .vscode/
 .idea/
+
+# Environment files
+.env
+.env.local
+
+# Cache and temporary files
+cache/
+temp/
+tmp/
+
+# Node modules (if using any frontend build tools)
+node_modules/
+package-lock.json
+
+# Database backups
+*.sql
+*.sql.gz
+database/backups/
+
+# PHPMailer (if installed via composer, already in vendor/)
+# If manually installed, add the path here

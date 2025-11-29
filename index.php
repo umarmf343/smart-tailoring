@@ -8,14 +8,32 @@
 // Start session to maintain login state
 session_start();
 
+// Include database connection
+define('DB_ACCESS', true);
+require_once 'config/db.php';
+
+// Include concurrent user manager
+require_once 'config/concurrent_users.php';
+
+// Initialize concurrent user manager (max 100 concurrent users)
+$userManager = new ConcurrentUserManager($conn, 100);
+
+// Check if server is full
+if ($userManager->isServerFull()) {
+    $capacity = $userManager->getCapacityInfo();
+    include 'server_busy.php';
+    exit;
+}
+
+// Register/update this session
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+$user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : null;
+$userManager->registerSession($user_id, $user_type);
+
 // Check if user is logged in
 $is_logged_in = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 $user_name = $is_logged_in ? $_SESSION['user_name'] : '';
 $user_type = $is_logged_in ? $_SESSION['user_type'] : '';
-
-// Include database connection
-define('DB_ACCESS', true);
-require_once 'config/db.php';
 ?>
 
 <!DOCTYPE html>
@@ -34,6 +52,9 @@ require_once 'config/db.php';
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MapLibre GL JS CSS (Modern GPU-accelerated maps) -->
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
@@ -72,7 +93,7 @@ require_once 'config/db.php';
             <div class="form-message" id="authMessage"></div>
 
             <!-- LOGIN FORM -->
-            <form id="loginForm" class="auth-form">
+            <form id="loginForm" class="auth-form" autocomplete="off">
                 <input type="hidden" name="user_type" id="loginUserType" value="customer">
 
                 <div class="form-group">
@@ -80,7 +101,7 @@ require_once 'config/db.php';
                     <div class="input-group">
                         <i class="fas fa-envelope input-icon"></i>
                         <input type="email" name="email" class="form-input"
-                            placeholder="Enter your email" required>
+                            placeholder="Enter your email" required autocomplete="off">
                     </div>
                 </div>
 
@@ -89,7 +110,7 @@ require_once 'config/db.php';
                     <div class="input-group">
                         <i class="fas fa-lock input-icon"></i>
                         <input type="password" name="password" id="loginPassword"
-                            class="form-input" placeholder="Enter your password" required>
+                            class="form-input" placeholder="Enter your password" required autocomplete="new-password">
                         <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -100,7 +121,9 @@ require_once 'config/db.php';
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                         <input type="checkbox" name="remember"> Remember Me
                     </label>
-                    <a href="#" style="color: var(--primary-color); text-decoration: none;">Forgot Password?</a>
+                    <a href="#" onclick="showForgotPasswordModal(); return false;" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">
+                        <i class="fas fa-key"></i> Forgot Password?
+                    </a>
                 </div>
 
                 <button type="submit" class="form-button">
@@ -127,7 +150,7 @@ require_once 'config/db.php';
                     <div class="input-group">
                         <i class="fas fa-envelope input-icon"></i>
                         <input type="email" name="email" class="form-input"
-                            placeholder="Enter your email" required>
+                            placeholder="Enter your email" required autocomplete="off">
                     </div>
                 </div>
 
@@ -136,7 +159,8 @@ require_once 'config/db.php';
                     <div class="input-group">
                         <i class="fas fa-phone input-icon"></i>
                         <input type="tel" name="phone" class="form-input"
-                            placeholder="10-digit mobile number" pattern="[6-9][0-9]{9}" required>
+                            placeholder="10-digit mobile number" pattern="[6-9][0-9]{9}"
+                            minlength="10" maxlength="10" required autocomplete="off">
                     </div>
                 </div>
 
@@ -146,7 +170,7 @@ require_once 'config/db.php';
                         <i class="fas fa-lock input-icon"></i>
                         <input type="password" name="password" id="registerPassword"
                             class="form-input" placeholder="Create password (min 6 characters)"
-                            minlength="6" required>
+                            minlength="6" required autocomplete="new-password">
                         <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -213,6 +237,126 @@ require_once 'config/db.php';
                     <a onclick="showRegisterForm()">Register Now</a>
                 </p>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal-overlay" id="forgotPasswordModal" style="display: none;">
+    <div class="modal-container" style="max-width: 500px;">
+        <!-- Modal Header -->
+        <div class="modal-header">
+            <h2><i class="fas fa-key"></i> Reset Password</h2>
+            <p>Enter your email to receive password reset instructions</p>
+            <button class="modal-close" onclick="closeForgotPasswordModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+            <!-- Error/Success Message -->
+            <div class="form-message" id="forgotMessage"></div>
+
+            <!-- Forgot Password Form -->
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label class="form-label">Select Account Type</label>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <label style="flex: 1; display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer;">
+                            <input type="radio" name="user_type" value="customer" checked>
+                            <i class="fas fa-user"></i> Customer
+                        </label>
+                        <label style="flex: 1; display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer;">
+                            <input type="radio" name="user_type" value="tailor">
+                            <i class="fas fa-store"></i> Tailor
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-group">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" name="email" class="form-input"
+                            placeholder="Enter your registered email" required>
+                    </div>
+                    <small style="color: #6b7280; font-size: 0.875rem;">
+                        We'll send you an OTP to reset your password
+                    </small>
+                </div>
+
+                <button type="submit" class="form-button">
+                    <i class="fas fa-paper-plane"></i> Send OTP
+                </button>
+
+                <div style="text-align: center; margin-top: 1rem;">
+                    <a href="#" onclick="backToLogin(); return false;" style="color: var(--primary-color); text-decoration: none;">
+                        <i class="fas fa-arrow-left"></i> Back to Login
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- OTP Verification Modal -->
+<div class="modal-overlay" id="otpModal" style="display: none;">
+    <div class="modal-container" style="max-width: 500px;">
+        <!-- Modal Header -->
+        <div class="modal-header">
+            <h2>📧 Verify Your Email</h2>
+            <p>We've sent a 6-digit OTP to <strong id="otpEmail"></strong></p>
+            <button class="modal-close" onclick="closeOTPModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+            <!-- Success/Error Message -->
+            <div class="form-message" id="otpMessage"></div>
+
+            <form id="otpVerificationForm">
+                <input type="hidden" id="otpEmailHidden" name="email">
+                <input type="hidden" id="otpPurpose" name="purpose" value="registration">
+
+                <div class="form-group">
+                    <label class="form-label">Enter 6-Digit OTP</label>
+                    <div class="input-group">
+                        <i class="fas fa-key input-icon"></i>
+                        <input type="text" name="otp_code" id="otpCode" class="form-input"
+                            placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+                            style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: bold;"
+                            required autocomplete="off">
+                    </div>
+                    <small style="color: #6b7280; font-size: 0.875rem; display: block; margin-top: 0.5rem;">
+                        ⏱️ OTP expires in <strong id="otpTimer">10:00</strong>
+                    </small>
+                </div>
+
+                <button type="submit" class="form-button">
+                    <i class="fas fa-check-circle"></i> Verify OTP
+                </button>
+
+                <div style="text-align: center; margin-top: 1rem;">
+                    <p style="color: #6b7280; font-size: 0.875rem;">Didn't receive the code?</p>
+                    <button type="button" id="resendOtpBtn" onclick="resendOTP()"
+                        style="background: transparent; border: none; color: var(--primary-color); font-weight: 600; cursor: pointer; text-decoration: underline;">
+                        <i class="fas fa-redo"></i> Resend OTP
+                    </button>
+                    <p id="resendTimer" style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem; display: none;">
+                        Resend available in <strong id="resendCountdown">120</strong>s
+                    </p>
+                </div>
+
+                <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                    <button type="button" onclick="skipOTPVerification()"
+                        style="background: transparent; border: none; color: #6b7280; font-size: 0.875rem; cursor: pointer;">
+                        <i class="fas fa-arrow-right"></i> Skip for now (verify later)
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -331,16 +475,16 @@ require_once 'config/db.php';
         <div class="nav-container">
             <!-- Logo -->
             <div class="nav-logo">
-                <img src="assets/images/logo.jpg" alt="Smart Tailoring Service Logo">
+                <img src="assets/images/logo.png" alt="Smart Tailoring Service Logo">
                 <span class="logo-text">Smart Tailoring Service</span>
             </div>
 
             <!-- Navigation Menu -->
-            <ul class="nav-menu" id="navMenu">
+            <ul class="nav-menu">
                 <li><a href="#home" class="nav-link active">Home</a></li>
                 <li><a href="#services" class="nav-link">Services</a></li>
                 <li><a href="#tailors" class="nav-link">Find Tailors</a></li>
-                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li><a href="contact.php" class="nav-link">Contact</a></li>
             </ul>
 
 
@@ -348,32 +492,32 @@ require_once 'config/db.php';
             <div class="nav-auth">
                 <?php if ($is_logged_in): ?>
                     <!-- Logged in state -->
-                    <span style="margin-right: 1rem; color: var(--text-dark);">
+                    <span class="welcome-text" style="margin-right: 1rem; color: var(--text-dark);">
                         Welcome, <strong><?php echo htmlspecialchars($user_name); ?></strong>!
                     </span>
-                    <button class="btn-login-register" onclick="window.location.href='<?php echo $user_type === 'customer' ? 'customer' : 'tailor'; ?>/dashboard.php'">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    <button class="btn-dashboard" onclick="window.location.href='<?php echo $user_type === 'customer' ? 'customer' : 'tailor'; ?>/dashboard.php'">
+                        <i class="fas fa-tachometer-alt"></i> <span class="btn-text">Dashboard</span>
                     </button>
-                    <button class="btn-login-register" style="margin-left: 0.5rem; background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color);" onclick="window.location.href='auth/logout.php'">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                    <button class="btn-logout" onclick="window.location.href='auth/logout.php'">
+                        <i class="fas fa-sign-out-alt"></i> <span class="btn-text">Logout</span>
                     </button>
                 <?php else: ?>
                     <!-- Not logged in state -->
                     <button class="btn-login-register" onclick="openLoginModal()">
-                        Login & Register
+                        <span class="login-text-full">Login & Register</span>
+                        <span class="login-text-short">Login</span>
                     </button>
                 <?php endif; ?>
-            </div>
 
+                <!-- Admin Login Button (Always visible) -->
+                <button class="btn-admin-login" onclick="window.location.href='admin/'" title="Admin Portal">
+                    <i class="fas fa-shield-alt"></i>
+                </button>
+            </div>
 
             <!-- Search Icon -->
-            <div class="nav-search">
+            <div class="nav-search" onclick="activateSearch()" style="cursor: pointer;" title="Search Tailors">
                 <i class="fas fa-search"></i>
-            </div>
-
-            <!-- Mobile Menu Toggle -->
-            <div class="mobile-menu-icon" onclick="toggleMobileMenu()">
-                <i class="fas fa-bars"></i>
             </div>
         </div>
     </nav>
@@ -383,10 +527,11 @@ require_once 'config/db.php';
         <div class="hero-overlay"></div>
         <div class="hero-container">
             <div class="hero-content">
-                <h1 class="hero-title">Find the Best Tailors in Satna</h1>
+                <h1 class="hero-title">Find skilled tailors to - Snip, Stitch Style Up!</h1>
                 <p class="hero-subtitle">
-                    Connect with skilled tailors and get your clothes stitched, altered,
-                    or repaired with just a few clicks.
+                    From fabric to fashion — in your way.
+                    <br>
+                    Custom fits, bold styles, crafted just for you.
                 </p>
                 <div class="hero-buttons">
                     <button class="btn btn-primary" onclick="scrollToTailors()">
@@ -396,6 +541,9 @@ require_once 'config/db.php';
                         <i class="fas fa-store"></i> Register Your Shop
                     </button>
                 </div>
+                <p class="hero-subtitle">
+                    Dress it. Flaunt it. Snitch it.
+                </p>
 
                 <!-- Stats -->
                 <div class="hero-stats">
@@ -515,7 +663,7 @@ require_once 'config/db.php';
                         <li><a href="#home">Home</a></li>
                         <li><a href="#services">Services</a></li>
                         <li><a href="#tailors">Find Tailors</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="contact.php">Contact</a></li>
                     </ul>
                 </div>
 
@@ -523,10 +671,10 @@ require_once 'config/db.php';
                 <div class="footer-column">
                     <h3 class="footer-heading">Extra Links</h3>
                     <ul class="footer-links">
-                        <li><a href="#faq">Ask Questions</a></li>
-                        <li><a href="#terms">Terms Of Use</a></li>
-                        <li><a href="#privacy">Privacy Policy</a></li>
-                        <li><a href="#about">About Us</a></li>
+                        <li><a href="faq.php">Ask Questions</a></li>
+                        <li><a href="terms.php">Terms Of Use</a></li>
+                        <li><a href="privacy.php">Privacy Policy</a></li>
+                        <li><a href="about.php">About Us</a></li>
                     </ul>
                 </div>
 
@@ -568,10 +716,14 @@ require_once 'config/db.php';
         </div>
     </footer>
 
-    <!-- Custom JavaScript -->
-    <script src="assets/js/app.js"></script>
+    <!-- MapLibre GL JS (Modern GPU-accelerated maps - free, no API key) -->
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 
-    <!-- Load stats dynamically -->
+    <!-- Map Integration Script -->
+    <script src="assets/js/map-integration.js"></script>
+
+    <!-- Custom JavaScript -->
+    <!-- app.js already loaded above -->
     <script>
         // Load database stats
         fetch('api/get_stats.php')

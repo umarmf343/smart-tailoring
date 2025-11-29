@@ -27,8 +27,11 @@ $shop_name = $_SESSION['shop_name'];
     <link rel="icon" type="image/jpg" href="../assets/images/STP-favicon.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
 
+    <!-- MapLibre GL JS CSS (Modern GPU-accelerated maps) -->
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         /* Same styles as customer profile.php */
         .profile-container {
@@ -301,12 +304,134 @@ $shop_name = $_SESSION['shop_name'];
         }
 
         @media (max-width: 768px) {
+
+            /* Hide welcome text in navbar on mobile */
+            .welcome-text {
+                display: none !important;
+            }
+
+            /* Hide navigation menu on mobile */
+            .nav-menu {
+                display: none;
+            }
+
+            /* Make dashboard and logout buttons icon-only on mobile */
+            .btn-dashboard .btn-text,
+            .btn-logout .btn-text {
+                display: none;
+            }
+
+            .btn-dashboard,
+            .btn-logout {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                margin-left: 0.5rem;
+            }
+
+            .btn-dashboard i,
+            .btn-logout i {
+                margin: 0;
+                font-size: 1.1rem;
+            }
+
+            .profile-container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .page-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+
             .profile-content {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .profile-sidebar {
+                padding: 1.25rem;
+            }
+
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+
+            .profile-main {
+                padding: 1.25rem;
             }
 
             .form-row {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .form-button {
+                padding: 0.85rem;
+                font-size: 0.95rem;
+            }
+
+            #map {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-container {
+                padding: 0 0.75rem;
+            }
+
+            .page-header {
+                padding: 1.25rem 0.85rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.25rem;
+            }
+
+            .profile-sidebar,
+            .profile-main {
+                padding: 1rem;
+            }
+
+            .profile-avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 2.25rem;
+            }
+
+            .profile-name {
+                font-size: 1.1rem;
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+            }
+
+            .form-input,
+            .form-select,
+            .form-textarea {
+                padding: 0.75rem;
+                font-size: 0.95rem;
+            }
+
+            .form-button {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            #map {
+                height: 220px;
             }
         }
     </style>
@@ -318,7 +443,7 @@ $shop_name = $_SESSION['shop_name'];
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <img src="../assets/images/logo.jpg" alt="Logo">
+                <img src="../assets/images/logo.png" alt="Logo">
                 <span class="logo-text">Smart Tailoring Service</span>
             </div>
 
@@ -330,9 +455,12 @@ $shop_name = $_SESSION['shop_name'];
             </ul>
 
             <div class="nav-auth">
-                <span style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($tailor_name); ?>!</span>
-                <button class="btn-login-register" onclick="window.location.href='../auth/logout.php'">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <span class="welcome-text" style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($tailor_name); ?>!</span>
+                <a href="dashboard.php" class="btn-dashboard" title="Dashboard">
+                    <i class="fas fa-tachometer-alt"></i> <span class="btn-text">Dashboard</span>
+                </a>
+                <button class="btn-logout" onclick="window.location.href='../auth/logout.php'">
+                    <i class="fas fa-sign-out-alt"></i> <span class="btn-text">Logout</span>
                 </button>
             </div>
         </div>
@@ -385,6 +513,17 @@ $shop_name = $_SESSION['shop_name'];
                         </a>
                     </li>
                 </ul>
+
+                <!-- Location Setter Button -->
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+                    <button onclick="showLocationSetterModal()" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Set Shop Location</span>
+                    </button>
+                    <p style="font-size: 0.75rem; color: #6b7280; text-align: center; margin-top: 0.5rem;">
+                        Help customers find you on map
+                    </p>
+                </div>
             </div>
 
             <!-- Main Content -->
@@ -401,25 +540,39 @@ $shop_name = $_SESSION['shop_name'];
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">Shop Name *</label>
-                                <input type="text" name="shop_name" class="form-input" id="shopName" required>
+                                <input type="text" name="shop_name" class="form-input" id="shopName"
+                                    required pattern="[A-Za-z0-9\s&'-]{2,100}"
+                                    title="Shop name should be 2-100 characters"
+                                    minlength="2" maxlength="100">
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Owner Name *</label>
-                                <input type="text" name="owner_name" class="form-input" id="ownerName" required>
+                                <input type="text" name="owner_name" class="form-input" id="ownerName"
+                                    required pattern="[A-Za-z\s]{2,50}"
+                                    title="Name should only contain letters and spaces (2-50 characters)"
+                                    minlength="2" maxlength="50">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">Email *</label>
-                                <input type="email" name="email" class="form-input" id="email" required>
+                                <input type="email" name="email" class="form-input" id="email"
+                                    required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                                    title="Email cannot be changed"
+                                    maxlength="100" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
+                                <small style="color: #6b7280; font-size: 0.875rem; display: block; margin-top: 0.25rem;">
+                                    <i class="fas fa-info-circle"></i> Email cannot be changed for security reasons
+                                </small>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Phone Number *</label>
                                 <input type="tel" name="phone" class="form-input" id="phone"
-                                    pattern="[0-9]{10}" placeholder="10 digit phone number" required>
+                                    pattern="[6-9][0-9]{9}" placeholder="10 digit phone number"
+                                    title="Phone number must be 10 digits starting with 6-9"
+                                    minlength="10" maxlength="10" required>
                             </div>
                         </div>
 
@@ -427,7 +580,9 @@ $shop_name = $_SESSION['shop_name'];
                             <div class="form-group">
                                 <label class="form-label">Shop Address *</label>
                                 <textarea name="shop_address" class="form-input form-textarea" id="shopAddress"
-                                    placeholder="Enter your shop address" required></textarea>
+                                    placeholder="Enter your shop address" required
+                                    minlength="10" maxlength="500"
+                                    title="Address should be between 10 and 500 characters"></textarea>
                             </div>
                         </div>
 
@@ -435,13 +590,18 @@ $shop_name = $_SESSION['shop_name'];
                             <div class="form-group">
                                 <label class="form-label">Area *</label>
                                 <input type="text" name="area" class="form-input" id="area"
-                                    placeholder="e.g., Civil Lines, Ramnagar" required>
+                                    placeholder="e.g., Civil Lines, Ramnagar" required
+                                    pattern="[A-Za-z\s,.-]{2,50}"
+                                    title="Area name should be 2-50 characters"
+                                    minlength="2" maxlength="50">
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Speciality</label>
                                 <input type="text" name="speciality" class="form-input" id="speciality"
-                                    placeholder="e.g., Wedding Specialist, Designer Work">
+                                    placeholder="e.g., Wedding Specialist, Designer Work"
+                                    maxlength="100"
+                                    title="Speciality should not exceed 100 characters">
                             </div>
                         </div>
 
@@ -449,7 +609,9 @@ $shop_name = $_SESSION['shop_name'];
                             <div class="form-group">
                                 <label class="form-label">Services Offered</label>
                                 <input type="text" name="services_offered" class="form-input" id="servicesOffered"
-                                    placeholder="e.g., Stitching, Alteration, Embroidery">
+                                    placeholder="e.g., Stitching, Alteration, Embroidery"
+                                    maxlength="200"
+                                    title="Services should not exceed 200 characters">
                             </div>
                         </div>
 
@@ -457,13 +619,16 @@ $shop_name = $_SESSION['shop_name'];
                             <div class="form-group">
                                 <label class="form-label">Experience (Years)</label>
                                 <input type="number" name="experience_years" class="form-input" id="experienceYears"
-                                    min="0" max="50" placeholder="Years of experience">
+                                    min="0" max="50" placeholder="Years of experience"
+                                    title="Experience should be between 0 and 50 years">
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Price Range</label>
                                 <input type="text" name="price_range" class="form-input" id="priceRange"
-                                    placeholder="e.g., ₹500-2000, Budget Friendly">
+                                    placeholder="e.g., ₹500-2000, Budget Friendly"
+                                    maxlength="50"
+                                    title="Price range should not exceed 50 characters">
                             </div>
                         </div>
 
@@ -765,6 +930,12 @@ $shop_name = $_SESSION['shop_name'];
             alert.classList.remove('show');
         }
     </script>
+
+    <!-- MapLibre GL JS (Modern GPU-accelerated maps - free, no API key) -->
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+
+    <!-- Map Integration Script -->
+    <script src="../assets/js/map-integration.js"></script>
 
 </body>
 

@@ -5,16 +5,22 @@
  * Allows customers to edit their profile and change password
  */
 
-session_start();
+// Security
+define('DB_ACCESS', true);
+require_once '../config/session_check.php';
+require_once '../config/security.php';
 
-// Check if user is logged in and is a customer
-if (!isset($_SESSION['logged_in']) || $_SESSION['user_type'] !== 'customer') {
+// Check if user is customer
+if ($_SESSION['user_type'] !== 'customer') {
     header('Location: ../index.php');
     exit;
 }
 
 $customer_id = $_SESSION['user_id'];
 $customer_name = $_SESSION['user_name'];
+
+// Generate CSRF token
+$csrf_token = generate_csrf_token();
 ?>
 
 <!DOCTYPE html>
@@ -301,12 +307,124 @@ $customer_name = $_SESSION['user_name'];
         }
 
         @media (max-width: 768px) {
+
+            /* Hide welcome text in navbar on mobile */
+            .welcome-text {
+                display: none !important;
+            }
+
+            /* Hide navigation menu on mobile */
+            .nav-menu {
+                display: none;
+            }
+
+            /* Make dashboard and logout buttons icon-only on mobile */
+            .btn-dashboard .btn-text,
+            .btn-logout .btn-text {
+                display: none;
+            }
+
+            .btn-dashboard,
+            .btn-logout {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                margin-left: 0.5rem;
+            }
+
+            .btn-dashboard i,
+            .btn-logout i {
+                margin: 0;
+                font-size: 1.1rem;
+            }
+
+            .profile-container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .page-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+
             .profile-content {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .profile-sidebar {
+                padding: 1.25rem;
+            }
+
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+
+            .profile-main {
+                padding: 1.25rem;
             }
 
             .form-row {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .form-button {
+                padding: 0.85rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-container {
+                padding: 0 0.75rem;
+            }
+
+            .page-header {
+                padding: 1.25rem 0.85rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.25rem;
+            }
+
+            .profile-sidebar,
+            .profile-main {
+                padding: 1rem;
+            }
+
+            .profile-avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 2.25rem;
+            }
+
+            .profile-name {
+                font-size: 1.1rem;
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+            }
+
+            .form-input {
+                padding: 0.75rem;
+                font-size: 0.95rem;
+            }
+
+            .form-button {
+                padding: 0.75rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -318,7 +436,7 @@ $customer_name = $_SESSION['user_name'];
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <img src="../assets/images/logo.jpg" alt="Logo">
+                <img src="../assets/images/logo.png" alt="Logo">
                 <span class="logo-text">Smart Tailoring Service</span>
             </div>
 
@@ -330,9 +448,12 @@ $customer_name = $_SESSION['user_name'];
             </ul>
 
             <div class="nav-auth">
-                <span style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($customer_name); ?>!</span>
-                <button class="btn-login-register" onclick="window.location.href='../auth/logout.php'">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <span class="welcome-text" style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($customer_name); ?>!</span>
+                <a href="dashboard.php" class="btn-dashboard" title="Dashboard">
+                    <i class="fas fa-tachometer-alt"></i> <span class="btn-text">Dashboard</span>
+                </a>
+                <button class="btn-logout" onclick="window.location.href='../auth/logout.php'">
+                    <i class="fas fa-sign-out-alt"></i> <span class="btn-text">Logout</span>
                 </button>
             </div>
         </div>
@@ -401,12 +522,21 @@ $customer_name = $_SESSION['user_name'];
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">Full Name *</label>
-                                <input type="text" name="full_name" class="form-input" id="fullName" required>
+                                <input type="text" name="full_name" class="form-input" id="fullName"
+                                    required pattern="[A-Za-z\s]{2,50}"
+                                    title="Name should only contain letters and spaces (2-50 characters)"
+                                    minlength="2" maxlength="50">
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Email *</label>
-                                <input type="email" name="email" class="form-input" id="email" required>
+                                <input type="email" name="email" class="form-input" id="email"
+                                    required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                                    title="Email cannot be changed"
+                                    maxlength="100" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
+                                <small style="color: #6b7280; font-size: 0.875rem; display: block; margin-top: 0.25rem;">
+                                    <i class="fas fa-info-circle"></i> Email cannot be changed for security reasons
+                                </small>
                             </div>
                         </div>
 
@@ -414,7 +544,9 @@ $customer_name = $_SESSION['user_name'];
                             <div class="form-group">
                                 <label class="form-label">Phone Number *</label>
                                 <input type="tel" name="phone" class="form-input" id="phone"
-                                    pattern="[0-9]{10}" placeholder="10 digit phone number" required>
+                                    pattern="[6-9][0-9]{9}" placeholder="10 digit phone number"
+                                    title="Phone number must be 10 digits starting with 6-9"
+                                    minlength="10" maxlength="10" required>
                             </div>
                         </div>
 
@@ -422,7 +554,9 @@ $customer_name = $_SESSION['user_name'];
                             <div class="form-group">
                                 <label class="form-label">Address</label>
                                 <textarea name="address" class="form-input form-textarea" id="address"
-                                    placeholder="Enter your full address"></textarea>
+                                    placeholder="Enter your full address"
+                                    maxlength="500"
+                                    title="Address should not exceed 500 characters"></textarea>
                             </div>
                         </div>
 

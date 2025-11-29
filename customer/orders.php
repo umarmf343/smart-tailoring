@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Customer Orders Page
  * Displays all orders for the logged-in customer
@@ -18,23 +19,24 @@ $customer_name = $_SESSION['user_name'];
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - Smart Tailoring Service</title>
-    
+
     <link rel="icon" type="image/jpg" href="../assets/images/STP-favicon.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    
+
     <style>
         .orders-container {
             max-width: 1400px;
             margin: 2rem auto;
             padding: 0 2rem;
         }
-        
+
         .page-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: var(--white);
@@ -42,17 +44,17 @@ $customer_name = $_SESSION['user_name'];
             border-radius: var(--radius-lg);
             margin-bottom: 2rem;
         }
-        
+
         .page-header h1 {
             margin: 0;
             font-size: 2rem;
         }
-        
+
         .orders-grid {
             display: grid;
             gap: 1.5rem;
         }
-        
+
         .order-card {
             background: var(--white);
             border-radius: var(--radius-lg);
@@ -61,12 +63,12 @@ $customer_name = $_SESSION['user_name'];
             border: 2px solid var(--border-color);
             transition: all 0.3s ease;
         }
-        
+
         .order-card:hover {
             border-color: var(--primary-color);
             box-shadow: var(--shadow-lg);
         }
-        
+
         .order-header {
             display: flex;
             justify-content: space-between;
@@ -75,64 +77,128 @@ $customer_name = $_SESSION['user_name'];
             padding-bottom: 1rem;
             border-bottom: 2px solid var(--light-bg);
         }
-        
+
         .order-number {
             font-size: 1.25rem;
             font-weight: 700;
             color: var(--text-dark);
         }
-        
+
         .order-status {
             padding: 0.5rem 1rem;
             border-radius: 50px;
             font-weight: 600;
             font-size: 0.9rem;
         }
-        
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-accepted { background: #dbeafe; color: #1e40af; }
-        .status-in_progress { background: #e0e7ff; color: #4338ca; }
-        .status-ready { background: #d1fae5; color: #065f46; }
-        .status-completed { background: #d1fae5; color: #065f46; }
-        .status-cancelled { background: #fee2e2; color: #991b1b; }
-        
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-booked {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-cutting {
+            background: #e0d4ff;
+            color: #6b21a8;
+        }
+
+        .status-stitching {
+            background: #ddd6fe;
+            color: #5b21b6;
+        }
+
+        .status-first_fitting {
+            background: #fce7f3;
+            color: #9f1239;
+        }
+
+        .status-alterations {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .status-final_fitting {
+            background: #cffafe;
+            color: #155e75;
+        }
+
+        .status-ready_for_pickup {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-delivered {
+            background: #bbf7d0;
+            color: #14532d;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Legacy status support */
+        .status-accepted {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-in_progress {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .status-ready {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
         .order-body {
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 2rem;
         }
-        
+
         .order-details {
             display: grid;
             gap: 0.75rem;
         }
-        
+
         .detail-row {
             display: flex;
             gap: 0.5rem;
         }
-        
+
         .detail-label {
             font-weight: 600;
             color: var(--text-light);
             min-width: 140px;
         }
-        
+
         .detail-value {
             color: var(--text-dark);
         }
-        
+
         .tailor-info {
             background: var(--light-bg);
             padding: 1.5rem;
             border-radius: var(--radius-md);
         }
-        
+
         .tailor-info h4 {
             margin: 0 0 1rem 0;
             color: var(--text-dark);
         }
-        
+
         .order-actions {
             display: flex;
             gap: 1rem;
@@ -140,7 +206,7 @@ $customer_name = $_SESSION['user_name'];
             padding-top: 1.5rem;
             border-top: 2px solid var(--light-bg);
         }
-        
+
         .btn-action {
             padding: 0.75rem 1.5rem;
             border: none;
@@ -149,25 +215,25 @@ $customer_name = $_SESSION['user_name'];
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .btn-cancel {
             background: #fee2e2;
             color: #991b1b;
         }
-        
+
         .btn-cancel:hover {
             background: #fecaca;
         }
-        
+
         .btn-details {
             background: var(--primary-color);
             color: var(--white);
         }
-        
+
         .btn-details:hover {
             background: var(--secondary-color);
         }
-        
+
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
@@ -175,35 +241,197 @@ $customer_name = $_SESSION['user_name'];
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
         }
-        
+
         .empty-state i {
             font-size: 4rem;
             color: var(--primary-color);
             margin-bottom: 1rem;
         }
+
+        @media (max-width: 768px) {
+
+            /* Hide welcome text in navbar on mobile */
+            .welcome-text {
+                display: none !important;
+            }
+
+            /* Hide navigation menu on mobile */
+            .nav-menu {
+                display: none;
+            }
+
+            /* Make dashboard and logout buttons icon-only on mobile */
+            .btn-dashboard .btn-text,
+            .btn-logout .btn-text {
+                display: none;
+            }
+
+            .btn-dashboard,
+            .btn-logout {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                margin-left: 0.5rem;
+            }
+
+            .btn-dashboard i,
+            .btn-logout i {
+                margin: 0;
+                font-size: 1.1rem;
+            }
+
+            .orders-container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .orders-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            /* Order card mobile responsive */
+            .order-card {
+                padding: 1rem;
+            }
+
+            .order-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+
+            .order-number {
+                font-size: 1rem;
+            }
+
+            .order-status {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.85rem;
+            }
+
+            .order-body {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .detail-label {
+                min-width: auto;
+                font-size: 0.85rem;
+            }
+
+            .detail-value {
+                font-size: 0.95rem;
+                font-weight: 500;
+            }
+
+            .tailor-info {
+                padding: 1rem;
+            }
+
+            .tailor-info h4 {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .order-actions {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .btn-action {
+                width: 100%;
+                padding: 0.75rem;
+                justify-content: center;
+                font-size: 0.9rem;
+            }
+
+            .page-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .orders-container {
+                padding: 0 0.75rem;
+            }
+
+            .page-header {
+                padding: 1.25rem 0.85rem;
+                margin-bottom: 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.25rem;
+            }
+
+            .order-card {
+                padding: 0.85rem;
+            }
+
+            .order-number {
+                font-size: 0.9rem;
+            }
+
+            .order-status {
+                font-size: 0.75rem;
+                padding: 0.35rem 0.75rem;
+            }
+
+            .detail-label {
+                font-size: 0.8rem;
+            }
+
+            .detail-value {
+                font-size: 0.9rem;
+            }
+
+            .btn-action {
+                padding: 0.65rem;
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <img src="../assets/images/logo.jpg" alt="Logo">
+                <img src="../assets/images/logo.png" alt="Logo">
                 <span class="logo-text">Smart Tailoring Service</span>
             </div>
-            
+
             <ul class="nav-menu">
                 <li><a href="../index.php" class="nav-link">Home</a></li>
                 <li><a href="dashboard.php" class="nav-link">Dashboard</a></li>
                 <li><a href="orders.php" class="nav-link active">My Orders</a></li>
+                <li><a href="measurements.php" class="nav-link">Measurements</a></li>
                 <li><a href="profile.php" class="nav-link">Profile</a></li>
             </ul>
-            
+
             <div class="nav-auth">
-                <span style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($customer_name); ?>!</span>
-                <button class="btn-login-register" onclick="window.location.href='../auth/logout.php'">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <span class="welcome-text" style="margin-right: 1rem;">Welcome, <?php echo htmlspecialchars($customer_name); ?>!</span>
+                <a href="dashboard.php" class="btn-dashboard" title="Dashboard">
+                    <i class="fas fa-tachometer-alt"></i> <span class="btn-text">Dashboard</span>
+                </a>
+                <button class="btn-logout" onclick="window.location.href='../auth/logout.php'">
+                    <i class="fas fa-sign-out-alt"></i> <span class="btn-text">Logout</span>
                 </button>
             </div>
         </div>
@@ -211,7 +439,7 @@ $customer_name = $_SESSION['user_name'];
 
     <!-- Orders Container -->
     <div class="orders-container">
-        
+
         <!-- Page Header -->
         <div class="page-header">
             <h1><i class="fas fa-shopping-bag"></i> My Orders</h1>
@@ -269,7 +497,7 @@ $customer_name = $_SESSION['user_name'];
         // Display orders
         function displayOrders(orders) {
             const grid = document.getElementById('ordersGrid');
-            
+
             if (orders.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
@@ -283,7 +511,7 @@ $customer_name = $_SESSION['user_name'];
                 `;
                 return;
             }
-            
+
             grid.innerHTML = orders.map(order => createOrderCard(order)).join('');
         }
 
@@ -292,7 +520,7 @@ $customer_name = $_SESSION['user_name'];
             const statusClass = `status-${order.order_status}`;
             const statusText = order.order_status.replace('_', ' ').toUpperCase();
             const canCancel = ['pending', 'accepted'].includes(order.order_status);
-            
+
             return `
                 <div class="order-card">
                     <div class="order-header">
@@ -369,10 +597,10 @@ $customer_name = $_SESSION['user_name'];
         function formatDate(dateString) {
             if (!dateString) return 'N/A';
             const date = new Date(dateString);
-            return date.toLocaleDateString('en-IN', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
+            return date.toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
             });
         }
 
@@ -381,27 +609,27 @@ $customer_name = $_SESSION['user_name'];
             if (!confirm('Are you sure you want to cancel this order?')) {
                 return;
             }
-            
+
             const formData = new FormData();
             formData.append('order_id', orderId);
-            
+
             fetch('../api/orders/cancel_order.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Order cancelled successfully');
-                    loadOrders(); // Reload orders
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to cancel order');
-            });
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Order cancelled successfully');
+                        loadOrders(); // Reload orders
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to cancel order');
+                });
         }
 
         // View order details
@@ -411,5 +639,9 @@ $customer_name = $_SESSION['user_name'];
         }
     </script>
 
+    <!-- Enhanced Order Features -->
+    <script src="../assets/js/order-enhancements.js"></script>
+
 </body>
+
 </html>

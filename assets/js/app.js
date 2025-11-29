@@ -25,11 +25,36 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize filters
     initFilters();
 
+    // Prevent autofill on login forms
+    preventAutofill();
+
     // Check login status
     //  checkLoginStatus();
 
-    console.log('Smart Tailoring Service initialized successfully!');
 });
+
+// ============================================
+// PREVENT AUTOFILL
+// ============================================
+function preventAutofill() {
+    // Get all password and email inputs in login/register forms
+    const inputs = document.querySelectorAll('#loginForm input, #registerForm input');
+
+    inputs.forEach(input => {
+        // Remove readonly on focus to allow user input
+        input.addEventListener('focus', function () {
+            this.removeAttribute('readonly');
+        });
+
+        // Add readonly initially to prevent autofill
+        input.setAttribute('readonly', 'readonly');
+
+        // Remove readonly after a short delay to prevent autofill but allow normal typing
+        setTimeout(() => {
+            input.removeAttribute('readonly');
+        }, 500);
+    });
+}
 
 // ============================================
 // SMOOTH SCROLLING
@@ -164,6 +189,7 @@ function createTailorCard(tailor) {
     card.dataset.area = tailor.area;
     card.dataset.verified = tailor.is_verified;
     card.dataset.priceRange = tailor.price_range;
+    card.dataset.rating = tailor.rating || 0;
 
     // Prepare services array
     const services = tailor.services_offered ? tailor.services_offered.split(',').slice(0, 3) : [];
@@ -179,9 +205,9 @@ function createTailorCard(tailor) {
         <div class="tailor-header-section">
             <div class="tailor-image-left">
                 ${tailor.shop_image
-                ? `<img src="/smart/smart-tailoring/uploads/shops/${tailor.shop_image}" alt="${tailor.shop_name}">`
-                : `<div class="tailor-avatar-left">${tailor.shop_name.charAt(0).toUpperCase()}</div>`
-            }
+            ? `<img src="/smart/smart-tailoring/uploads/shops/${tailor.shop_image}" alt="${tailor.shop_name}">`
+            : `<div class="tailor-avatar-left">${tailor.shop_name.charAt(0).toUpperCase()}</div>`
+        }
             </div>
             
             <div class="tailor-title-right">
@@ -219,8 +245,8 @@ function createTailorCard(tailor) {
             <div class="services-row">
                 <span class="services-label">Services:</span>
                 ${services.map(service =>
-                    `<span class="service-badge">${service.trim()}</span>`
-                ).join('')}
+            `<span class="service-badge">${service.trim()}</span>`
+        ).join('')}
             </div>
         </div>
         
@@ -268,8 +294,28 @@ function callTailor(phone) {
 }
 
 function showLocation(tailorId) {
-    alert('Map integration coming soon! Tailor ID: ' + tailorId);
-    // TODO: Implement Google Maps integration
+    // Fetch tailor data to get location coordinates
+    fetch(`api/get_tailors.php`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.tailors) {
+                const tailor = data.tailors.find(t => t.id == tailorId);
+                if (tailor) {
+                    if (tailor.latitude && tailor.longitude) {
+                        // Show location on map
+                        showLocationModal(tailor.id, tailor.shop_name, parseFloat(tailor.latitude), parseFloat(tailor.longitude));
+                    } else {
+                        alert('📍 Location not set for this tailor shop yet.');
+                    }
+                } else {
+                    alert('Tailor not found');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to load tailor location');
+        });
 }
 
 function placeOrder(tailorId) {
@@ -338,8 +384,26 @@ function initSearch() {
     }
 }
 
+// Activate search from navigation icon
+function activateSearch() {
+    // Scroll to tailors section
+    const tailorsSection = document.getElementById('tailors');
+    if (tailorsSection) {
+        tailorsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Focus on search input after scrolling
+        setTimeout(() => {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.select();
+            }
+        }, 800);
+    }
+}
+
 function filterTailors(searchTerm) {
-    const tailorCards = document.querySelectorAll('.tailor-card');
+    const tailorCards = document.querySelectorAll('.tailor-card-compact');
 
     tailorCards.forEach(card => {
         const text = card.textContent.toLowerCase();
@@ -372,15 +436,20 @@ function initFilters() {
 }
 
 function applyFilter(filter) {
-    const tailorCards = document.querySelectorAll('.tailor-card');
+    const tailorCards = document.querySelectorAll('.tailor-card-compact');
 
     tailorCards.forEach(card => {
         if (filter === 'all') {
             card.style.display = 'block';
         } else if (filter === 'verified') {
+            // Show only verified tailors
             card.style.display = card.dataset.verified === '1' ? 'block' : 'none';
         } else if (filter === 'premium') {
-            card.style.display = card.dataset.priceRange === 'premium' ? 'block' : 'none';
+            // Show verified tailors with 5-star rating
+            const isVerified = card.dataset.verified === '1';
+            const rating = parseFloat(card.dataset.rating || 0);
+            const isPremium = isVerified && rating >= 5.0;
+            card.style.display = isPremium ? 'block' : 'none';
         }
     });
 }
@@ -390,7 +459,6 @@ function applyFilter(filter) {
 // ============================================
 function viewTailorDetails(tailorId) {
     // TODO: Implement tailor details modal or page
-    console.log('View details for tailor ID:', tailorId);
     alert('Tailor details feature coming soon! Tailor ID: ' + tailorId);
 }
 
@@ -415,7 +483,6 @@ function viewTailorDetails(tailorId) {
 
 function updateUIForLoggedInUser() {
     // TODO: Update UI when user is logged in
-    console.log('User logged in:', currentUser);
 }
 
 // ============================================
@@ -726,13 +793,23 @@ function handleRegister() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showAuthMessage(data.message, 'success');
-
-                // Switch to login form after 2 seconds
-                setTimeout(() => {
-                    showLoginForm();
-                    form.reset();
-                }, 2000);
+                if (data.requires_otp) {
+                    // Show OTP verification modal
+                    showAuthMessage(data.message, 'success');
+                    setTimeout(() => {
+                        closeAuthModal();
+                        showOTPModal(data.email, data.user_type);
+                    }, 1500);
+                } else {
+                    // No OTP required, proceed to login
+                    showAuthMessage(data.message, 'success');
+                    setTimeout(() => {
+                        showLoginForm();
+                        form.reset();
+                    }, 2000);
+                }
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             } else {
                 showAuthMessage(data.message, 'error');
                 submitBtn.disabled = false;
@@ -749,7 +826,6 @@ function handleRegister() {
 
 
 
-console.log('Authentication system initialized!');
 
 // Helper function to generate star icons
 function generateStars(rating) {
@@ -910,3 +986,477 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+// ==================== FORGOT PASSWORD FUNCTIONALITY ====================
+
+// Show forgot password modal
+function showForgotPasswordModal() {
+    const authModal = document.getElementById('authModal');
+    const forgotModal = document.getElementById('forgotPasswordModal');
+
+    if (authModal) authModal.style.display = 'none';
+    if (forgotModal) {
+        forgotModal.style.display = 'flex';
+        // Clear previous messages and form
+        document.getElementById('forgotMessage').style.display = 'none';
+        document.getElementById('forgotPasswordForm').reset();
+    }
+}
+
+// Close forgot password modal
+function closeForgotPasswordModal() {
+    const forgotModal = document.getElementById('forgotPasswordModal');
+    if (forgotModal) {
+        forgotModal.style.display = 'none';
+        document.getElementById('forgotMessage').style.display = 'none';
+        document.getElementById('forgotPasswordForm').reset();
+    }
+}
+
+// Back to login modal
+function backToLogin() {
+    const authModal = document.getElementById('authModal');
+    const forgotModal = document.getElementById('forgotPasswordModal');
+
+    if (forgotModal) forgotModal.style.display = 'none';
+    if (authModal) {
+        authModal.style.display = 'flex';
+        showLogin(); // Show login tab
+    }
+}
+
+// Handle forgot password form submission
+document.addEventListener('DOMContentLoaded', function () {
+    const forgotForm = document.getElementById('forgotPasswordForm');
+
+    if (forgotForm) {
+        forgotForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const emailInput = forgotForm.querySelector('input[name="email"]');
+            const email = emailInput ? emailInput.value.trim() : '';
+            const userType = forgotForm.querySelector('input[name="user_type"]:checked')?.value;
+            const messageDiv = document.getElementById('forgotMessage');
+            const submitBtn = forgotForm.querySelector('button[type="submit"]');
+
+            // Validate inputs
+            if (!email || !userType) {
+                if (messageDiv) {
+                    messageDiv.textContent = 'Please fill in all fields';
+                    messageDiv.className = 'forgot-message error';
+                    messageDiv.style.display = 'block';
+                }
+                return;
+            }
+
+            // Show loading state
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending OTP...';
+
+            try {
+                // Send OTP for password reset
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('purpose', 'password_reset');
+                formData.append('user_type', userType);
+
+                const response = await fetch('api/otp/send_otp.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Close forgot password modal and show OTP modal
+                    closeForgotPasswordModal();
+                    showOTPModal(email, userType, 'password_reset');
+                } else {
+                    if (messageDiv) {
+                        messageDiv.textContent = data.message || 'Failed to send OTP';
+                        messageDiv.className = 'forgot-message error';
+                        messageDiv.style.display = 'block';
+                    }
+                }
+
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+
+            } catch (error) {
+                console.error('Forgot password error:', error);
+                if (messageDiv) {
+                    messageDiv.textContent = 'An error occurred. Please try again.';
+                    messageDiv.className = 'forgot-message error';
+                    messageDiv.style.display = 'block';
+                }
+
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+    }
+
+    // Close forgot password modal when clicking outside
+    const forgotModal = document.getElementById('forgotPasswordModal');
+    if (forgotModal) {
+        forgotModal.addEventListener('click', function (e) {
+            if (e.target === forgotModal) {
+                closeForgotPasswordModal();
+            }
+        });
+    }
+});
+
+// ============================================
+// OTP VERIFICATION FUNCTIONS
+// ============================================
+
+let otpTimerInterval = null;
+let resendTimerInterval = null;
+let otpUserData = {};
+
+// Show OTP Modal
+function showOTPModal(email, userType = 'customer', purpose = 'registration') {
+    const otpModal = document.getElementById('otpModal');
+    const otpEmailDisplay = document.getElementById('otpEmail');
+    const otpEmailHidden = document.getElementById('otpEmailHidden');
+    const otpPurpose = document.getElementById('otpPurpose');
+
+    if (otpModal && otpEmailDisplay && otpEmailHidden) {
+        otpEmailDisplay.textContent = email;
+        otpEmailHidden.value = email;
+        otpPurpose.value = purpose;
+        otpUserData = { email, userType, purpose };
+
+        otpModal.style.display = 'flex';
+        document.getElementById('otpCode').focus();
+
+        // Start 10-minute timer
+        startOTPTimer(600); // 10 minutes = 600 seconds
+
+        // Start resend timer (2 minutes)
+        startResendTimer(120); // 2 minutes = 120 seconds
+    }
+}
+
+// Close OTP Modal
+function closeOTPModal() {
+    const otpModal = document.getElementById('otpModal');
+    if (otpModal) {
+        otpModal.style.display = 'none';
+        document.getElementById('otpVerificationForm').reset();
+        clearInterval(otpTimerInterval);
+        clearInterval(resendTimerInterval);
+    }
+}
+
+// Start OTP expiry timer
+function startOTPTimer(seconds) {
+    clearInterval(otpTimerInterval);
+    const timerDisplay = document.getElementById('otpTimer');
+
+    let timeLeft = seconds;
+
+    function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        timerDisplay.textContent = `${minutes}:${secs.toString().padStart(2, '0')}`;
+
+        if (timeLeft <= 0) {
+            clearInterval(otpTimerInterval);
+            timerDisplay.textContent = 'Expired';
+            timerDisplay.style.color = '#ef4444';
+            showOTPMessage('OTP has expired. Please request a new one.', 'error');
+        }
+        timeLeft--;
+    }
+
+    updateTimer();
+    otpTimerInterval = setInterval(updateTimer, 1000);
+}
+
+// Start resend countdown timer
+function startResendTimer(seconds) {
+    clearInterval(resendTimerInterval);
+    const resendBtn = document.getElementById('resendOtpBtn');
+    const resendTimerDiv = document.getElementById('resendTimer');
+    const countdownSpan = document.getElementById('resendCountdown');
+
+    resendBtn.disabled = true;
+    resendBtn.style.opacity = '0.5';
+    resendTimerDiv.style.display = 'block';
+
+    let timeLeft = seconds;
+
+    function updateResendTimer() {
+        countdownSpan.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(resendTimerInterval);
+            resendBtn.disabled = false;
+            resendBtn.style.opacity = '1';
+            resendTimerDiv.style.display = 'none';
+        }
+        timeLeft--;
+    }
+
+    updateResendTimer();
+    resendTimerInterval = setInterval(updateResendTimer, 1000);
+}
+
+// Handle OTP Verification Form Submit
+document.addEventListener('DOMContentLoaded', function () {
+    const otpForm = document.getElementById('otpVerificationForm');
+    if (otpForm) {
+        otpForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            verifyOTP();
+        });
+    }
+
+    // Auto-submit when 6 digits entered
+    const otpCodeInput = document.getElementById('otpCode');
+    if (otpCodeInput) {
+        otpCodeInput.addEventListener('input', function (e) {
+            // Only allow numbers
+            this.value = this.value.replace(/[^0-9]/g, '');
+
+            // Auto-submit when 6 digits entered
+            if (this.value.length === 6) {
+                setTimeout(() => verifyOTP(), 300);
+            }
+        });
+    }
+});
+
+// Verify OTP
+function verifyOTP() {
+    const form = document.getElementById('otpVerificationForm');
+    const formData = new FormData(form);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    const purpose = document.getElementById('otpPurpose').value;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+
+    fetch('api/otp/verify_otp.php', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showOTPMessage(data.message, 'success');
+
+                setTimeout(() => {
+                    closeOTPModal();
+
+                    if (purpose === 'password_reset') {
+                        // Show password reset form
+                        showPasswordResetForm(otpUserData.email, otpUserData.userType);
+                    } else {
+                        // Registration verification - show success and redirect
+                        alert('✅ Email verified successfully! Please login to continue.');
+                        window.location.reload();
+                    }
+                }, 1500);
+            } else {
+                showOTPMessage(data.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+
+                // Clear OTP input for retry
+                document.getElementById('otpCode').value = '';
+                document.getElementById('otpCode').focus();
+            }
+        })
+        .catch(error => {
+            console.error('OTP verification error:', error);
+            showOTPMessage('Verification failed. Please try again.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+}
+
+// Show Password Reset Form (after OTP verification)
+function showPasswordResetForm(email, userType) {
+    const content = `
+        <div style="max-width: 400px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h2 style="text-align: center; color: #667eea; margin-bottom: 1.5rem;">
+                🔒 Reset Password
+            </h2>
+            <form id="resetPasswordForm" style="display: flex; flex-direction: column; gap: 1rem;">
+                <input type="hidden" name="email" value="${email}">
+                <input type="hidden" name="user_type" value="${userType}">
+                
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">New Password</label>
+                    <input type="password" name="password" required minlength="6" 
+                        placeholder="Enter new password (min 6 characters)"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem;">
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Confirm Password</label>
+                    <input type="password" name="confirm_password" required minlength="6"
+                        placeholder="Confirm new password"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem;">
+                </div>
+                
+                <div id="resetMessage" style="display: none; padding: 0.75rem; border-radius: 8px; text-align: center;"></div>
+                
+                <button type="submit" style="padding: 0.75rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">
+                    <i class="fas fa-check"></i> Reset Password
+                </button>
+            </form>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', `
+        <div id="resetPasswordOverlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;">
+            ${content}
+        </div>
+    `);
+
+    // Handle form submission
+    document.getElementById('resetPasswordForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        handlePasswordReset(this);
+    });
+}
+
+// Handle Password Reset
+function handlePasswordReset(form) {
+    const password = form.password.value;
+    const confirmPassword = form.confirm_password.value;
+    const messageDiv = document.getElementById('resetMessage');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    if (password !== confirmPassword) {
+        messageDiv.textContent = 'Passwords do not match!';
+        messageDiv.style.display = 'block';
+        messageDiv.style.background = '#fee2e2';
+        messageDiv.style.color = '#dc2626';
+        return;
+    }
+
+    if (password.length < 6) {
+        messageDiv.textContent = 'Password must be at least 6 characters!';
+        messageDiv.style.display = 'block';
+        messageDiv.style.background = '#fee2e2';
+        messageDiv.style.color = '#dc2626';
+        return;
+    }
+
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
+
+    const formData = new FormData(form);
+
+    fetch('api/auth/reset_password.php', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                messageDiv.textContent = data.message;
+                messageDiv.style.display = 'block';
+                messageDiv.style.background = '#d1fae5';
+                messageDiv.style.color = '#065f46';
+
+                setTimeout(() => {
+                    document.getElementById('resetPasswordOverlay').remove();
+                    alert('✅ Password reset successfully! Please login with your new password.');
+                    window.location.reload();
+                }, 2000);
+            } else {
+                messageDiv.textContent = data.message;
+                messageDiv.style.display = 'block';
+                messageDiv.style.background = '#fee2e2';
+                messageDiv.style.color = '#dc2626';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Password reset error:', error);
+            messageDiv.textContent = 'An error occurred. Please try again.';
+            messageDiv.style.display = 'block';
+            messageDiv.style.background = '#fee2e2';
+            messageDiv.style.color = '#dc2626';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+}
+
+// Resend OTP
+function resendOTP() {
+    const resendBtn = document.getElementById('resendOtpBtn');
+    const originalText = resendBtn.innerHTML;
+
+    resendBtn.disabled = true;
+    resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+    const formData = new FormData();
+    formData.append('email', otpUserData.email);
+    formData.append('purpose', otpUserData.purpose);
+    formData.append('user_type', otpUserData.userType);
+
+    fetch('api/otp/resend_otp.php', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showOTPMessage('New OTP sent successfully!', 'success');
+
+                // Restart timers
+                startOTPTimer(600);
+                startResendTimer(120);
+
+                // Clear OTP input
+                document.getElementById('otpCode').value = '';
+                document.getElementById('otpCode').focus();
+            } else {
+                showOTPMessage(data.message, 'error');
+                resendBtn.disabled = false;
+                resendBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Resend OTP error:', error);
+            showOTPMessage('Failed to resend OTP. Please try again.', 'error');
+            resendBtn.disabled = false;
+            resendBtn.innerHTML = originalText;
+        });
+}
+
+// Skip OTP Verification
+function skipOTPVerification() {
+    if (confirm('Are you sure you want to skip email verification? You can verify your email later from your profile.')) {
+        closeOTPModal();
+        alert('Registration completed! Please login to continue.');
+        window.location.reload();
+    }
+}
+
+// Show OTP Message
+function showOTPMessage(message, type) {
+    const messageDiv = document.getElementById('otpMessage');
+    if (messageDiv) {
+        messageDiv.textContent = message;
+        messageDiv.className = `form-message ${type}`;
+        messageDiv.style.display = 'block';
+
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+}
+
