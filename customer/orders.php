@@ -659,6 +659,7 @@ $customer_name = $_SESSION['user_name'];
     </script>
 
     <!-- Enhanced Order Features -->
+    <script src="../assets/js/order-utils.js"></script>
     <script src="../assets/js/order-enhancements.js"></script>
 
 </body>

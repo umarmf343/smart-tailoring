@@ -828,24 +828,8 @@ function handleRegister() {
 
 
 // Helper function to generate star icons
-function generateStars(rating) {
-    let stars = '';
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-
-    for (let i = 1; i <= 5; i++) {
-        if (i <= fullStars) {
-            stars += '<i class="fas fa-star"></i>';
-        } else if (i === fullStars + 1 && hasHalfStar) {
-            stars += '<i class="fas fa-star-half-alt"></i>';
-        } else {
-            stars += '<i class="far fa-star"></i>';
-        }
-    }
-
-    return stars;
-}
-
+// generateStars function is defined earlier in the file (line 342)
+// Removed duplicate definition to eliminate code duplication
 
 // ============================================
 // ORDER MODAL FUNCTIONS

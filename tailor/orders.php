@@ -890,6 +890,7 @@ $shop_name = $_SESSION['shop_name'];
     </script>
 
     <!-- Include Enhanced Order Modal JavaScript -->
+    <script src="../assets/js/order-utils.js"></script>
     <script src="../assets/js/tailor-order-enhancements.js"></script>
 
 </body>
