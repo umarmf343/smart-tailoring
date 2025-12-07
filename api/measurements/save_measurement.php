@@ -56,32 +56,31 @@ try {
             $measurements_data = $_POST['measurements_data'];
         }
     } else {
-        // Collect individual measurement fields
-        $possible_fields = [
-            'chest',
-            'waist',
-            'hips',
+        // Dynamically collect all measurement fields from database
+        $fieldsQuery = $conn->query("SELECT field_name FROM measurement_fields");
+        $possible_fields = [];
+        while ($row = $fieldsQuery->fetch_assoc()) {
+            $possible_fields[] = $row['field_name'];
+        }
+
+        // Also include legacy field names that might be in POST
+        $legacy_fields = [
             'shoulder_width',
-            'sleeve_length',
-            'shirt_length',
-            'neck',
-            'bicep',
-            'wrist',
-            'armhole',
-            'inseam',
-            'outseam',
-            'thigh',
-            'knee',
-            'ankle',
-            'rise',
             'collar',
             'cuff',
             'back_width',
             'front_length',
-            'back_length'
+            'back_length',
+            'blazer_length',
+            'sherwani_length',
+            'waistcoat_length',
+            'blouse_length',
+            'instructions'
         ];
 
-        foreach ($possible_fields as $field) {
+        $all_fields = array_unique(array_merge($possible_fields, $legacy_fields));
+
+        foreach ($all_fields as $field) {
             if (isset($_POST[$field]) && $_POST[$field] !== '') {
                 $measurements_data[$field] = $_POST[$field];
             }

@@ -5,8 +5,8 @@
  * Main page for logged-in tailors
  */
 
-// Start session
-session_start();
+// Start secure session
+require_once '../config/session.php';
 
 // Check if user is logged in and is a tailor
 if (!isset($_SESSION['logged_in']) || $_SESSION['user_type'] !== 'tailor') {
@@ -14,44 +14,32 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['user_type'] !== 'tailor') {
     exit;
 }
 
-
 // Include database connection
 define('DB_ACCESS', true);
 require_once '../config/db.php';
+require_once '../repositories/TailorRepository.php';
 
 // Get tailor details
 $tailor_id = $_SESSION['user_id'];
-$tailor_query = "SELECT * FROM tailors WHERE id = " . $tailor_id;
-$tailor = db_fetch_one($tailor_query);
-
-// Get tailor shop image
-
-require_once '../config/db.php';
-require_once '../repositories/TailorRepository.php';
 
 $tailorRepo = new TailorRepository($conn);
 $tailor = $tailorRepo->findById($tailor_id);
 $shop_image = $tailor['shop_image'] ?? null;
 
-
-
-
 // Get tailor's order count
-$order_count_query = "SELECT COUNT(*) as count FROM orders WHERE tailor_id = " . $tailor_id;
-$order_count = db_fetch_one($order_count_query);
-$total_orders = $order_count['count'];
+$result = $conn->query("SELECT COUNT(*) as count FROM orders WHERE tailor_id = " . intval($tailor_id));
+$order_data = $result->fetch_assoc();
+$total_orders = $order_data['count'] ?? 0;
 
 // Get pending orders
-$pending_query = "SELECT COUNT(*) as count FROM orders WHERE tailor_id = " . $tailor_id . " AND order_status = 'pending'";
-$pending_count = db_fetch_one($pending_query);
-$pending_orders = $pending_count['count'];
+$result = $conn->query("SELECT COUNT(*) as count FROM orders WHERE tailor_id = " . intval($tailor_id) . " AND order_status = 'pending'");
+$pending_data = $result->fetch_assoc();
+$pending_orders = $pending_data['count'] ?? 0;
 
 // Get completed orders
-$completed_query = "SELECT COUNT(*) as count FROM orders WHERE tailor_id = " . $tailor_id . " AND order_status = 'completed'";
-$completed_count = db_fetch_one($completed_query);
-$completed_orders = $completed_count['count'];
-
-db_close();
+$result = $conn->query("SELECT COUNT(*) as count FROM orders WHERE tailor_id = " . intval($tailor_id) . " AND order_status = 'completed'");
+$completed_data = $result->fetch_assoc();
+$completed_orders = $completed_data['count'] ?? 0;
 ?>
 
 <!DOCTYPE html>

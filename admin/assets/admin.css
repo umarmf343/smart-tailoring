@@ -244,6 +244,31 @@ body {
     gap: 1rem;
 }
 
+.test-btn {
+    padding: 0.6rem 1.2rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.test-btn:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.test-btn i {
+    font-size: 1rem;
+}
+
 .admin-badge {
     padding: 0.5rem 1rem;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));

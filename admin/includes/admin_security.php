@@ -5,10 +5,8 @@
  * Include this file at the top of every admin page to ensure authentication
  */
 
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Use centralized session configuration
+require_once __DIR__ . '/../../config/session.php';
 
 // Check if admin is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {

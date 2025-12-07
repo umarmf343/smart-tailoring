@@ -709,15 +709,10 @@ $csrf_token = generate_csrf_token();
                     body: formData
                 })
                 .then(response => {
-                    // Log the raw response for debugging
-                    console.log('Response status:', response.status);
-                    console.log('Response headers:', response.headers);
-
                     // Get the text first to see what we're actually receiving
                     return response.text();
                 })
                 .then(text => {
-                    console.log('Response text:', text);
 
                     // Try to parse as JSON
                     try {
@@ -791,8 +786,6 @@ $csrf_token = generate_csrf_token();
                     // Build absolute path
                     imageUrl = '/smart/smart-tailoring/' + imageUrl;
                 }
-
-                console.log('Final image URL:', imageUrl); // Debug log
 
                 avatarImage.src = imageUrl;
                 avatarImage.style.display = 'block';

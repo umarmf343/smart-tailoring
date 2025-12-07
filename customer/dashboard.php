@@ -5,8 +5,8 @@
  * Main page for logged-in customers
  */
 
-// Start session
-session_start();
+// Start secure session
+require_once '../config/session.php';
 
 // Check if user is logged in and is a customer
 if (!isset($_SESSION['logged_in']) || $_SESSION['user_type'] !== 'customer') {
@@ -17,30 +17,19 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['user_type'] !== 'customer') {
 // Include database connection
 define('DB_ACCESS', true);
 require_once '../config/db.php';
+require_once '../repositories/CustomerRepository.php';
 
 // Get customer details
 $customer_id = $_SESSION['user_id'];
-$customer_query = "SELECT * FROM customers WHERE id = " . $customer_id;
-$customer = db_fetch_one($customer_query);
-
-// Get customer profile image
-
-require_once '../config/db.php';
-require_once '../repositories/CustomerRepository.php';
 
 $customerRepo = new CustomerRepository($conn);
 $customer = $customerRepo->findById($customer_id);
 $profile_image = $customer['profile_image'] ?? null;
 
-
-
-
 // Get customer's order count
-$order_count_query = "SELECT COUNT(*) as count FROM orders WHERE customer_id = " . $customer_id;
-$order_count = db_fetch_one($order_count_query);
-$total_orders = $order_count['count'];
-
-db_close();
+$result = $conn->query("SELECT COUNT(*) as count FROM orders WHERE customer_id = " . intval($customer_id));
+$order_data = $result->fetch_assoc();
+$total_orders = $order_data['count'] ?? 0;
 ?>
 
 <!DOCTYPE html>

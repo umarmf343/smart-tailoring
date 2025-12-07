@@ -749,8 +749,6 @@ $shop_name = $_SESSION['shop_name'];
                     imageUrl = '/smart/smart-tailoring/' + imageUrl;
                 }
 
-                console.log('Final image URL:', imageUrl); // Debug log
-
                 avatarImage.src = imageUrl;
                 avatarImage.style.display = 'block';
                 avatarInitial.style.display = 'none';

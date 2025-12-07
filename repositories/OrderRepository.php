@@ -165,12 +165,60 @@ class OrderRepository
                 'phone' => $row['customer_phone'],
                 'address' => $row['customer_address']
             ];
+
+            // Fetch customer's default measurement notes for this order
+            $measurementNotes = $this->getCustomerMeasurementNotes($row['customer_id'], $row['garment_type']);
+            if ($measurementNotes) {
+                $row['measurement_notes'] = $measurementNotes;
+            }
+
             $orders[] = $row;
         }
 
         return $orders;
     }
 
+    /**
+     * Get customer's measurement notes for a specific garment type
+     * @param int $customer_id
+     * @param string $garment_type
+     * @return string|null
+     */
+    private function getCustomerMeasurementNotes($customer_id, $garment_type)
+    {
+        $query = "SELECT notes, measurements_data 
+                  FROM measurements 
+                  WHERE customer_id = ? 
+                    AND is_default = 1 
+                    AND (garment_context = ? OR garment_context = 'full')
+                  LIMIT 1";
+
+        $stmt = $this->conn->prepare($query);
+        if (!$stmt) {
+            return null;
+        }
+
+        $stmt->bind_param("is", $customer_id, $garment_type);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($row = $result->fetch_assoc()) {
+            $notes = $row['notes'] ?? '';
+
+            // Extract instructions from measurements_data if present
+            if (!empty($row['measurements_data'])) {
+                $measurementData = json_decode($row['measurements_data'], true);
+                if ($measurementData && isset($measurementData['instructions'])) {
+                    $instructions = $measurementData['instructions'];
+                    $notes = trim($notes . ' ' . $instructions);
+                }
+            }
+
+            return !empty($notes) && $notes !== '0' ? $notes : null;
+        }
+
+        return null;
+    }
     /**
      * Update order status
      * @param int $order_id

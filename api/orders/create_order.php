@@ -92,7 +92,8 @@ try {
 
     // Decide which method to use based on whether enhanced fields are present
     $hasEnhancedFields = isset($_POST['fabric_type']) || isset($_POST['measurement_id']) ||
-        isset($_POST['deadline']) || isset($_POST['design_specifications']);
+        isset($_POST['deadline']) || isset($_POST['design_specifications']) ||
+        isset($_POST['measurements_snapshot']);
 
     if ($hasEnhancedFields) {
         // Use new enhanced method

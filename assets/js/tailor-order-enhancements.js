@@ -16,7 +16,7 @@ function showTailorOrderDetailsModal(orderId) {
 // Load order details for tailor
 function loadTailorOrderDetails(orderId) {
     Promise.all([
-        fetch(`../api/orders/get_tailor_orders.php`).then(r => r.json()),
+        fetch(`../api/orders/get_orders.php`).then(r => r.json()),
         fetch(`../api/orders/get_order_history.php?order_id=${orderId}`).then(r => r.json())
     ])
         .then(([ordersData, historyData]) => {
@@ -78,13 +78,35 @@ function displayTailorOrderDetails(order, history) {
                         ${createDetailRow('Service Type', order.service_type)}
                         ${createDetailRow('Garment Type', order.garment_type)}
                         ${createDetailRow('Quantity', order.quantity)}
+                        ${order.measurements ? createDetailRow('Measurements', order.measurements) : ''}
+                        
+                        ${order.measurements_snapshot ? `
+                            <div style="background: #dbeafe; border-left: 3px solid #2563eb; padding: 0.75rem; margin: 0.5rem 0; border-radius: 4px;">
+                                <strong style="color: #1e3a8a;"><i class="fas fa-ruler-combined"></i> Customer Provided Measurements:</strong>
+                                <div style="margin-top: 0.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                    ${formatMeasurementsSnapshot(order.measurements_snapshot)}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${order.measurement_notes ? `
+                            <div style="background: #e0f2fe; border-left: 3px solid #0284c7; padding: 0.75rem; margin: 0.5rem 0; border-radius: 4px;">
+                                <strong style="color: #075985;"><i class="fas fa-sticky-note"></i> Measurement Notes:</strong>
+                                <p style="margin: 0.25rem 0 0 0; color: #0c4a6e; font-style: italic;">${order.measurement_notes}</p>
+                            </div>
+                        ` : ''}
+                        
                         ${createDetailRow('Estimated Price', '₹' + (order.estimated_price || 'TBD'))}
                         ${order.final_price ? createDetailRow('Final Price', '₹' + order.final_price) : ''}
+                        ${order.delivery_date ? createDetailRow('Expected Delivery', formatDate(order.delivery_date)) : ''}
+                        ${order.deadline ? createDetailRow('Deadline', formatDate(order.deadline)) : ''}
+                        ${order.first_fitting_date ? createDetailRow('First Fitting Date', formatDate(order.first_fitting_date)) : ''}
+                        ${order.final_fitting_date ? createDetailRow('Final Fitting Date', formatDate(order.final_fitting_date)) : ''}
                         ${order.fabric_type ? createDetailRow('Fabric Type', order.fabric_type) : ''}
                         ${order.fabric_color ? createDetailRow('Fabric Color', `${order.fabric_color} <span style="display: inline-block; width: 20px; height: 20px; background-color: ${order.fabric_color}; border: 1px solid #ccc; border-radius: 3px; margin-left: 8px; vertical-align: middle;"></span>`) : ''}
-                        ${order.deadline ? createDetailRow('Deadline', formatDate(order.deadline)) : ''}
-                        ${order.deposit_amount ? createDetailRow('Deposit', '₹' + order.deposit_amount) : ''}
-                        ${order.balance_due ? createDetailRow('Balance Due', '₹' + order.balance_due) : ''}
+                        ${order.deposit_amount && order.deposit_amount > 0 ? createDetailRow('Deposit', '₹' + order.deposit_amount) : ''}
+                        ${order.balance_due && order.balance_due > 0 ? createDetailRow('Balance Due', '₹' + order.balance_due) : ''}
+                        ${order.payment_status ? createDetailRow('Payment Status', order.payment_status.toUpperCase()) : ''}
                     </div>
                 </div>
                 
@@ -94,6 +116,7 @@ function displayTailorOrderDetails(order, history) {
                     <div style="background: #f9fafb; padding: 1rem; border-radius: 8px;">
                         ${createDetailRow('Customer Name', order.customer_name)}
                         ${createDetailRow('Contact', order.customer_phone)}
+                        ${order.customer_address ? createDetailRow('Address', order.customer_address) : ''}
                         ${order.customer_email ? createDetailRow('Email', order.customer_email) : ''}
                     </div>
                     
@@ -301,4 +324,20 @@ function cancelTailorOrder(orderId) {
 // Wrapper function for compatibility
 function viewTailorOrderDetails(orderId) {
     showTailorOrderDetailsModal(orderId);
+}
+
+// Format measurements snapshot JSON into readable display
+function formatMeasurementsSnapshot(snapshotData) {
+    try {
+        const measurements = typeof snapshotData === 'string' ? JSON.parse(snapshotData) : snapshotData;
+
+        return Object.entries(measurements)
+            .map(([key, value]) => {
+                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `<div style="color: #1e40af;"><strong>${label}:</strong> ${value}"</div>`;
+            })
+            .join('');
+    } catch (e) {
+        return `<div style="color: #1e40af;">${snapshotData}</div>`;
+    }
 }

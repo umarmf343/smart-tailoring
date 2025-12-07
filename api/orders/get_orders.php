@@ -1,17 +1,20 @@
 <?php
+
 /**
  * API: Get Orders
  * GET /api/orders/get_orders.php
  * Returns orders for logged-in user (customer or tailor)
  */
 
-session_start();
-
-// Set JSON response header
+// Suppress any output and set JSON header FIRST
+ob_start();
 header('Content-Type: application/json');
+
+session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['logged_in'])) {
+    ob_end_clean();
     http_response_code(401);
     echo json_encode([
         'success' => false,
@@ -28,7 +31,7 @@ require_once '../../services/OrderService.php';
 try {
     // Create service instance
     $orderService = new OrderService($conn);
-    
+
     // Get orders based on user type
     if ($_SESSION['user_type'] === 'customer') {
         $result = $orderService->getCustomerOrders($_SESSION['user_id']);
@@ -37,11 +40,16 @@ try {
     } else {
         throw new Exception('Invalid user type');
     }
-    
+
+    // Clear any accidental output
+    ob_end_clean();
+
     // Return response
     echo json_encode($result);
-    
 } catch (Exception $e) {
+    // Clear any accidental output
+    ob_end_clean();
+
     http_response_code(500);
     echo json_encode([
         'success' => false,
@@ -51,4 +59,3 @@ try {
 
 // Close database connection
 db_close();
-?>

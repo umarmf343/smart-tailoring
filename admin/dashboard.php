@@ -125,6 +125,9 @@ db_close();
                 <p>Overview of your tailoring service platform</p>
             </div>
             <div class="header-actions">
+                <a href="../integration_test.php" target="_blank" class="test-btn" title="Run Integration Tests">
+                    <i class="fas fa-vial"></i> Integration Tests
+                </a>
                 <span class="admin-badge"><?php echo htmlspecialchars($admin_role); ?></span>
                 <span class="welcome-text">Welcome, <?php echo htmlspecialchars($admin_name); ?>!</span>
             </div>
@@ -278,7 +281,7 @@ db_close();
                                         </span>
                                     </div>
                                     <div class="item-actions">
-                                        <span class="price-tag">₹<?php echo number_format($order['final_price'], 2); ?></span>
+                                        <span class="price-tag">₹<?php echo number_format($order['final_price'] ?? 0, 2); ?></span>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

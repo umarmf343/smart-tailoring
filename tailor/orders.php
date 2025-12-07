@@ -781,6 +781,12 @@ $shop_name = $_SESSION['shop_name'];
                                 <span class="detail-value">${order.measurements}</span>
                             </div>
                             ` : ''}
+                            ${order.measurement_notes ? `
+                            <div class="detail-row">
+                                <span class="detail-label">Measurement Notes:</span>
+                                <span class="detail-value" style="font-style: italic; color: #666;">${order.measurement_notes}</span>
+                            </div>
+                            ` : ''}
                             ${order.special_instructions ? `
                             <div class="detail-row">
                                 <span class="detail-label">Instructions:</span>

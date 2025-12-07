@@ -1096,8 +1096,19 @@ $customer_name = $_SESSION['user_name'];
             const context = measurement.garment_context; // Already has proper casing from database
 
             let measurementsHTML = '';
+            let instructions = '';
+
             if (measurement.measurements) {
-                measurementsHTML = Object.entries(measurement.measurements)
+                // Separate instructions from regular measurements
+                const entries = Object.entries(measurement.measurements);
+                const regularMeasurements = entries.filter(([key]) => key !== 'instructions');
+                const instructionsEntry = entries.find(([key]) => key === 'instructions');
+
+                if (instructionsEntry) {
+                    instructions = instructionsEntry[1];
+                }
+
+                measurementsHTML = regularMeasurements
                     .map(([key, value]) => `
                         <div class="measurement-item">
                             <label>${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</label>
@@ -1105,6 +1116,9 @@ $customer_name = $_SESSION['user_name'];
                         </div>
                     `).join('');
             }
+
+            // Combine notes and instructions
+            const displayNotes = [measurement.notes, instructions].filter(n => n && n !== '0').join(' | ');
 
             return `
                 <div class="measurement-card ${isDefault ? 'default' : ''}">
@@ -1118,7 +1132,7 @@ $customer_name = $_SESSION['user_name'];
                         ${measurementsHTML}
                     </div>
                     
-                    ${measurement.notes ? `<div class="measurement-notes"><i class="fas fa-sticky-note"></i> ${measurement.notes}</div>` : ''}
+                    ${displayNotes ? `<div class="measurement-notes"><i class="fas fa-sticky-note"></i> ${displayNotes}</div>` : ''}
                     
                     <div class="measurement-actions">
                         ${!isDefault ? `

@@ -1,3 +1,13 @@
+# Smart Tailoring Service - Apache Configuration
+
+# HTTPS Redirect (Enable in production)
+# Uncomment these lines when deployed with HTTPS
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteCond %{HTTPS} off
+#     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
 # Enable compression for faster loading
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
@@ -47,7 +57,9 @@
     # Content Security Policy (CSP)
     Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://unpkg.com https://nominatim.openstreetmap.org https://tile.openstreetmap.org https://*.tile.openstreetmap.org;"
     
-    # Strict Transport Security (HSTS) - Uncomment when using HTTPS
+    # Strict Transport Security (HSTS) - Enable when using HTTPS in production
+    # Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
     # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
     
     # Referrer Policy

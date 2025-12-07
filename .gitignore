@@ -1,8 +1,24 @@
 # Sensitive configuration files (DO NOT COMMIT)
 config/db.php
+config/db_old_backup.php
+config/db_enhanced.php
 config/email.php
+config/config.php
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Test files (remove before deployment)
+test_*.php
+integration_test.php
+run_tests.php
+deployment_check.php
+test_results_*.json
 
 # Example files are safe to commit
+# .env.example
 # config/config.example.php
 # config/email.example.php
 
@@ -23,10 +39,6 @@ Thumbs.db
 *.tmp
 .vscode/
 .idea/
-
-# Environment files
-.env
-.env.local
 
 # Cache and temporary files
 cache/
