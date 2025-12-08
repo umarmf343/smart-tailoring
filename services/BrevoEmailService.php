@@ -60,7 +60,7 @@ class BrevoEmailService
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curlError = curl_error($ch);
-        curl_close($ch);
+        // curl_close($ch); // Not needed in PHP 8.0+
 
         if ($httpCode >= 200 && $httpCode < 300) {
             return true;

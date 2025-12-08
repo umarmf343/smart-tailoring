@@ -69,10 +69,6 @@ function getCloudDatabaseConnection()
         mysqli_options($conn, MYSQLI_OPT_READ_TIMEOUT, 30);
     }
 
-    // Set write timeout (if supported)
-    if (defined('MYSQLI_OPT_WRITE_TIMEOUT')) {
-        mysqli_options($conn, MYSQLI_OPT_WRITE_TIMEOUT, 30);
-    }
     try {
         if ($use_ssl && file_exists($ca_cert_path)) {
             // SSL Connection for Aiven MySQL
@@ -255,7 +251,7 @@ function db_close()
     if (isset($conn) && $conn instanceof mysqli) {
         try {
             // Check if connection is still alive before closing
-            if (@$conn->ping()) {
+            if ($conn->query("SELECT 1")) {
                 mysqli_close($conn);
             }
         } catch (Exception $e) {
@@ -281,7 +277,11 @@ function db_health_check()
         return false;
     }
 
-    return mysqli_ping($conn);
+    try {
+        return (bool) $conn->query("SELECT 1");
+    } catch (Exception $e) {
+        return false;
+    }
 }
 
 // Set error handling based on environment

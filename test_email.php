@@ -61,7 +61,6 @@ try {
 
     // Timeout settings
     $mail->Timeout = 10;
-    $mail->Timelimit = 10;
 
     // Recipients
     $mail->setFrom(MAIL_FROM_EMAIL, MAIL_FROM_NAME);
