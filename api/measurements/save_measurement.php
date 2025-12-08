@@ -65,16 +65,55 @@ try {
 
         // Also include legacy field names that might be in POST
         $legacy_fields = [
+            // Common
+            'chest',
+            'waist',
             'shoulder_width',
+            'sleeve_length',
+            'neck',
+            'hip',
+
+            // Shirt/Top specific
+            'shirt_length',
             'collar',
+            'bicep',
+            'wrist',
             'cuff',
             'back_width',
             'front_length',
             'back_length',
-            'blazer_length',
+
+            // Bottom specific
+            'inseam',
+            'outseam',
+            'thigh',
+            'knee',
+            'ankle',
+            'rise',
+            'pant_waist',
+
+            // Specific Garments
+            'jacket_length',
+            'kurta_length',
             'sherwani_length',
+            'blazer_length',
             'waistcoat_length',
             'blouse_length',
+            'kameez_length',
+            'salwar_length',
+            'dress_length',
+            'frock_length',
+            'petticoat_length',
+
+            // Women specific
+            'bust',
+            'armhole',
+            'blouse_bust',
+            'blouse_waist',
+            'blouse_shoulder',
+            'petticoat_waist',
+
+            // Other
             'instructions'
         ];
 

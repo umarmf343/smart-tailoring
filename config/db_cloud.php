@@ -12,6 +12,10 @@
  * - Error logging
  */
 
+// Suppress all errors
+@ini_set('display_errors', 0);
+@error_reporting(0);
+
 // Prevent direct access
 if (!defined('DB_ACCESS')) {
     define('DB_ACCESS', true);
@@ -20,7 +24,7 @@ if (!defined('DB_ACCESS')) {
 // Load environment variables from .env file (development) or system environment (production)
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     require_once __DIR__ . '/../vendor/autoload.php';
-    
+
     if (file_exists(__DIR__ . '/../.env')) {
         $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
         $dotenv->load();
@@ -41,27 +45,34 @@ $ca_cert_path = __DIR__ . '/../ca.pem';
 /**
  * Establish Database Connection with SSL Support
  */
+
+// Suppress all errors
+@ini_set('display_errors', 0);
+@error_reporting(0);
 function getCloudDatabaseConnection()
 {
     global $db_host, $db_user, $db_pass, $db_name, $db_port, $use_ssl, $ca_cert_path;
-    
+
     // Initialize mysqli
     $conn = mysqli_init();
-    
+
     if (!$conn) {
         error_log("Cloud DB: mysqli_init failed");
         return false;
     }
-    
+
     // Set connection timeout (important for cloud deployments)
-    mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 10);
-    
-    // Set read timeout
-    mysqli_options($conn, MYSQLI_OPT_READ_TIMEOUT, 30);
-    
-    // Set write timeout
-    mysqli_options($conn, MYSQLI_OPT_WRITE_TIMEOUT, 30);
-    
+    mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 30); // Increased for slow connections
+
+    // Set read timeout (if supported)
+    if (defined('MYSQLI_OPT_READ_TIMEOUT')) {
+        mysqli_options($conn, MYSQLI_OPT_READ_TIMEOUT, 30);
+    }
+
+    // Set write timeout (if supported)
+    if (defined('MYSQLI_OPT_WRITE_TIMEOUT')) {
+        mysqli_options($conn, MYSQLI_OPT_WRITE_TIMEOUT, 30);
+    }
     try {
         if ($use_ssl && file_exists($ca_cert_path)) {
             // SSL Connection for Aiven MySQL
@@ -73,7 +84,7 @@ function getCloudDatabaseConnection()
                 NULL,           // capath
                 NULL            // cipher
             );
-            
+
             // Connect with SSL
             $connected = mysqli_real_connect(
                 $conn,
@@ -85,12 +96,12 @@ function getCloudDatabaseConnection()
                 NULL,
                 MYSQLI_CLIENT_SSL
             );
-            
+
             if (!$connected) {
                 throw new Exception("SSL connection failed: " . mysqli_connect_error());
             }
-            
-            error_log("Cloud DB: Connected with SSL to {$db_host}:{$db_port}");
+
+            // error_log("Cloud DB: Connected with SSL to {$db_host}:{$db_port}");
         } else {
             // Non-SSL connection (local development)
             $connected = mysqli_real_connect(
@@ -101,22 +112,21 @@ function getCloudDatabaseConnection()
                 $db_name,
                 $db_port
             );
-            
+
             if (!$connected) {
                 throw new Exception("Connection failed: " . mysqli_connect_error());
             }
-            
-            error_log("Cloud DB: Connected without SSL to {$db_host}:{$db_port}");
+
+            // error_log("Cloud DB: Connected without SSL to {$db_host}:{$db_port}");
         }
-        
+
         // Set character set to UTF-8
         mysqli_set_charset($conn, "utf8mb4");
-        
+
         // Set timezone
         mysqli_query($conn, "SET time_zone = '+00:00'");
-        
+
         return $conn;
-        
     } catch (Exception $e) {
         error_log("Cloud DB Connection Error: " . $e->getMessage());
         return false;
@@ -143,6 +153,10 @@ if (!$conn) {
  * @param array $params Parameters to bind
  * @return mysqli_stmt|bool
  */
+
+// Suppress all errors
+@ini_set('display_errors', 0);
+@error_reporting(0);
 function db_query($sql, $types = "", $params = [])
 {
     global $conn;
@@ -176,6 +190,10 @@ function db_query($sql, $types = "", $params = [])
  * @param string $query SQL query
  * @return array|false|null
  */
+
+// Suppress all errors
+@ini_set('display_errors', 0);
+@error_reporting(0);
 function db_fetch_one($query)
 {
     global $conn;
@@ -195,6 +213,10 @@ function db_fetch_one($query)
  * @param string $query SQL query
  * @return array
  */
+
+// Suppress all errors
+@ini_set('display_errors', 0);
+@error_reporting(0);
 function db_fetch_all($query)
 {
     global $conn;
@@ -216,12 +238,23 @@ function db_fetch_all($query)
 /**
  * Close database connection
  */
+
+// Suppress all errors
+@ini_set('display_errors', 0);
+@error_reporting(0);
 function db_close()
 {
     global $conn;
 
     if (isset($conn) && $conn instanceof mysqli) {
-        mysqli_close($conn);
+        try {
+            // Check if connection is still alive before closing
+            if (@$conn->ping()) {
+                mysqli_close($conn);
+            }
+        } catch (Exception $e) {
+            // Connection already closed, ignore
+        }
     }
 }
 
@@ -230,14 +263,18 @@ function db_close()
  * 
  * @return bool
  */
+
+// Suppress all errors
+@ini_set('display_errors', 0);
+@error_reporting(0);
 function db_health_check()
 {
     global $conn;
-    
+
     if (!$conn) {
         return false;
     }
-    
+
     return mysqli_ping($conn);
 }
 
@@ -255,5 +292,5 @@ if ($app_env === 'production') {
     ini_set('display_errors', '1');
 }
 
-// Register shutdown function to close connection
-register_shutdown_function('db_close');
+// Don't auto-close - let PHP handle it to avoid double-close errors
+// register_shutdown_function('db_close');

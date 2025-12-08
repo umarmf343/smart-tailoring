@@ -1143,7 +1143,7 @@ $customer_name = $_SESSION['user_name'];
                         <button class="btn-sm btn-edit" onclick="editMeasurement(${measurement.id})">
                             <i class="fas fa-edit"></i> Edit
                         </button>
-                        <button class="btn-sm btn-delete" onclick="deleteMeasurement(${measurement.id})">
+                        <button class="btn-sm btn-delete" onclick="deleteMeasurement(${measurement.id}, this)">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                     </div>
@@ -1273,9 +1273,15 @@ $customer_name = $_SESSION['user_name'];
         }
 
         // Delete measurement
-        function deleteMeasurement(id) {
+        function deleteMeasurement(id, btn) {
             if (!confirm('Are you sure you want to delete this measurement?')) {
                 return;
+            }
+
+            // Disable button to prevent double-submit
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
             }
 
             const formData = new FormData();
@@ -1292,11 +1298,20 @@ $customer_name = $_SESSION['user_name'];
                         loadMeasurements();
                     } else {
                         alert(data.message);
+                        // Re-enable button if failed
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                        }
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('Failed to delete measurement');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                    }
                 });
         }
 

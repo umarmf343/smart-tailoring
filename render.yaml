@@ -45,6 +45,9 @@ services:
       - key: DB_USE_SSL
         value: true
       
+      - key: AIVEN_CA_CERT_URL
+        sync: false
+      
       # Cloudinary Configuration
       - key: CLOUDINARY_CLOUD_NAME
         sync: false

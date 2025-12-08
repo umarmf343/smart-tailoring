@@ -50,8 +50,15 @@ RUN echo '<Directory /var/www/html>\n\
 </Directory>' > /etc/apache2/conf-available/smart-tailoring.conf \
     && a2enconf smart-tailoring
 
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Expose port 80
 EXPOSE 80
+
+# Set entrypoint
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Start Apache
 CMD ["apache2-foreground"]

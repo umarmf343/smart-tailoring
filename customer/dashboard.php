@@ -5,6 +5,11 @@
  * Main page for logged-in customers
  */
 
+// Suppress ALL errors and start output buffering
+@ini_set('display_errors', 0);
+@error_reporting(0);
+ob_start();
+
 // Start secure session
 require_once '../config/session.php';
 
@@ -98,7 +103,7 @@ $total_orders = $order_data['count'] ?? 0;
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -111,6 +116,9 @@ $total_orders = $order_data['count'] ?? 0;
             display: flex;
             align-items: center;
             gap: 1rem;
+            overflow: visible;
+            position: relative;
+            z-index: 1;
         }
 
         .stat-icon {
@@ -122,6 +130,7 @@ $total_orders = $order_data['count'] ?? 0;
             justify-content: center;
             font-size: 1.5rem;
             color: var(--white);
+            flex-shrink: 0;
         }
 
         .stat-icon.blue {
@@ -140,11 +149,19 @@ $total_orders = $order_data['count'] ?? 0;
             font-size: 2rem;
             color: var(--text-dark);
             margin-bottom: 0.25rem;
+            white-space: nowrap;
+            position: relative;
+            z-index: 2;
+            background: var(--white);
         }
 
         .stat-content p {
             color: var(--text-light);
             font-size: 0.95rem;
+            white-space: nowrap;
+            position: relative;
+            z-index: 2;
+            background: var(--white);
         }
 
         .dashboard-section {
@@ -153,6 +170,8 @@ $total_orders = $order_data['count'] ?? 0;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
             margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
         }
 
         .section-header {
@@ -160,11 +179,16 @@ $total_orders = $order_data['count'] ?? 0;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 2;
         }
 
         .section-header h2 {
             font-size: 1.75rem;
             color: var(--text-dark);
+            background: var(--white);
+            position: relative;
+            z-index: 3;
         }
 
         .view-all-btn {
@@ -563,11 +587,16 @@ $total_orders = $order_data['count'] ?? 0;
             <div class="profile-card">
                 <div class="profile-avatar">
                     <?php if ($profile_image): ?>
-                        <img src="/smart/smart-tailoring/uploads/profiles/<?php echo htmlspecialchars($profile_image); ?>"
+                        <?php
+                        $image_src = (strpos($profile_image, 'http') === 0)
+                            ? $profile_image
+                            : "/smart/smart-tailoring/uploads/profiles/" . $profile_image;
+                        ?>
+                        <img src="<?php echo htmlspecialchars($image_src); ?>"
                             alt="Profile"
                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                     <?php else: ?>
-                        <?php echo strtoupper(substr($customer_name, 0, 1)); ?>
+                        <?php echo strtoupper(substr($customer['full_name'] ?? '', 0, 1)); ?>
                     <?php endif; ?>
                 </div>
 

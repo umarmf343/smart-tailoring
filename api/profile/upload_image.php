@@ -33,8 +33,31 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Include dependencies
 define('DB_ACCESS', true);
-require_once '../../config/db.php';
-require_once '../../utils/ImageUpload.php';
+
+// Load environment variables
+if (file_exists('../../vendor/autoload.php')) {
+    require_once '../../vendor/autoload.php';
+    if (file_exists('../../.env.cloud')) {
+        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..', '.env.cloud');
+        $dotenv->load();
+    } elseif (file_exists('../../.env')) {
+        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
+        $dotenv->load();
+    }
+}
+
+// Use cloud database if SSL is enabled
+$use_cloud = filter_var(getenv('DB_USE_SSL') ?: ($_ENV['DB_USE_SSL'] ?? 'false'), FILTER_VALIDATE_BOOLEAN);
+require_once $use_cloud ? '../../config/db_cloud.php' : '../../config/db.php';
+
+// Use cloud storage if configured
+$use_cloudinary = !empty(getenv('CLOUDINARY_CLOUD_NAME') ?: ($_ENV['CLOUDINARY_CLOUD_NAME'] ?? ''));
+if ($use_cloudinary) {
+    require_once '../../utils/cloudinary_helper.php';
+} else {
+    require_once '../../utils/ImageUpload.php';
+}
+
 require_once '../../repositories/CustomerRepository.php';
 require_once '../../repositories/TailorRepository.php';
 
@@ -49,73 +72,125 @@ try {
 
     if ($user_type === 'customer') {
         // Customer profile image upload
-        $upload_path = '../../uploads/profiles/';
-        $imageUpload = new ImageUpload($upload_path);
 
-        $result = $imageUpload->upload($_FILES['profile_image'], 'customer_');
+        if ($use_cloudinary) {
+            // Upload to Cloudinary (Cloud)
+            $result = handleImageUpload($_FILES['profile_image'], 'profiles/customers');
 
-        if ($result['success']) {
-            $customerRepo = new CustomerRepository($conn);
+            if ($result['success']) {
+                $customerRepo = new CustomerRepository($conn);
+                $image_url = $result['url'];
 
-            // Get old image to delete
-            $customer = $customerRepo->findById($user_id);
-            $old_image = $customer['profile_image'] ?? null;
-
-            // Update database
-            if ($customerRepo->updateProfileImage($user_id, $result['filename'])) {
-                // Delete old image if exists
-                if ($old_image && file_exists($upload_path . $old_image)) {
-                    $imageUpload->delete($old_image);
+                // Update database with Cloudinary URL
+                if ($customerRepo->updateProfileImage($user_id, $image_url)) {
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'Profile image updated successfully!',
+                        'filename' => basename($image_url),
+                        'image_url' => $image_url
+                    ]);
+                } else {
+                    throw new Exception('Failed to update database');
                 }
-
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Profile image updated successfully!',
-                    'filename' => $result['filename'],
-                    'image_url' => '../../uploads/profiles/' . $result['filename']
-                ]);
             } else {
-                // Delete uploaded file if database update fails
-                $imageUpload->delete($result['filename']);
-                throw new Exception('Failed to update database');
+                throw new Exception($result['error']);
             }
         } else {
-            throw new Exception($result['message']);
+            // Upload to local storage (Local development)
+            $upload_path = '../../uploads/profiles/';
+            $imageUpload = new ImageUpload($upload_path);
+
+            $result = $imageUpload->upload($_FILES['profile_image'], 'customer_');
+
+            if ($result['success']) {
+                $customerRepo = new CustomerRepository($conn);
+
+                // Get old image to delete
+                $customer = $customerRepo->findById($user_id);
+                $old_image = $customer['profile_image'] ?? null;
+
+                // Update database
+                if ($customerRepo->updateProfileImage($user_id, $result['filename'])) {
+                    // Delete old image if exists
+                    if ($old_image && file_exists($upload_path . $old_image)) {
+                        $imageUpload->delete($old_image);
+                    }
+
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'Profile image updated successfully!',
+                        'filename' => $result['filename'],
+                        'image_url' => '../../uploads/profiles/' . $result['filename']
+                    ]);
+                } else {
+                    // Delete uploaded file if database update fails
+                    $imageUpload->delete($result['filename']);
+                    throw new Exception('Failed to update database');
+                }
+            } else {
+                throw new Exception($result['message']);
+            }
         }
     } else if ($user_type === 'tailor') {
         // Tailor shop image upload
-        $upload_path = '../../uploads/shops/';
-        $imageUpload = new ImageUpload($upload_path);
 
-        $result = $imageUpload->upload($_FILES['profile_image'], 'shop_');
+        if ($use_cloudinary) {
+            // Upload to Cloudinary (Cloud)
+            $result = handleImageUpload($_FILES['profile_image'], 'profiles/tailors');
 
-        if ($result['success']) {
-            $tailorRepo = new TailorRepository($conn);
+            if ($result['success']) {
+                $tailorRepo = new TailorRepository($conn);
+                $image_url = $result['url'];
 
-            // Get old image to delete
-            $tailor = $tailorRepo->findById($user_id);
-            $old_image = $tailor['shop_image'] ?? null;
-
-            // Update database
-            if ($tailorRepo->updateShopImage($user_id, $result['filename'])) {
-                // Delete old image if exists
-                if ($old_image && file_exists($upload_path . $old_image)) {
-                    $imageUpload->delete($old_image);
+                // Update database with Cloudinary URL
+                if ($tailorRepo->updateShopImage($user_id, $image_url)) {
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'Shop image updated successfully!',
+                        'filename' => basename($image_url),
+                        'image_url' => $image_url
+                    ]);
+                } else {
+                    throw new Exception('Failed to update database');
                 }
-
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Shop image updated successfully!',
-                    'filename' => $result['filename'],
-                    'image_url' => '../../uploads/shops/' . $result['filename']
-                ]);
             } else {
-                // Delete uploaded file if database update fails
-                $imageUpload->delete($result['filename']);
-                throw new Exception('Failed to update database');
+                throw new Exception($result['error']);
             }
         } else {
-            throw new Exception($result['message']);
+            // Upload to local storage (Local development)
+            $upload_path = '../../uploads/shops/';
+            $imageUpload = new ImageUpload($upload_path);
+
+            $result = $imageUpload->upload($_FILES['profile_image'], 'shop_');
+
+            if ($result['success']) {
+                $tailorRepo = new TailorRepository($conn);
+
+                // Get old image to delete
+                $tailor = $tailorRepo->findById($user_id);
+                $old_image = $tailor['shop_image'] ?? null;
+
+                // Update database
+                if ($tailorRepo->updateShopImage($user_id, $result['filename'])) {
+                    // Delete old image if exists
+                    if ($old_image && file_exists($upload_path . $old_image)) {
+                        $imageUpload->delete($old_image);
+                    }
+
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'Shop image updated successfully!',
+                        'filename' => $result['filename'],
+                        'image_url' => '../../uploads/shops/' . $result['filename']
+                    ]);
+                } else {
+                    // Delete uploaded file if database update fails
+                    $imageUpload->delete($result['filename']);
+                    throw new Exception('Failed to update database');
+                }
+            } else {
+                throw new Exception($result['message']);
+            }
         }
     } else {
         throw new Exception('Invalid user type');

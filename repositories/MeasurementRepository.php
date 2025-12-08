@@ -82,6 +82,8 @@ class MeasurementRepository
             }
 
             return $measurement_id;
+        } else {
+            error_log("MeasurementRepository create error: " . $stmt->error);
         }
 
         return false;
@@ -119,7 +121,7 @@ class MeasurementRepository
         $id = $measurement->getId();
 
         $stmt->bind_param(
-            "issssii",
+            "isssisi",
             $customer_id,
             $label,
             $garment_context,
@@ -130,6 +132,10 @@ class MeasurementRepository
         );
 
         $result = $stmt->execute();
+
+        if (!$result) {
+            error_log("MeasurementRepository update error: " . $stmt->error);
+        }
 
         // If this is set as default, unset other defaults
         if ($result && $is_default) {

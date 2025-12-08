@@ -26,7 +26,7 @@ function uploadToCloudinary($filePath, $folder = '')
     // Get Cloudinary credentials from environment
     $cloudName = getenv('CLOUDINARY_CLOUD_NAME') ?: ($_ENV['CLOUDINARY_CLOUD_NAME'] ?? null);
     $uploadPreset = getenv('CLOUDINARY_UPLOAD_PRESET') ?: ($_ENV['CLOUDINARY_UPLOAD_PRESET'] ?? null);
-    
+
     // Validate environment variables
     if (empty($cloudName) || empty($uploadPreset)) {
         error_log("Cloudinary: Missing CLOUDINARY_CLOUD_NAME or CLOUDINARY_UPLOAD_PRESET");
@@ -36,7 +36,7 @@ function uploadToCloudinary($filePath, $folder = '')
             'error' => 'Cloudinary configuration missing'
         ];
     }
-    
+
     // Validate file exists
     if (!file_exists($filePath)) {
         error_log("Cloudinary: File not found at {$filePath}");
@@ -46,27 +46,27 @@ function uploadToCloudinary($filePath, $folder = '')
             'error' => 'File not found'
         ];
     }
-    
+
     // Cloudinary upload endpoint
     $uploadUrl = "https://api.cloudinary.com/v1_1/{$cloudName}/image/upload";
-    
+
     // Prepare file for upload
     $fileData = new CURLFile($filePath, mime_content_type($filePath), basename($filePath));
-    
+
     // Build POST data
     $postData = [
         'file' => $fileData,
         'upload_preset' => $uploadPreset
     ];
-    
+
     // Add folder if specified
     if (!empty($folder)) {
         $postData['folder'] = $folder;
     }
-    
+
     // Initialize cURL
     $ch = curl_init();
-    
+
     curl_setopt_array($ch, [
         CURLOPT_URL => $uploadUrl,
         CURLOPT_POST => true,
@@ -77,14 +77,14 @@ function uploadToCloudinary($filePath, $folder = '')
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2
     ]);
-    
+
     // Execute request
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlError = curl_error($ch);
-    
+
     curl_close($ch);
-    
+
     // Check for cURL errors
     if ($response === false) {
         error_log("Cloudinary cURL error: {$curlError}");
@@ -94,10 +94,10 @@ function uploadToCloudinary($filePath, $folder = '')
             'error' => "Upload failed: {$curlError}"
         ];
     }
-    
+
     // Parse JSON response
     $result = json_decode($response, true);
-    
+
     // Check HTTP status
     if ($httpCode !== 200) {
         $errorMsg = $result['error']['message'] ?? 'Unknown error';
@@ -108,10 +108,10 @@ function uploadToCloudinary($filePath, $folder = '')
             'error' => $errorMsg
         ];
     }
-    
+
     // Success! Return secure URL
     $secureUrl = $result['secure_url'] ?? null;
-    
+
     if (empty($secureUrl)) {
         error_log("Cloudinary: No secure_url in response");
         return [
@@ -120,9 +120,9 @@ function uploadToCloudinary($filePath, $folder = '')
             'error' => 'Invalid response from Cloudinary'
         ];
     }
-    
+
     error_log("Cloudinary: Successfully uploaded to {$secureUrl}");
-    
+
     return [
         'success' => true,
         'url' => $secureUrl,
@@ -146,7 +146,7 @@ function deleteFromCloudinary($publicId)
     $cloudName = getenv('CLOUDINARY_CLOUD_NAME') ?: ($_ENV['CLOUDINARY_CLOUD_NAME'] ?? null);
     $apiKey = getenv('CLOUDINARY_API_KEY') ?: ($_ENV['CLOUDINARY_API_KEY'] ?? null);
     $apiSecret = getenv('CLOUDINARY_API_SECRET') ?: ($_ENV['CLOUDINARY_API_SECRET'] ?? null);
-    
+
     // Check if signed API credentials are available
     if (empty($apiKey) || empty($apiSecret)) {
         error_log("Cloudinary: Cannot delete without API_KEY and API_SECRET");
@@ -155,21 +155,21 @@ function deleteFromCloudinary($publicId)
             'error' => 'Deletion requires API credentials'
         ];
     }
-    
+
     $timestamp = time();
     $signature = sha1("public_id={$publicId}&timestamp={$timestamp}{$apiSecret}");
-    
+
     $deleteUrl = "https://api.cloudinary.com/v1_1/{$cloudName}/image/destroy";
-    
+
     $postData = [
         'public_id' => $publicId,
         'timestamp' => $timestamp,
         'api_key' => $apiKey,
         'signature' => $signature
     ];
-    
+
     $ch = curl_init();
-    
+
     curl_setopt_array($ch, [
         CURLOPT_URL => $deleteUrl,
         CURLOPT_POST => true,
@@ -177,17 +177,17 @@ function deleteFromCloudinary($publicId)
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT => 15
     ]);
-    
+
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    
+
     $result = json_decode($response, true);
-    
+
     if ($httpCode === 200 && ($result['result'] ?? '') === 'ok') {
         return ['success' => true, 'error' => null];
     }
-    
+
     return [
         'success' => false,
         'error' => $result['error']['message'] ?? 'Deletion failed'
@@ -214,7 +214,7 @@ function handleImageUpload($file, $folder = '', $allowedTypes = ['image/jpeg', '
             'error' => 'No file uploaded'
         ];
     }
-    
+
     // Check for upload errors
     if ($file['error'] !== UPLOAD_ERR_OK) {
         $errorMessages = [
@@ -226,14 +226,14 @@ function handleImageUpload($file, $folder = '', $allowedTypes = ['image/jpeg', '
             UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
             UPLOAD_ERR_EXTENSION => 'File upload stopped by extension'
         ];
-        
+
         return [
             'success' => false,
             'url' => null,
             'error' => $errorMessages[$file['error']] ?? 'Upload failed'
         ];
     }
-    
+
     // Validate file type
     $fileType = mime_content_type($file['tmp_name']);
     if (!in_array($fileType, $allowedTypes)) {
@@ -243,7 +243,7 @@ function handleImageUpload($file, $folder = '', $allowedTypes = ['image/jpeg', '
             'error' => 'Invalid file type. Allowed: ' . implode(', ', $allowedTypes)
         ];
     }
-    
+
     // Validate file size
     if ($file['size'] > $maxSize) {
         $maxSizeMB = round($maxSize / 1048576, 2);
@@ -253,7 +253,7 @@ function handleImageUpload($file, $folder = '', $allowedTypes = ['image/jpeg', '
             'error' => "File too large. Max size: {$maxSizeMB}MB"
         ];
     }
-    
+
     // Upload to Cloudinary
     return uploadToCloudinary($file['tmp_name'], $folder);
 }

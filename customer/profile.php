@@ -642,8 +642,14 @@ $csrf_token = generate_csrf_token();
 
                         // Load profile image if exists
                         if (profile.profile_image) {
-                            // Build correct image path
-                            const imagePath = '/smart/smart-tailoring/uploads/profiles/' + profile.profile_image;
+                            let imagePath;
+                            // Check if it's a full URL (Cloudinary) or local file
+                            if (profile.profile_image.startsWith('http')) {
+                                imagePath = profile.profile_image;
+                            } else {
+                                // Build correct image path for local files
+                                imagePath = '/smart/smart-tailoring/uploads/profiles/' + profile.profile_image;
+                            }
                             displayProfileImage(imagePath);
                             document.getElementById('deleteAvatarBtn').style.display = 'flex';
                         }
