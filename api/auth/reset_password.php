@@ -5,6 +5,11 @@
  * Updates user password after successful OTP verification
  */
 
+// Disable error display for clean JSON response
+ini_set('display_errors', 0);
+error_reporting(0);
+
+
 header('Content-Type: application/json');
 
 // Only accept POST requests
@@ -40,6 +45,19 @@ try {
         echo json_encode([
             'success' => false,
             'message' => 'Invalid email address'
+        ]);
+        exit;
+    }
+
+    // Initialize OTP service
+    require_once '../../services/EmailOTPService.php';
+    $otpService = new EmailOTPService($conn);
+    
+    // Check if a valid OTP was verified in the last 15 minutes
+    if (!$otpService->checkVerifiedOTP($email, 'password_reset', 15)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Session expired or invalid. Please verify OTP again.'
         ]);
         exit;
     }

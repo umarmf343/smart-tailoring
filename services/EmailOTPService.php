@@ -351,4 +351,29 @@ class EmailOTPService
         $stmt->close();
         return false;
     }
+
+    /**
+     * Check if there is a valid verified OTP for the given email and purpose
+     * within the specified time window.
+     */
+    public function checkVerifiedOTP($email, $purpose, $time_window_minutes = 15)
+    {
+        $stmt = $this->conn->prepare("
+            SELECT id 
+            FROM email_otp 
+            WHERE email = ? 
+            AND purpose = ? 
+            AND is_verified = 1 
+            AND verified_at >= DATE_SUB(NOW(), INTERVAL ? MINUTE)
+            ORDER BY verified_at DESC 
+            LIMIT 1
+        ");
+        $stmt->bind_param("ssi", $email, $purpose, $time_window_minutes);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $exists = $result->num_rows > 0;
+        $stmt->close();
+        
+        return $exists;
+    }
 }
