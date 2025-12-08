@@ -11,16 +11,27 @@ use PHPMailer\PHPMailer\Exception;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../config/email.php';
+require_once __DIR__ . '/BrevoEmailService.php';
 
 class EmailOTPService
 {
     private $conn;
     private $mailer;
+    private $useBrevo = false;
+    private $brevoService;
 
     public function __construct($db_connection)
     {
         $this->conn = $db_connection;
-        $this->initializeMailer();
+
+        // Check if Brevo API Key is set
+        $apiKey = getenv('BREVO_API_KEY') ?: ($_ENV['BREVO_API_KEY'] ?? '');
+        if (!empty($apiKey)) {
+            $this->useBrevo = true;
+            $this->brevoService = new BrevoEmailService();
+        } else {
+            $this->initializeMailer();
+        }
     }
 
     /**
@@ -147,7 +158,7 @@ class EmailOTPService
     }
 
     /**
-     * Send OTP email using PHPMailer
+     * Send OTP email using PHPMailer or Brevo
      */
     private function sendOTPEmail($email, $otp_code, $purpose, $user_name = null)
     {
@@ -155,15 +166,16 @@ class EmailOTPService
             // Determine template based on purpose
             $template = $purpose === 'password_reset' ? 'password_reset_otp.html' : 'otp_verification.html';
             $subject = $purpose === 'password_reset' ? 'Password Reset OTP' : 'Email Verification OTP';
+            $subject .= ' - Smart Tailoring Service';
 
             // Load email template
             $template_path = EMAIL_TEMPLATES_DIR . $template;
             if (!file_exists($template_path)) {
-                error_log("Email template not found: " . $template_path);
-                return false;
+                // Fallback template if file missing
+                $email_body = "<h1>Your OTP Code</h1><p>Hello {{USER_NAME}},</p><p>Your OTP code is: <strong>{{OTP_CODE}}</strong></p><p>Valid for {{EXPIRY_TIME}} minutes.</p>";
+            } else {
+                $email_body = file_get_contents($template_path);
             }
-
-            $email_body = file_get_contents($template_path);
 
             // Replace placeholders
             $email_body = str_replace('{{OTP_CODE}}', $otp_code, $email_body);
@@ -171,10 +183,15 @@ class EmailOTPService
             $email_body = str_replace('{{USER_NAME}}', $user_name ?? 'User', $email_body);
             $email_body = str_replace('{{EXPIRY_TIME}}', OTP_EXPIRY_MINUTES, $email_body);
 
-            // Configure email
+            // Use Brevo if enabled
+            if ($this->useBrevo) {
+                return $this->brevoService->sendEmail($email, $user_name ?? 'User', $subject, $email_body);
+            }
+
+            // Fallback to PHPMailer
             $this->mailer->clearAddresses();
             $this->mailer->addAddress($email);
-            $this->mailer->Subject = $subject . ' - Smart Tailoring Service';
+            $this->mailer->Subject = $subject;
             $this->mailer->Body = $email_body;
             $this->mailer->AltBody = "Your OTP is: $otp_code. Valid for " . OTP_EXPIRY_MINUTES . " minutes.";
 

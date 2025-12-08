@@ -54,6 +54,12 @@ try {
         throw new Exception('Invalid email format');
     }
 
+    // Validate email domain (MX record check)
+    $domain = substr(strrchr($email, "@"), 1);
+    if (!checkdnsrr($domain, "MX")) {
+        throw new Exception('Invalid email domain. Please use a valid email provider.');
+    }
+
     // Validate phone number (Indian format)
     if (!preg_match('/^[6-9][0-9]{9}$/', $phone)) {
         throw new Exception('Invalid phone number. Must be 10 digits starting with 6-9');
@@ -99,23 +105,13 @@ try {
         $address = isset($_POST['address']) ? trim($_POST['address']) : '';
 
         // Insert customer using prepared statement
-        // Auto-verify email since SMTP is blocked on Render free tier
-        $stmt = $conn->prepare("INSERT INTO customers (full_name, email, phone, password, address, email_verified) VALUES (?, ?, ?, ?, ?, 1)");
+        $stmt = $conn->prepare("INSERT INTO customers (full_name, email, phone, password, address, email_verified) VALUES (?, ?, ?, ?, ?, 0)");
         $stmt->bind_param("sssss", $name, $email, $phone, $password_hash, $address);
 
         if ($stmt->execute()) {
             $user_id = $conn->insert_id;
             $stmt->close();
 
-            // Skip OTP sending to prevent timeouts
-            echo json_encode([
-                'success' => true,
-                'message' => 'Registration successful! You can login now.',
-                'user_type' => 'customer',
-                'requires_otp' => false
-            ]);
-
-            /* OTP Disabled for Render Deployment
             // Send OTP for email verification
             try {
                 $otpService = new EmailOTPService($conn);
@@ -149,7 +145,6 @@ try {
                     'requires_otp' => false
                 ]);
             }
-            */
         } else {
             $stmt->close();
             throw new Exception('Registration failed. Please try again.');
@@ -194,23 +189,13 @@ try {
         }
 
         // Insert tailor using prepared statement
-        // Auto-verify email since SMTP is blocked on Render free tier
-        $stmt = $conn->prepare("INSERT INTO tailors (shop_name, owner_name, email, phone, password, shop_address, area, speciality, services_offered, experience_years, price_range, email_verified) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'medium', 1)");
+        $stmt = $conn->prepare("INSERT INTO tailors (shop_name, owner_name, email, phone, password, shop_address, area, speciality, services_offered, experience_years, price_range, email_verified) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'medium', 0)");
         $stmt->bind_param("sssssssssi", $name, $name, $email, $phone, $password_hash, $shop_address, $area, $speciality, $services, $experience);
 
         if ($stmt->execute()) {
             $user_id = $conn->insert_id;
             $stmt->close();
 
-            // Skip OTP sending to prevent timeouts
-            echo json_encode([
-                'success' => true,
-                'message' => 'Tailor registration successful! Your profile will be reviewed and activated soon.',
-                'user_type' => 'tailor',
-                'requires_otp' => false
-            ]);
-
-            /* OTP Disabled for Render Deployment
             // Send OTP for email verification
             try {
                 $otpService = new EmailOTPService($conn);
@@ -242,7 +227,6 @@ try {
                     'requires_otp' => false
                 ]);
             }
-            */
         } else {
             $stmt->close();
             throw new Exception('Registration failed. Please try again.');
