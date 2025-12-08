@@ -10,10 +10,10 @@ session_start();
 
 // Include database connection
 define('DB_ACCESS', true);
-require_once 'config/db.php';
+require_once __DIR__ . '/config/db.php';
 
 // Include concurrent user manager
-require_once 'config/concurrent_users.php';
+require_once __DIR__ . '/config/concurrent_users.php';
 
 // Initialize concurrent user manager (max 100 concurrent users)
 $userManager = new ConcurrentUserManager($conn, 100);
