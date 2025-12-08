@@ -48,7 +48,7 @@ jobs:
         run: php database/migrate.php run
       
       - name: Test database connection
-        run: php -r "require 'vendor/autoload.php'; require 'config/db.php'; \$pdo = getDatabaseConnection(); echo 'Database connected successfully';"
+        run: php -r "require 'vendor/autoload.php'; require 'config/db.php'; if (isset(\$conn) && \$conn instanceof mysqli) { echo 'Database connected successfully'; } else { echo 'Database connection failed'; exit(1); }"
 
   deploy:
     name: Deploy to Server
