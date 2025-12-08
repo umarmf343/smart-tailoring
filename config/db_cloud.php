@@ -86,6 +86,12 @@ function getCloudDatabaseConnection()
             );
 
             // Connect with SSL
+            // Add MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT to avoid hostname mismatch issues
+            $flags = MYSQLI_CLIENT_SSL;
+            if (defined('MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT')) {
+                $flags |= MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT;
+            }
+
             $connected = mysqli_real_connect(
                 $conn,
                 $db_host,
@@ -94,7 +100,7 @@ function getCloudDatabaseConnection()
                 $db_name,
                 $db_port,
                 NULL,
-                MYSQLI_CLIENT_SSL
+                $flags
             );
 
             if (!$connected) {
