@@ -373,7 +373,7 @@ class EmailOTPService
         $result = $stmt->get_result();
         $exists = $result->num_rows > 0;
         $stmt->close();
-        
+
         return $exists;
     }
 }

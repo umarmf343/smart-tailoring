@@ -52,7 +52,7 @@ try {
     // Initialize OTP service
     require_once '../../services/EmailOTPService.php';
     $otpService = new EmailOTPService($conn);
-    
+
     // Check if a valid OTP was verified in the last 15 minutes
     if (!$otpService->checkVerifiedOTP($email, 'password_reset', 15)) {
         echo json_encode([
