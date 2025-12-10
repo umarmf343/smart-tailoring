@@ -4,6 +4,11 @@
  * Returns counts of tailors, customers, orders
  */
 
+// Disable error display for clean JSON response
+ini_set('display_errors', 0);
+error_reporting(0);
+
+
 define('DB_ACCESS', true);
 require_once '../config/db.php';
 

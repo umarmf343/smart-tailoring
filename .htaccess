@@ -1,5 +1,9 @@
 # Smart Tailoring Service - Apache Configuration
 
+# DISABLE PHP ERROR DISPLAY
+php_flag display_errors off
+php_value error_reporting 0
+
 # HTTPS Redirect (Enable in production)
 # Uncomment these lines when deployed with HTTPS
 # <IfModule mod_rewrite.c>

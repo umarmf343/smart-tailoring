@@ -6,6 +6,10 @@
  * Returns counts for homepage display
  */
 
+// Disable error display for clean JSON response
+ini_set('display_errors', 0);
+error_reporting(0);
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
@@ -54,7 +58,4 @@ try {
     ]);
 }
 
-// Close database connection
-if (isset($conn)) {
-    db_close();
-}
+// Connection is automatically closed by PHP or handled by pool

@@ -7,6 +7,10 @@
  * Include this file at the very beginning of your application bootstrap.
  */
 
+// Suppress all errors
+@ini_set('display_errors', 0);
+@error_reporting(0);
+
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     // Configure session security based on environment

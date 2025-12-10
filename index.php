@@ -221,7 +221,7 @@ $user_type = $is_logged_in ? $_SESSION['user_type'] : '';
 
                 <div class="form-group">
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                        <input type="checkbox" required> I agree to Terms & Conditions
+                        <input type="checkbox" required> <span>I agree to <a href="terms.php" target="_blank" style="color: #2c3e50; text-decoration: underline;">Terms</a> & <a href="privacy.php" target="_blank" style="color: #2c3e50; text-decoration: underline;">Conditions</a></span>
                     </label>
                 </div>
 

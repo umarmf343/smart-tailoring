@@ -6,6 +6,10 @@
  * Returns JSON response
  */
 
+// Disable error display for clean JSON response
+ini_set('display_errors', 0);
+error_reporting(0);
+
 // Allow database access
 define('DB_ACCESS', true);
 
@@ -89,5 +93,4 @@ try {
     ]);
 }
 
-// Close database connection
-db_close();
+// Connection is automatically closed by PHP or handled by pool

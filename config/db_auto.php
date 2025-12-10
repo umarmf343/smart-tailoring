@@ -3,7 +3,6 @@
 /**
  * Database Connection Router
  * Automatically routes to cloud or local database based on .env settings
- * Updated for Render deployment
  */
 
 // Load environment from .env file (simple loader without dependencies)

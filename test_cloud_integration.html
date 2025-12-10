@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Services Test - Smart Tailoring</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .test-section h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .info-value {
+            color: #333;
+            word-break: break-all;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            background: #f0f4ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .preview {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚀 Cloud Services Test</h1>
+        <p class="subtitle">Testing Aiven MySQL + Cloudinary Integration</p>
+
+        <!-- Database Connection Test -->
+        <div class="test-section">
+            <h2>📊 Database Connection (Aiven MySQL)</h2>
+            <div id="db-status">
+                <div class="status info">⏳ Loading...</div>
+            </div>
+        </div>
+
+        <!-- Cloudinary Test -->
+        <div class="test-section">
+            <h2>☁️ Cloudinary Configuration</h2>
+            <div id="cloudinary-status">
+                <div class="status info">⏳ Loading...</div>
+            </div>
+        </div>
+
+        <!-- Image Upload Test -->
+        <div class="test-section">
+            <h2>📤 Test Image Upload to Cloudinary</h2>
+            <p style="margin-bottom: 15px; color: #666;">
+                Login required to test. Use your existing customer account.
+            </p>
+            <button onclick="window.location.href='auth/login_handler.php?test=1'">
+                Login to Test Upload
+            </button>
+        </div>
+
+        <!-- Instructions -->
+        <div class="test-section">
+            <h2>📝 Next Steps</h2>
+            <ol style="margin-left: 20px; color: #555; line-height: 1.8;">
+                <li>Verify database connection is successful</li>
+                <li>Check Cloudinary configuration is correct</li>
+                <li>Login and test image upload</li>
+                <li>Check uploaded image appears in Cloudinary dashboard</li>
+                <li>Once verified, ready to deploy to Render!</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Test Database Connection
+        fetch('test_connection_status.php')
+            .then(res => res.json())
+            .then(data => {
+                const dbStatus = document.getElementById('db-status');
+
+                if (data.database.connected) {
+                    dbStatus.innerHTML = `
+                        <div class="status success">✅ Connected to Aiven MySQL</div>
+                        <div class="info-grid">
+                            <div class="info-label">Host:</div>
+                            <div class="info-value">${data.database.host}</div>
+                            <div class="info-label">Database:</div>
+                            <div class="info-value">${data.database.database}</div>
+                            <div class="info-label">SSL:</div>
+                            <div class="info-value">Enabled ✅</div>
+                            <div class="info-label">Tables:</div>
+                            <div class="info-value">${data.database.tables} found</div>
+                        </div>
+                    `;
+                } else {
+                    dbStatus.innerHTML = `
+                        <div class="status error">❌ Connection Failed</div>
+                        <p>${data.database.error}</p>
+                    `;
+                }
+
+                // Cloudinary Status
+                const cloudinaryStatus = document.getElementById('cloudinary-status');
+                if (data.cloudinary.configured) {
+                    cloudinaryStatus.innerHTML = `
+                        <div class="status success">✅ Cloudinary Configured</div>
+                        <div class="info-grid">
+                            <div class="info-label">Cloud Name:</div>
+                            <div class="info-value">${data.cloudinary.cloud_name}</div>
+                            <div class="info-label">Upload Preset:</div>
+                            <div class="info-value">${data.cloudinary.upload_preset}</div>
+                        </div>
+                    `;
+                } else {
+                    cloudinaryStatus.innerHTML = `
+                        <div class="status error">❌ Cloudinary Not Configured</div>
+                        <p>Please set CLOUDINARY_CLOUD_NAME and CLOUDINARY_UPLOAD_PRESET</p>
+                    `;
+                }
+            })
+            .catch(err => {
+                console.error('Test failed:', err);
+                document.getElementById('db-status').innerHTML = `
+                    <div class="status error">❌ Test Failed: ${err.message}</div>
+                `;
+            });
+    </script>
+</body>
+
+</html>

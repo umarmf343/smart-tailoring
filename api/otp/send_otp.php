@@ -5,6 +5,9 @@
  * Generates and sends OTP to user's email
  */
 
+ini_set('display_errors', 0);
+error_reporting(0);
+
 header('Content-Type: application/json');
 
 // Only accept POST requests
@@ -24,11 +27,11 @@ require_once '../../services/EmailOTPService.php';
 
 try {
     // Get request data
-    $email = trim($_POST['email'] ?? '');
-    $purpose = trim($_POST['purpose'] ?? 'registration'); // registration, password_reset, email_change
-    $user_type = trim($_POST['user_type'] ?? null);
+    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $purpose = isset($_POST['purpose']) ? trim($_POST['purpose']) : 'registration';
+    $user_type = isset($_POST['user_type']) ? trim($_POST['user_type']) : null;
     $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : null;
-    $user_name = trim($_POST['user_name'] ?? null);
+    $user_name = isset($_POST['user_name']) ? trim($_POST['user_name']) : null;
 
     // Validate email
     if (empty($email)) {

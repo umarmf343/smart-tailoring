@@ -5,6 +5,11 @@
  * Handles password reset requests
  */
 
+// Disable error display for clean JSON response
+ini_set('display_errors', 0);
+error_reporting(0);
+
+
 header('Content-Type: application/json');
 
 // Start session
