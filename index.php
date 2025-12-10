@@ -362,7 +362,7 @@ $user_type = $is_logged_in ? $_SESSION['user_type'] : '';
 </div>
 
 <!-- Custom JavaScript -->
-<script src="assets/js/app.js"></script>
+<script src="assets/js/app.js?v=<?php echo time(); ?>"></script>
 
 <!-- Order Placement Modal -->
 <div class="modal-overlay" id="orderModal">
