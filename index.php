@@ -45,6 +45,7 @@ $user_type = $is_logged_in ? $_SESSION['user_type'] : '';
     <meta name="description" content="Smart Tailoring Service - Find the best tailors in Satna for custom stitching, alterations, and designer wear. Book online today!">
     <meta name="keywords" content="tailor, stitching, satna, alterations, designer wear, custom clothing, smart tailoring">
     <meta name="author" content="Smart Tailoring Service">
+    <meta name="google-site-verification" content="EUH00pAOdVaFRbCLj71OVXC5ok5T30VsNn19_t-UEp8" />
     <link rel="canonical" href="https://smart-tailoring-opv5.onrender.com/">
 
     <!-- Open Graph / Facebook -->
