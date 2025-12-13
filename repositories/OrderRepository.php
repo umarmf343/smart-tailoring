@@ -235,8 +235,118 @@ class OrderRepository
         }
 
         $stmt->bind_param("si", $status, $order_id);
-        return $stmt->execute();
+        $result = $stmt->execute();
+
+        if ($result) {
+            // Auto-generate OTPs based on status
+            if ($status === 'accepted') {
+                $this->generateStartOtp($order_id);
+            } elseif ($status === 'ready_for_pickup') {
+                $this->generateDeliveryOtp($order_id);
+            }
+        }
+
+        return $result;
     }
+
+    /**
+     * Generate Start OTP for order
+     * @param int $order_id
+     * @return string|false
+     */
+    public function generateStartOtp($order_id)
+    {
+        $otp = $this->generateOtp();
+        $query = "UPDATE orders SET start_otp = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("si", $otp, $order_id);
+
+        return $stmt->execute() ? $otp : false;
+    }
+
+    /**
+     * Verify Start OTP
+     * @param int $order_id
+     * @param string $otp
+     * @return bool
+     */
+    public function verifyStartOtp($order_id, $otp)
+    {
+        $query = "SELECT id FROM orders WHERE id = ? AND start_otp = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("is", $order_id, $otp);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            // OTP is correct, update verified_at and status
+            $updateQuery = "UPDATE orders 
+                            SET start_otp_verified_at = NOW(), 
+                                order_status = 'in_progress',
+                                updated_at = NOW() 
+                            WHERE id = ?";
+            $updateStmt = $this->conn->prepare($updateQuery);
+            $updateStmt->bind_param("i", $order_id);
+            return $updateStmt->execute();
+        }
+
+        return false;
+    }
+
+    /**
+     * Generate Delivery OTP for order
+     * @param int $order_id
+     * @return string|false
+     */
+    public function generateDeliveryOtp($order_id)
+    {
+        $otp = $this->generateOtp();
+        $query = "UPDATE orders SET delivery_otp = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("si", $otp, $order_id);
+
+        return $stmt->execute() ? $otp : false;
+    }
+
+    /**
+     * Verify Delivery OTP
+     * @param int $order_id
+     * @param string $otp
+     * @return bool
+     */
+    public function verifyDeliveryOtp($order_id, $otp)
+    {
+        $query = "SELECT id FROM orders WHERE id = ? AND delivery_otp = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("is", $order_id, $otp);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            // OTP is correct, update verified_at and status
+            $updateQuery = "UPDATE orders 
+                            SET delivery_otp_verified_at = NOW(), 
+                                order_status = 'delivered',
+                                completed_at = NOW(),
+                                updated_at = NOW() 
+                            WHERE id = ?";
+            $updateStmt = $this->conn->prepare($updateQuery);
+            $updateStmt->bind_param("i", $order_id);
+            return $updateStmt->execute();
+        }
+
+        return false;
+    }
+
+    /**
+     * Generate a 4-digit OTP
+     * @return string
+     */
+    private function generateOtp()
+    {
+        return str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+    }
+
 
     /**
      * Update payment status

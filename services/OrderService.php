@@ -19,6 +19,58 @@ class OrderService
     }
 
     /**
+     * Verify Start OTP
+     * @param int $order_id
+     * @param string $otp
+     * @param int $tailor_id
+     * @return array
+     */
+    public function verifyStartOtp($order_id, $otp, $tailor_id)
+    {
+        try {
+            // Verify order belongs to tailor
+            $order = $this->orderRepository->findById($order_id);
+            if (!$order || $order->getTailorId() != $tailor_id) {
+                return ['success' => false, 'message' => 'Order not found or unauthorized'];
+            }
+
+            if ($this->orderRepository->verifyStartOtp($order_id, $otp)) {
+                return ['success' => true, 'message' => 'Start OTP verified successfully'];
+            }
+
+            return ['success' => false, 'message' => 'Invalid OTP'];
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => 'Error verifying OTP: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Verify Delivery OTP
+     * @param int $order_id
+     * @param string $otp
+     * @param int $tailor_id
+     * @return array
+     */
+    public function verifyDeliveryOtp($order_id, $otp, $tailor_id)
+    {
+        try {
+            // Verify order belongs to tailor
+            $order = $this->orderRepository->findById($order_id);
+            if (!$order || $order->getTailorId() != $tailor_id) {
+                return ['success' => false, 'message' => 'Order not found or unauthorized'];
+            }
+
+            if ($this->orderRepository->verifyDeliveryOtp($order_id, $otp)) {
+                return ['success' => true, 'message' => 'Delivery OTP verified successfully'];
+            }
+
+            return ['success' => false, 'message' => 'Invalid OTP'];
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => 'Error verifying OTP: ' . $e->getMessage()];
+        }
+    }
+
+    /**
      * Create new order with validation
      * @param array $orderData
      * @return array Response with success status and message

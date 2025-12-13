@@ -697,8 +697,12 @@ $shop_name = $_SESSION['shop_name'];
                     </button>
                 `;
             } else if (order.order_status === 'booked') {
-                actionButtons = `
-                    <button class="btn-action btn-progress" onclick="updateOrderStatus(${order.id}, 'cutting')">
+                actionButtons = `                    <button class="btn-action btn-progress" onclick="verifyStartOtp(${order.id})" style="background: #0284c7;">
+                        <i class="fas fa-key"></i> Verify Start Code
+                    </button>
+                `;
+            } else if (order.order_status === 'in_progress') {
+                actionButtons = `                    <button class="btn-action btn-progress" onclick="updateOrderStatus(${order.id}, 'cutting')">
                         <i class="fas fa-cut"></i> Start Cutting
                     </button>
                 `;
@@ -740,8 +744,8 @@ $shop_name = $_SESSION['shop_name'];
                 `;
             } else if (order.order_status === 'ready_for_pickup') {
                 actionButtons = `
-                    <button class="btn-action btn-complete" onclick="updateOrderStatus(${order.id}, 'delivered')">
-                        <i class="fas fa-truck"></i> Mark as Delivered
+                    <button class="btn-action btn-complete" onclick="verifyDeliveryOtp(${order.id})" style="background: #16a34a;">
+                        <i class="fas fa-key"></i> Verify Delivery Code
                     </button>
                 `;
             } else if (order.order_status === 'delivered') {
@@ -862,6 +866,62 @@ $shop_name = $_SESSION['shop_name'];
                     </div>
                 </div>
             `;
+        }
+
+        // Verify Start OTP
+        function verifyStartOtp(orderId) {
+            const otp = prompt("Please enter the 4-digit Start Code provided by the customer:");
+            if (!otp) return;
+
+            const formData = new FormData();
+            formData.append('order_id', orderId);
+            formData.append('otp', otp);
+
+            fetch('../api/orders/verify_start_otp.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Start Code verified! Order is now In Progress.');
+                        loadOrders();
+                    } else {
+                        alert(data.message || 'Invalid Start Code. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to verify Start Code');
+                });
+        }
+
+        // Verify Delivery OTP
+        function verifyDeliveryOtp(orderId) {
+            const otp = prompt("Please enter the 4-digit Delivery Code provided by the customer:");
+            if (!otp) return;
+
+            const formData = new FormData();
+            formData.append('order_id', orderId);
+            formData.append('otp', otp);
+
+            fetch('../api/orders/verify_delivery_otp.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Delivery Code verified! Order is now Completed.');
+                        loadOrders();
+                    } else {
+                        alert(data.message || 'Invalid Delivery Code. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to verify Delivery Code');
+                });
         }
 
         // Update order status

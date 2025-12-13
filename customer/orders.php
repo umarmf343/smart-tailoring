@@ -525,6 +525,38 @@ $customer_name = $_SESSION['user_name'];
             const statusText = order.order_status.replace('_', ' ').toUpperCase();
             const canCancel = ['pending', 'accepted'].includes(order.order_status);
 
+            // OTP Display Logic
+            let otpHtml = '';
+            if (order.order_status === 'accepted' && order.start_otp) {
+                otpHtml = `
+                    <div class="otp-section" style="background: #e0f2fe; padding: 1rem; border-radius: 8px; margin: 1rem 0; border: 1px dashed #0284c7;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin: 0; color: #0369a1; font-size: 0.9rem;">START JOB CODE</h4>
+                                <p style="margin: 0.25rem 0 0; font-size: 0.8rem; color: #0c4a6e;">Share with tailor to start work</p>
+                            </div>
+                            <div style="font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; color: #0284c7; background: #fff; padding: 0.25rem 0.75rem; border-radius: 4px;">
+                                ${order.start_otp}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (order.order_status === 'ready_for_pickup' && order.delivery_otp) {
+                otpHtml = `
+                    <div class="otp-section" style="background: #dcfce7; padding: 1rem; border-radius: 8px; margin: 1rem 0; border: 1px dashed #16a34a;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin: 0; color: #15803d; font-size: 0.9rem;">DELIVERY CODE</h4>
+                                <p style="margin: 0.25rem 0 0; font-size: 0.8rem; color: #14532d;">Share to pick up order</p>
+                            </div>
+                            <div style="font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; color: #16a34a; background: #fff; padding: 0.25rem 0.75rem; border-radius: 4px;">
+                                ${order.delivery_otp}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
             return `
                 <div class="order-card">
                     <div class="order-header">
@@ -597,6 +629,8 @@ $customer_name = $_SESSION['user_name'];
                             </div>
                         </div>
                     </div>
+
+                    ${otpHtml}
                     
                     <div class="order-actions">
                         ${canCancel ? `
