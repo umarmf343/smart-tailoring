@@ -42,7 +42,13 @@ $user_type = $is_logged_in ? $_SESSION['user_type'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smart Tailoring Service - Find the best tailors in Satna for custom stitching, alterations, and designer wear. Book online today!">
     <title>Smart Tailoring Service - Find Best Tailors in Satna</title>
+
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
     <!-- Favicon -->
     <link rel="icon" type="image/jpg" href="assets/images/STP-favicon.jpg">
@@ -363,8 +369,7 @@ $user_type = $is_logged_in ? $_SESSION['user_type'] : '';
         </div>
     </div>
 
-    <!-- Custom JavaScript -->
-    <script src="assets/js/app.js?v=<?php echo time(); ?>"></script>
+
 
     <!-- Order Placement Modal -->
     <div class="modal-overlay" id="orderModal">
@@ -559,15 +564,6 @@ $user_type = $is_logged_in ? $_SESSION['user_type'] : '';
             </div>
         </div>
     </div>
-
-    <!-- </body> -->
-
-</html>
-
-
-
-<body <?php if ($is_logged_in) echo 'class="logged-in"'; ?> data-user-type="<?php echo $user_type; ?>">
-
 
     <!-- Navigation Bar  -->
     <nav class="navbar">
@@ -950,6 +946,8 @@ $user_type = $is_logged_in ? $_SESSION['user_type'] : '';
             return colors[name] || null;
         }
     </script>
+    <!-- Custom JavaScript -->
+    <script src="assets/js/app.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>
