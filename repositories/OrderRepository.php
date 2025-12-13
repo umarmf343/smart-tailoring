@@ -442,7 +442,7 @@ class OrderRepository
                   LEFT JOIN customers c ON oh.changed_by_type = 'customer' AND oh.changed_by_id = c.id
                   LEFT JOIN tailors t ON oh.changed_by_type = 'tailor' AND oh.changed_by_id = t.id
                   WHERE oh.order_id = ?
-                  ORDER BY oh.changed_at DESC";
+                  ORDER BY oh.created_at DESC";
 
         $stmt = $this->conn->prepare($query);
 
