@@ -199,14 +199,21 @@ This creates:
 
 ### 4️⃣ Create Admin Account
 
-> Make sure you've run `php migrate.php run` first so the `admins` table exists.
+> Migrations now seed a default super admin so you can sign in immediately after `php migrate.php run` (which also creates the `admins` table if it's missing).
+
+Seeded account details:
+- **Username:** `admin`
+- **Email:** `anupamkushwaha639@gmail.com`
+- **Password hash:** `$2y$10$zAM5U232ptyS7eLA7pgS.OtX.0quZAVZdBhATPOzMYXYxN6eGYUe2`
+
+If you prefer to set your own password before running the migrations, update the hash below and re-run. Be sure the `admins` table exists first by running `php migrate.php run` or creating the table manually.
 
 ```sql
 INSERT INTO admins (username, password, full_name, name, email, role, created_at)
-VALUES ('admin', '$2y$10$[hash]', 'Administrator', 'Administrator', 'anupamkushwaha639@gmail.com', 'super_admin', NOW());
+VALUES ('admin', '$2y$10$zAM5U232ptyS7eLA7pgS.OtX.0quZAVZdBhATPOzMYXYxN6eGYUe2', 'Administrator', 'Administrator', 'anupamkushwaha639@gmail.com', 'super_admin', NOW());
 ```
 
-Generate password hash:
+Generate a new password hash:
 ```php
 <?php echo password_hash('your_password', PASSWORD_DEFAULT); ?>
 ```
