@@ -9,19 +9,19 @@
 return [
     // Database Configuration
     'db' => [
-        'host' => 'localhost',
-        'username' => 'root',
-        'password' => '', // Change in production
-        'database' => 'smart_tailoring',
+        'host' => 'quranseed.com.ng',
+        'username' => 'baladre1_tailor',
+        'password' => 'Himmacolage343#',
+        'database' => 'baladre1_tailor',
         'charset' => 'utf8mb4'
     ],
 
     // Application Settings
     'app' => [
         'name' => 'Smart Tailoring Service',
-        'url' => 'http://localhost/smart/smart-tailoring',
-        'environment' => 'development', // development, staging, production
-        'debug' => true, // Set to false in production
+        'url' => 'http://quranseed.com.ng',
+        'environment' => 'production', // development, staging, production
+        'debug' => false, // Set to false in production
         'timezone' => 'Asia/Kolkata'
     ],
 
