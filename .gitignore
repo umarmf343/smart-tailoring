@@ -54,5 +54,8 @@ package-lock.json
 *.sql.gz
 database/backups/
 
+# Keep structured migration SQL files under version control
+!database/migrations/*.sql
+
 # PHPMailer (if installed via composer, already in vendor/)
 # If manually installed, add the path here
