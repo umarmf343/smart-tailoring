@@ -199,9 +199,11 @@ This creates:
 
 ### 4️⃣ Create Admin Account
 
+> Make sure you've run `php migrate.php run` first so the `admins` table exists.
+
 ```sql
-INSERT INTO admins (username, password, name, email, role, created_at)
-VALUES ('admin', '$2y$10$[hash]', 'Administrator', 'anupamkushwaha639@gmail.com', 'super_admin', NOW());
+INSERT INTO admins (username, password, full_name, name, email, role, created_at)
+VALUES ('admin', '$2y$10$[hash]', 'Administrator', 'Administrator', 'anupamkushwaha639@gmail.com', 'super_admin', NOW());
 ```
 
 Generate password hash:

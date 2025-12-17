@@ -128,10 +128,12 @@ try {
     session_regenerate_id(true);
 
     // Login successful - create session
+    $admin_display_name = $admin['full_name'] ?? $admin['name'] ?? $admin['username'];
+
     $_SESSION['admin_logged_in'] = true;
     $_SESSION['admin_id'] = (int)$admin['id'];
     $_SESSION['admin_username'] = htmlspecialchars($admin['username'], ENT_QUOTES, 'UTF-8');
-    $_SESSION['admin_name'] = htmlspecialchars($admin['full_name'], ENT_QUOTES, 'UTF-8');
+    $_SESSION['admin_name'] = htmlspecialchars($admin_display_name, ENT_QUOTES, 'UTF-8');
     $_SESSION['admin_email'] = htmlspecialchars($admin['email'], ENT_QUOTES, 'UTF-8');
     $_SESSION['admin_role'] = $admin['role'];
     $_SESSION['admin_login_time'] = time();
@@ -157,7 +159,7 @@ try {
         'success' => true,
         'message' => 'Login successful',
         'admin' => [
-            'name' => $admin['full_name'],
+            'name' => $admin_display_name,
             'role' => $admin['role']
         ]
     ]);

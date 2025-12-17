@@ -119,7 +119,9 @@ db_close();
                                 <tr>
                                     <td>#<?php echo $admin_user['id']; ?></td>
                                     <td>
-                                        <strong><?php echo htmlspecialchars($admin_user['name'] ?? $admin_user['username']); ?></strong>
+                                        <strong>
+                                            <?php echo htmlspecialchars($admin_user['full_name'] ?? $admin_user['name'] ?? $admin_user['username']); ?>
+                                        </strong>
                                         <?php if ($admin_user['id'] == $admin_id): ?>
                                             <span class="badge badge-info" style="margin-left: 0.5rem;">You</span>
                                         <?php endif; ?>
