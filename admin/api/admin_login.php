@@ -148,12 +148,10 @@ try {
     $_SESSION['admin_login_time'] = time();
     $_SESSION['admin_last_activity'] = time();
 
-    // Update last login time
-    $update_stmt = $conn->prepare("UPDATE admins SET last_login = NOW() WHERE id = ?");
-    $update_stmt->bind_param("i", $admin['id']);
-    $update_stmt->execute();
+    // Update last login time (skip quietly if column is missing)
+    updateAdminLastLogin($admin['id']);
 
-    // Log successful login
+    // Log successful login (non-blocking)
     logAdminActivity(
         $admin['id'],
         'login',
@@ -182,12 +180,80 @@ try {
 
 // Close connection
 if (isset($stmt)) $stmt->close();
-if (isset($update_stmt)) $update_stmt->close();
 db_close();
 
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
+
+/**
+ * Check if a column exists on a table (cached per request)
+ */
+function tableHasColumn($table, $column)
+{
+    global $conn;
+    static $cache = [];
+    $cacheKey = $table . '.' . $column;
+
+    if (isset($cache[$cacheKey])) {
+        return $cache[$cacheKey];
+    }
+
+    if (!$conn) {
+        return $cache[$cacheKey] = false;
+    }
+
+    try {
+        $stmt = $conn->prepare("SHOW COLUMNS FROM `$table` LIKE ?");
+
+        if (!$stmt) {
+            return $cache[$cacheKey] = false;
+        }
+
+        $stmt->bind_param("s", $column);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $exists = $result && $result->num_rows > 0;
+        $stmt->close();
+
+        return $cache[$cacheKey] = $exists;
+    } catch (Throwable $e) {
+        error_log("Column check failed for {$table}.{$column}: " . $e->getMessage());
+        return $cache[$cacheKey] = false;
+    }
+}
+
+/**
+ * Safely update the admin's last login timestamp.
+ * If the column is missing or the update fails, log the issue but do not block login.
+ */
+function updateAdminLastLogin($adminId)
+{
+    global $conn;
+
+    if (!$conn || !$adminId) {
+        return;
+    }
+
+    if (!tableHasColumn('admins', 'last_login')) {
+        return;
+    }
+
+    try {
+        $stmt = $conn->prepare("UPDATE admins SET last_login = NOW() WHERE id = ?");
+
+        if (!$stmt) {
+            error_log("Failed to prepare last_login update statement");
+            return;
+        }
+
+        $stmt->bind_param("i", $adminId);
+        $stmt->execute();
+        $stmt->close();
+    } catch (Throwable $e) {
+        error_log("Unable to update last_login for admin {$adminId}: " . $e->getMessage());
+    }
+}
 
 /**
  * Log admin activity
@@ -197,11 +263,20 @@ function logAdminActivity($admin_id, $action_type, $description, $target_type = 
     global $conn;
 
     try {
+        if (!$conn) {
+            return;
+        }
+
         $stmt = $conn->prepare("
             INSERT INTO admin_activity_log 
             (admin_id, action_type, action_description, target_type, target_id, ip_address, user_agent) 
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
+
+        if (!$stmt) {
+            error_log("Failed to prepare admin activity log statement");
+            return;
+        }
 
         $stmt->bind_param(
             "isssiis",
@@ -216,7 +291,7 @@ function logAdminActivity($admin_id, $action_type, $description, $target_type = 
 
         $stmt->execute();
         $stmt->close();
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         error_log("Failed to log admin activity: " . $e->getMessage());
     }
 }
@@ -229,17 +304,26 @@ function logFailedLogin($username, $ip)
     global $conn;
 
     try {
+        if (!$conn) {
+            return;
+        }
+
         $stmt = $conn->prepare("
             INSERT INTO admin_activity_log 
             (admin_id, action_type, action_description, ip_address) 
             VALUES (0, 'failed_login', ?, ?)
         ");
 
+        if (!$stmt) {
+            error_log("Failed to prepare failed login log statement");
+            return;
+        }
+
         $description = "Failed login attempt for username: " . $username;
         $stmt->bind_param("ss", $description, $ip);
         $stmt->execute();
         $stmt->close();
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         error_log("Failed to log failed login: " . $e->getMessage());
     }
 }

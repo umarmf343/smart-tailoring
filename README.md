@@ -204,13 +204,14 @@ This creates:
 Seeded account details:
 - **Username:** `admin`
 - **Email:** `anupamkushwaha639@gmail.com`
-- **Password hash:** `$2y$10$zAM5U232ptyS7eLA7pgS.OtX.0quZAVZdBhATPOzMYXYxN6eGYUe2`
+- **Password:** `admin123`
+- **Password hash:** `$2y$10$MODBHPvBOti2/05IkJPgDOpJLRdrBf3bOcwhz4NQOSANVR8wUkZuu`
 
 If you prefer to set your own password before running the migrations, update the hash below and re-run. Be sure the `admins` table exists first by running `php migrate.php run` or creating the table manually.
 
 ```sql
 INSERT INTO admins (username, password, full_name, name, email, role, created_at)
-VALUES ('admin', '$2y$10$zAM5U232ptyS7eLA7pgS.OtX.0quZAVZdBhATPOzMYXYxN6eGYUe2', 'Administrator', 'Administrator', 'anupamkushwaha639@gmail.com', 'super_admin', NOW());
+VALUES ('admin', '$2y$10$MODBHPvBOti2/05IkJPgDOpJLRdrBf3bOcwhz4NQOSANVR8wUkZuu', 'Administrator', 'Administrator', 'anupamkushwaha639@gmail.com', 'super_admin', NOW());
 ```
 
 Generate a new password hash:
