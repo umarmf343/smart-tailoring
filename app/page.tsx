@@ -39,6 +39,11 @@ export default function HomePage() {
                 I'm a Tailor
               </Button>
             </Link>
+            <Link href="/orders-system">
+              <Button size="lg" variant="ghost">
+                Orders System
+              </Button>
+            </Link>
           </div>
         </section>
 
