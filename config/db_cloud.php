@@ -140,11 +140,12 @@ $conn = getCloudDatabaseConnection();
 
 if (!$conn) {
     // Critical error - cannot proceed without database
-    if (getenv('APP_ENV') === 'production') {
-        die("Database service unavailable. Please try again later.");
-    } else {
-        die("Database Connection Failed. Check your .env configuration.");
-    }
+    $GLOBALS['db_connection_error'] = getenv('APP_ENV') === 'production'
+        ? "Database service unavailable. Please try again later."
+        : "Database Connection Failed. Check your .env configuration.";
+
+    // Keep the script running so callers can handle the error gracefully
+    $conn = null;
 }
 
 /**
@@ -162,6 +163,11 @@ if (!$conn) {
 function db_query($sql, $types = "", $params = [])
 {
     global $conn;
+
+    if (!$conn) {
+        error_log("Database unavailable for query execution.");
+        return false;
+    }
 
     if (empty($types)) {
         return mysqli_query($conn, $sql);
@@ -200,6 +206,11 @@ function db_fetch_one($query)
 {
     global $conn;
 
+    if (!$conn) {
+        error_log("Database unavailable for fetching a single row.");
+        return false;
+    }
+
     $result = mysqli_query($conn, $query);
     if (!$result) {
         error_log("Database query error: " . mysqli_error($conn));
@@ -222,6 +233,11 @@ function db_fetch_one($query)
 function db_fetch_all($query)
 {
     global $conn;
+
+    if (!$conn) {
+        error_log("Database unavailable for fetching rows.");
+        return [];
+    }
 
     $result = mysqli_query($conn, $query);
     if (!$result) {
@@ -247,6 +263,10 @@ function db_fetch_all($query)
 function db_close()
 {
     global $conn;
+
+    if (!$conn) {
+        return;
+    }
 
     if (isset($conn) && $conn instanceof mysqli) {
         try {

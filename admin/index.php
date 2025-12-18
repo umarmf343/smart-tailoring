@@ -7,7 +7,7 @@
     <title>Admin Login - Smart Tailoring Service</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/jpg" href="../assets/images/STP-favicon.jpg">
+    <link rel="icon" type="image/png" href="../assets/images/logo.png">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -261,8 +261,8 @@
                     <label class="form-label">Username</label>
                     <div class="input-group">
                         <i class="fas fa-user input-icon"></i>
-                        <input type="text" name="username" class="form-input"
-                            placeholder="Enter admin username" required autofocus>
+                        <input type="text" name="username" class="form-input" autocomplete="username"
+                            placeholder="Enter admin username" required>
                     </div>
                 </div>
 
@@ -271,7 +271,7 @@
                     <div class="input-group">
                         <i class="fas fa-lock input-icon"></i>
                         <input type="password" name="password" id="adminPassword" class="form-input"
-                            placeholder="Enter password" required>
+                            placeholder="Enter password" required autocomplete="current-password">
                         <button type="button" class="password-toggle" onclick="togglePassword()">
                             <i class="fas fa-eye" id="toggleIcon"></i>
                         </button>
@@ -329,6 +329,7 @@
             const formData = new FormData(this);
             const loginBtn = document.getElementById('loginBtn');
             const originalText = loginBtn.innerHTML;
+            let loginSuccessful = false;
 
             // Show loading state
             loginBtn.disabled = true;
@@ -340,23 +341,33 @@
                     body: formData
                 });
 
-                const data = await response.json();
+                const contentType = response.headers.get('content-type') || '';
+                let data = {};
 
-                if (data.success) {
-                    showMessage('Login successful! Redirecting...', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.php';
-                    }, 1000);
+                if (contentType.includes('application/json')) {
+                    data = await response.json();
                 } else {
-                    showMessage(data.message || 'Invalid credentials', 'error');
+                    const text = await response.text();
+                    throw new Error(text || 'Unexpected response from the server.');
+                }
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Invalid credentials');
+                }
+
+                loginSuccessful = true;
+                showMessage('Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.php';
+                }, 1000);
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage(error.message || 'An error occurred. Please try again.', 'error');
+            } finally {
+                if (!loginSuccessful) {
                     loginBtn.disabled = false;
                     loginBtn.innerHTML = originalText;
                 }
-            } catch (error) {
-                console.error('Login error:', error);
-                showMessage('An error occurred. Please try again.', 'error');
-                loginBtn.disabled = false;
-                loginBtn.innerHTML = originalText;
             }
         });
 

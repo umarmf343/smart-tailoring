@@ -34,5 +34,12 @@ if ($use_ssl) {
     require_once __DIR__ . '/db_cloud.php';
 } else {
     // Use local database (traditional)
-    require_once __DIR__ . '/db_local.php';
+    $local_db_path = __DIR__ . '/db_local.php';
+
+    if (file_exists($local_db_path)) {
+        require_once $local_db_path;
+    } else {
+        // Fallback to cloud configuration when local file is missing
+        require_once __DIR__ . '/db_cloud.php';
+    }
 }
