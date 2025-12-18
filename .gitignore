@@ -1,56 +1,27 @@
-# Sensitive configuration files (DO NOT COMMIT)
-# config/db.php (Router is safe to commit)
-# config/email.php (Updated to use env vars, safe to commit)
-config/db_old_backup.php
-config/db_enhanced.php
-config/config.php
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Environment files
-.env
-.env.local
-.env.production
+# dependencies
+/node_modules
 
-# Test files (remove before deployment)
-test_*.php
-integration_test.php
-run_tests.php
-deployment_check.php
-test_results_*.json
+# next.js
+/.next/
+/out/
 
-# Example files are safe to commit
-# .env.example
-# config/config.example.php
-# config/email.example.php
+# production
+/build
 
-# User uploaded content
-uploads/profiles/*
-uploads/shops/*
-!uploads/profiles/.gitkeep
-!uploads/shops/.gitkeep
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# System files
-.DS_Store
-Thumbs.db
-*.log
-*.tmp
-.vscode/
-.idea/
+# env files
+.env*
 
-# Cache and temporary files
-cache/
-temp/
-tmp/
+# vercel
+.vercel
 
-# Node modules (if using any frontend build tools)
-node_modules/
-
-# Database backups
-*.sql
-*.sql.gz
-database/backups/
-
-# Keep structured migration SQL files under version control
-!database/migrations/*.sql
-
-# PHPMailer (if installed via composer, already in vendor/)
-# If manually installed, add the path here
+# typescript
+*.tsbuildinfo
+next-env.d.ts
