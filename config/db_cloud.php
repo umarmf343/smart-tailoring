@@ -38,6 +38,7 @@ $db_pass = getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? '');
 $db_name = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'smart_tailoring');
 $db_port = (int)(getenv('DB_PORT') ?: ($_ENV['DB_PORT'] ?? 3306));
 $use_ssl = filter_var(getenv('DB_USE_SSL') ?: ($_ENV['DB_USE_SSL'] ?? 'false'), FILTER_VALIDATE_BOOLEAN);
+$allow_ssl_fallback = filter_var(getenv('DB_SSL_FALLBACK') ?: ($_ENV['DB_SSL_FALLBACK'] ?? 'true'), FILTER_VALIDATE_BOOLEAN);
 
 // SSL Certificate Path (for Aiven MySQL)
 $ca_cert_path = __DIR__ . '/../ca.pem';
@@ -168,6 +169,8 @@ function getCloudDatabaseConnection()
     }
 
     try {
+        $tried_ssl = false;
+
         if ($use_ssl && file_exists($ca_cert_path)) {
             // SSL Connection for Aiven MySQL
             mysqli_ssl_set(
@@ -197,12 +200,17 @@ function getCloudDatabaseConnection()
                 $flags
             );
 
-            if (!$connected) {
-                throw new Exception("SSL connection failed: " . mysqli_connect_error());
-            }
+            $tried_ssl = true;
 
-            // error_log("Cloud DB: Connected with SSL to {$db_host}:{$db_port}");
-        } else {
+            if (!$connected) {
+                if (!$allow_ssl_fallback) {
+                    throw new Exception("SSL connection failed: " . mysqli_connect_error());
+                }
+            }
+        }
+
+        // If SSL failed or not requested, try non-SSL
+        if (!$connected) {
             // Non-SSL connection (local development)
             $connected = mysqli_real_connect(
                 $conn,
@@ -214,10 +222,9 @@ function getCloudDatabaseConnection()
             );
 
             if (!$connected) {
-                throw new Exception("Connection failed: " . mysqli_connect_error());
+                $mode = $tried_ssl ? 'after SSL fallback' : 'non-SSL';
+                throw new Exception("Connection failed ({$mode}): " . mysqli_connect_error());
             }
-
-            // error_log("Cloud DB: Connected without SSL to {$db_host}:{$db_port}");
         }
 
         // Set character set to UTF-8
