@@ -866,6 +866,23 @@ body {
     min-height: 200px;
 }
 
+.tailor-cache-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #fff7e6;
+    border: 1px solid #f6ad55;
+    color: #9c4221;
+    padding: 0.9rem 1.1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.tailor-cache-notice i {
+    color: var(--secondary-color);
+}
+
 .loading {
     grid-column: 1 / -1;
     text-align: center;
