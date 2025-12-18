@@ -21,7 +21,8 @@ export default async function MeasurementsPage() {
           <h1 className="text-3xl font-bold mb-2">Measurement Library</h1>
           <p className="text-muted-foreground max-w-2xl">
             Save detailed body measurements for every garment type so tailors can deliver the perfect fit without
-            repeated appointments.
+            repeated appointments. Add multiple profiles, switch units on entry, and see real-time validation alerts
+            before sharing with tailors.
           </p>
         </div>
 

@@ -4,7 +4,14 @@ import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, MessageCircle, Package, CheckCircle, Clock } from "lucide-react"
+import { ArrowLeft, MessageCircle, Package, CheckCircle, Clock, Sparkles, AlertCircle } from "lucide-react"
+import {
+  MEASUREMENT_LIBRARY,
+  describeGarmentType,
+  formatConvertedMeasurement,
+  generateMeasurementAlerts,
+  getFitSuggestions,
+} from "@/lib/measurement-system"
 
 interface OrderDetailProps {
   orderId: string
@@ -16,17 +23,11 @@ const MOCK_ORDER = {
   tailorName: "Master Tailor Co.",
   tailorId: "1",
   service: "Custom Suit",
+  measurementProfileId: "ms-formal-suit",
   status: "in-progress" as const,
   price: 450,
   createdAt: new Date("2025-01-10"),
   estimatedDelivery: new Date("2025-01-25"),
-  measurements: {
-    chest: 40,
-    waist: 34,
-    shoulder: 18,
-    sleeveLength: 25,
-    inseam: 32,
-  },
   fabricChoice: "Navy Blue Wool",
   customDesign: "Classic two-button with notch lapels",
   specialInstructions: "Extra padding on shoulders, slightly tapered waist",
@@ -48,6 +49,11 @@ const statusColors = {
   delivered: "bg-primary text-primary-foreground",
   cancelled: "bg-destructive text-destructive-foreground",
 }
+
+const measurementProfile =
+  MEASUREMENT_LIBRARY.find((profile) => profile.id === MOCK_ORDER.measurementProfileId) ?? MEASUREMENT_LIBRARY[0]
+const measurementAlerts = generateMeasurementAlerts(measurementProfile)
+const fitSuggestions = getFitSuggestions(measurementProfile)
 
 export function OrderDetail({ orderId }: OrderDetailProps) {
   return (
@@ -161,15 +167,60 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
         <Card>
           <CardHeader>
             <CardTitle>Measurements</CardTitle>
+            <div className="flex flex-wrap gap-2 mt-2">
+              <Badge variant="secondary">{measurementProfile.name}</Badge>
+              <Badge variant="outline">
+                {describeGarmentType(measurementProfile.garmentType)} • {measurementProfile.unit}
+              </Badge>
+              {measurementAlerts.length > 0 ? (
+                <Badge variant="destructive" className="bg-amber-100 text-amber-800">
+                  {measurementAlerts.length} alert(s) flagged
+                </Badge>
+              ) : (
+                <Badge variant="outline">Verified</Badge>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {Object.entries(MOCK_ORDER.measurements).map(([key, value]) => (
+              {Object.entries(measurementProfile.measurements).map(([key, value]) => (
                 <div key={key} className="p-3 bg-muted rounded-lg">
                   <p className="text-sm text-muted-foreground capitalize mb-1">{key.replace(/([A-Z])/g, " $1")}</p>
-                  <p className="font-bold text-lg">{value} inch</p>
+                  <p className="font-bold text-lg">
+                    {value} {measurementProfile.unit}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    ≈ {formatConvertedMeasurement(value, measurementProfile.unit)}
+                  </p>
                 </div>
               ))}
+            </div>
+            {measurementAlerts.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {measurementAlerts.map((alert) => (
+                  <div
+                    key={alert.message}
+                    className="p-3 border rounded-md bg-amber-50 dark:bg-amber-950/30 text-sm flex items-start gap-2"
+                  >
+                    <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" />
+                    <div>
+                      <p className="font-medium">{alert.message}</p>
+                      <p className="text-xs text-muted-foreground">Fields: {alert.fields.join(", ")}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="mt-4 space-y-2">
+              <p className="text-sm font-semibold flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                Fit suggestions from tailor
+              </p>
+              <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                {fitSuggestions.map((suggestion) => (
+                  <li key={suggestion}>{suggestion}</li>
+                ))}
+              </ul>
             </div>
           </CardContent>
         </Card>

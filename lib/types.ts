@@ -48,18 +48,34 @@ export interface Measurement {
   id: string
   customerId: string
   name: string // e.g., "Formal Suit", "Casual Wear"
+  garmentType: "shirt" | "dress" | "pants" | "blazer"
   measurements: {
     chest?: number
+    bust?: number
     waist?: number
+    hip?: number
     hips?: number
-    shoulder?: number
+    shoulderWidth?: number
     sleeveLength?: number
+    cuffSize?: number
     inseam?: number
     neck?: number
+    bicepCircumference?: number
+    shirtLength?: number
+    dressLength?: number
+    armholeCircumference?: number
+    thighCircumference?: number
+    kneeCircumference?: number
+    ankleCircumference?: number
+    jacketLength?: number
     // Add more as needed
     [key: string]: number | undefined
   }
   unit: "cm" | "inch"
+  status: "draft" | "verified" | "needs-review"
+  primary?: boolean
+  notes?: string
+  lastUsedOrderId?: string
   createdAt: Date
   updatedAt: Date
 }

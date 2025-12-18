@@ -12,6 +12,7 @@ import { SavedTailors } from "./saved-tailors"
 import { WalletManager } from "./wallet-manager"
 import { Search, Package, Ruler, Users, Wallet } from "lucide-react"
 import Link from "next/link"
+import { MEASUREMENT_LIBRARY, generateMeasurementAlerts } from "@/lib/measurement-system"
 
 interface CustomerDashboardProps {
   user: User
@@ -19,6 +20,9 @@ interface CustomerDashboardProps {
 
 export function CustomerDashboard({ user }: CustomerDashboardProps) {
   const [activeTab, setActiveTab] = useState("overview")
+  const measurementProfiles = MEASUREMENT_LIBRARY
+  const verifiedProfiles = measurementProfiles.filter((profile) => profile.status === "verified").length
+  const flaggedProfiles = measurementProfiles.filter((profile) => generateMeasurementAlerts(profile).length > 0).length
 
   return (
     <div className="min-h-screen bg-background">
@@ -58,8 +62,10 @@ export function CustomerDashboard({ user }: CustomerDashboardProps) {
                   <Ruler className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">2</div>
-                  <p className="text-xs text-muted-foreground">Saved profiles</p>
+                  <div className="text-2xl font-bold">{measurementProfiles.length}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {verifiedProfiles} verified • {flaggedProfiles} flagged for review
+                  </p>
                 </CardContent>
               </Card>
 

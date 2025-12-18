@@ -11,6 +11,7 @@ import { AdminOrders } from "./admin-orders"
 import { AdminAnalytics } from "./admin-analytics"
 import { AdminReviews } from "./admin-reviews"
 import { Users, Package, DollarSign, AlertTriangle } from "lucide-react"
+import { MeasurementOversight } from "./measurement-oversight"
 
 interface AdminDashboardProps {
   user: User
@@ -148,6 +149,8 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
                 </CardContent>
               </Card>
             </div>
+
+            <MeasurementOversight />
           </TabsContent>
 
           <TabsContent value="customers">

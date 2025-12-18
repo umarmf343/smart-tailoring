@@ -7,11 +7,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertCircle, MessageCircle } from "lucide-react"
+import { formatConvertedMeasurement } from "@/lib/measurement-system"
 
 interface MeasurementAdjustmentRequestProps {
   orderId: string
   customerName: string
   measurements: Record<string, number>
+  unit?: "inch" | "cm"
   onRequestSent?: () => void
 }
 
@@ -19,6 +21,7 @@ export function MeasurementAdjustmentRequest({
   orderId,
   customerName,
   measurements,
+  unit = "inch",
   onRequestSent,
 }: MeasurementAdjustmentRequestProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -81,12 +84,15 @@ export function MeasurementAdjustmentRequest({
                   >
                     <p className="text-sm font-medium capitalize mb-1">{key.replace(/([A-Z])/g, " $1")}</p>
                     <p className="text-lg font-bold">
-                      {value} inch
+                      {value} {unit}
                       {concernedMeasurements.includes(key) && (
                         <Badge className="ml-2" variant="secondary">
                           Selected
                         </Badge>
                       )}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      ≈ {formatConvertedMeasurement(value, unit)}
                     </p>
                   </button>
                 ))}
