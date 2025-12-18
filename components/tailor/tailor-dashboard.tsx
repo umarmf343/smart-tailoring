@@ -9,7 +9,7 @@ import { TailorOrders } from "./tailor-orders"
 import { TailorProfile } from "./tailor-profile"
 import { TailorAnalytics } from "./tailor-analytics"
 import { TailorReviews } from "./tailor-reviews"
-import { Package, DollarSign, Star, TrendingUp } from "lucide-react"
+import { Package, DollarSign, Star, TrendingUp, Zap, BadgeCheck } from "lucide-react"
 
 interface TailorDashboardProps {
   user: User
@@ -38,7 +38,7 @@ export function TailorDashboard({ user }: TailorDashboardProps) {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">Active Orders</CardTitle>
@@ -82,7 +82,49 @@ export function TailorDashboard({ user }: TailorDashboardProps) {
                   <p className="text-xs text-muted-foreground">All time</p>
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Express Readiness</CardTitle>
+                  <Zap className="h-4 w-4 text-orange-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">3 / 5</div>
+                  <p className="text-xs text-muted-foreground">Express slots in use this week</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Badges</CardTitle>
+                  <BadgeCheck className="h-4 w-4 text-emerald-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">3</div>
+                  <p className="text-xs text-muted-foreground">Verified • Express Specialist • Top Rated</p>
+                </CardContent>
+              </Card>
             </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Express & Badge Highlights</CardTitle>
+              </CardHeader>
+              <CardContent className="grid md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+                <div className="p-3 rounded-lg border border-border">
+                  <p className="font-semibold text-foreground mb-1">SLA discipline</p>
+                  <p>Mid-progress reminders and ready-for-pickup deadlines are enabled for express jobs.</p>
+                </div>
+                <div className="p-3 rounded-lg border border-border">
+                  <p className="font-semibold text-foreground mb-1">Capacity guardrails</p>
+                  <p>Auto-block new express intake when weekly or concurrent caps are full.</p>
+                </div>
+                <div className="p-3 rounded-lg border border-border">
+                  <p className="font-semibold text-foreground mb-1">Badge momentum</p>
+                  <p>Keep response time & rating high to retain Top-Rated and Express Specialist renewals.</p>
+                </div>
+              </CardContent>
+            </Card>
 
             <TailorOrders limit={5} />
           </TabsContent>

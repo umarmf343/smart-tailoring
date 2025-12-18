@@ -5,9 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Search, MoreVertical, CheckCircle, X, Eye } from "lucide-react"
+import { Search, MoreVertical, CheckCircle, X, Eye, Zap, ShieldCheck } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Switch } from "@/components/ui/switch"
+import { getBadgeMeta } from "@/lib/badge-utils"
 
 // Mock data
 const MOCK_TAILORS = [
@@ -23,6 +25,27 @@ const MOCK_TAILORS = [
     totalRevenue: 48500,
     joinedAt: new Date("2024-01-15"),
     status: "approved" as const,
+    expressSettings: { enabled: true, expressSlaDays: 3, standardSlaDays: 8, feeRate: 0.25, weeklyCap: 6, weeklyInUse: 4, concurrentCap: 3, concurrentInUse: 2 },
+    badges: [
+      {
+        id: "b1",
+        type: "verified",
+        label: "Verified",
+        description: "Identity & business verified",
+        awardedAt: new Date("2024-11-01"),
+        status: "active" as const,
+        source: "manual" as const,
+      },
+      {
+        id: "b2",
+        type: "express-specialist",
+        label: "Express Specialist",
+        description: "On-time rush track record",
+        awardedAt: new Date("2024-12-10"),
+        status: "active" as const,
+        source: "automated" as const,
+      },
+    ],
   },
   {
     id: "2",
@@ -36,6 +59,18 @@ const MOCK_TAILORS = [
     totalRevenue: 0,
     joinedAt: new Date("2025-01-16"),
     status: "pending" as const,
+    expressSettings: { enabled: false, expressSlaDays: 0, standardSlaDays: 10, feeRate: 0, weeklyCap: 0, weeklyInUse: 0, concurrentCap: 0, concurrentInUse: 0 },
+    badges: [
+      {
+        id: "b3",
+        type: "professional",
+        label: "Professional Tailor",
+        description: "Tenure track after onboarding",
+        awardedAt: new Date("2025-01-16"),
+        status: "pending" as const,
+        source: "automated" as const,
+      },
+    ],
   },
 ]
 
@@ -107,6 +142,25 @@ function TailorList({ tailors, showApprovalActions }: { tailors: typeof MOCK_TAI
               {tailor.email} • {tailor.phone}
             </p>
             <p className="text-sm text-muted-foreground">{tailor.location}</p>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
+              <span className="flex items-center gap-1">
+                <Zap className={`h-4 w-4 ${tailor.expressSettings.enabled ? "text-orange-500" : "text-muted-foreground"}`} />
+                {tailor.expressSettings.enabled ? `${tailor.expressSettings.expressSlaDays}-day express • ${tailor.expressSettings.weeklyInUse}/${tailor.expressSettings.weeklyCap} slots` : "Express off"}
+              </span>
+              <Switch checked={tailor.expressSettings.enabled} aria-label="Toggle express" />
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {tailor.badges.map((badge) => {
+                const meta = getBadgeMeta(badge)
+                const Icon = meta.icon ?? ShieldCheck
+                return (
+                  <Badge key={`${tailor.id}-${badge.id}`} className={meta.tone}>
+                    <Icon className="h-3.5 w-3.5 mr-1" />
+                    {meta.label ?? badge.label}
+                  </Badge>
+                )
+              })}
+            </div>
             {tailor.status === "approved" && (
               <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
                 <span>Rating: {tailor.rating}/5</span>
@@ -146,6 +200,8 @@ function TailorList({ tailors, showApprovalActions }: { tailors: typeof MOCK_TAI
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem>View Orders</DropdownMenuItem>
                     <DropdownMenuItem>View Reviews</DropdownMenuItem>
+                    <DropdownMenuItem>Award / Revoke Badge</DropdownMenuItem>
+                    <DropdownMenuItem>Adjust Express Capacity</DropdownMenuItem>
                     <DropdownMenuItem className="text-destructive">Suspend Account</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

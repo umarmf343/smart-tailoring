@@ -32,6 +32,12 @@ const MOCK_ORDERS = [
     price: 450,
     createdAt: new Date("2025-01-10"),
     estimatedDelivery: new Date("2025-01-25"),
+    express: {
+      requested: true,
+      fee: 90,
+      promiseAt: new Date("2025-01-18"),
+      risk: "on-track" as const,
+    },
     measurementProfileId: "ms-formal-suit",
   },
   {
@@ -43,6 +49,12 @@ const MOCK_ORDERS = [
     price: 80,
     createdAt: new Date("2025-01-15"),
     estimatedDelivery: new Date("2025-01-20"),
+    express: {
+      requested: false,
+      fee: 0,
+      promiseAt: undefined,
+      risk: "none" as const,
+    },
     measurementProfileId: "ms-wedding-dress",
   },
   {
@@ -54,9 +66,22 @@ const MOCK_ORDERS = [
     price: 120,
     createdAt: new Date("2025-01-12"),
     estimatedDelivery: new Date("2025-01-22"),
+    express: {
+      requested: true,
+      fee: 30,
+      promiseAt: new Date("2025-01-16"),
+      risk: "at-risk" as const,
+    },
     measurementProfileId: "ms-cycling-pants",
   },
 ]
+
+const EXPRESS_CAPACITY = {
+  weeklyCap: 5,
+  weeklyInUse: 3,
+  concurrentCap: 3,
+  concurrentInUse: 2,
+}
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
@@ -111,59 +136,77 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
             </Select>
           </div>
         </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {filteredOrders.map((order) => {
-                const profile = MEASUREMENT_LIBRARY.find((item) => item.id === order.measurementProfileId)
-                return (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between p-4 border border-border rounded-lg"
-                  >
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center gap-3">
-                        <p className="font-medium">{order.service}</p>
-                        <Badge className={statusColors[order.status]}>{order.status.replace("-", " ")}</Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">Customer: {order.customerName}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Order #{order.id} • Placed {order.createdAt.toLocaleDateString()}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Est. Delivery: {order.estimatedDelivery.toLocaleDateString()}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Measurements: {profile?.name ?? "Not attached"} •{" "}
-                        {profile ? profile.status.replace("-", " ") : "pending"} (
-                        {describeGarmentType(order.garmentType)})
-                      </p>
+        <CardContent>
+          <div className="mb-4 rounded-lg border border-orange-200 bg-orange-50/60 dark:border-orange-900 dark:bg-orange-950/20 p-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-orange-800 dark:text-orange-200">Express capacity</p>
+              <p className="text-xs text-orange-700 dark:text-orange-300">
+                {EXPRESS_CAPACITY.weeklyInUse}/{EXPRESS_CAPACITY.weeklyCap} weekly slots • {EXPRESS_CAPACITY.concurrentInUse}/{EXPRESS_CAPACITY.concurrentCap} concurrent
+              </p>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Auto-reserve a slot when accepting an express order; reassign if risk is detected.
+            </div>
+          </div>
+          <div className="space-y-4">
+            {filteredOrders.map((order) => {
+              const profile = MEASUREMENT_LIBRARY.find((item) => item.id === order.measurementProfileId)
+              return (
+                <div key={order.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
+                  <div className="space-y-1 flex-1">
+                    <div className="flex items-center gap-3">
+                      <p className="font-medium">{order.service}</p>
+                      <Badge className={statusColors[order.status]}>{order.status.replace("-", " ")}</Badge>
+                      {order.express?.requested && <Badge className="bg-orange-600 text-white">Express</Badge>}
                     </div>
-                    <div className="text-right space-y-2">
-                      <p className="font-bold">${order.price}</p>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedOrder(order)
-                            setSelectedProfileId(order.measurementProfileId)
-                          }}
-                          className="gap-2"
-                        >
-                          <Eye className="h-4 w-4" />
-                          View
-                        </Button>
-                        <Button size="sm" variant="ghost">
-                          <MessageCircle className="h-4 w-4" />
-                        </Button>
-                      </div>
+                    <p className="text-sm text-muted-foreground">Customer: {order.customerName}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Order #{order.id} • Placed {order.createdAt.toLocaleDateString()}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Est. Delivery: {order.estimatedDelivery.toLocaleDateString()}
+                    </p>
+                    {order.express?.requested && (
+                      <p className="text-sm text-orange-700 dark:text-orange-300 flex items-center gap-2">
+                        <Badge className="bg-orange-600 text-white">Express</Badge>
+                        Promise: {order.express.promiseAt?.toLocaleDateString()} • {" "}
+                        {order.express.risk === "at-risk" ? "At risk — update customer" : "On track"}
+                      </p>
+                    )}
+                    <p className="text-sm text-muted-foreground">
+                      Measurements: {profile?.name ?? "Not attached"} • {" "}
+                      {profile ? profile.status.replace("-", " ") : "pending"} ({describeGarmentType(order.garmentType)})
+                    </p>
+                  </div>
+                  <div className="text-right space-y-2">
+                    <p className="font-bold">${order.price}</p>
+                    {order.express?.requested && (
+                      <p className="text-xs text-orange-700 dark:text-orange-300">Express fee: ${order.express.fee}</p>
+                    )}
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedOrder(order)
+                          setSelectedProfileId(order.measurementProfileId)
+                        }}
+                        className="gap-2"
+                      >
+                        <Eye className="h-4 w-4" />
+                        View
+                      </Button>
+                      <Button size="sm" variant="ghost">
+                        <MessageCircle className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                </div>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Order Details Dialog */}
       <Dialog
@@ -199,6 +242,24 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
                   <p className="font-medium">${selectedOrder.price}</p>
                 </div>
               </div>
+
+              {selectedOrder.express && (
+                <div className="grid grid-cols-2 gap-4 rounded-lg border border-orange-200 dark:border-orange-900 bg-orange-50/60 dark:bg-orange-950/20 p-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold flex items-center gap-2 text-orange-800 dark:text-orange-200">
+                      <Badge className="bg-orange-600 text-white">Express</Badge>
+                      Promise by {selectedOrder.express.promiseAt?.toLocaleDateString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Fee: ${selectedOrder.express.fee} • Status: {selectedOrder.express.risk === "at-risk" ? "At risk" : "On track"}
+                    </p>
+                  </div>
+                  <div className="space-y-1 text-sm text-muted-foreground">
+                    <p>Notifications: placed → mid-progress → ready-for-pickup with SLA reminders.</p>
+                    <p className="text-xs">Use reassignment if risk flagged and capacity exists.</p>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
