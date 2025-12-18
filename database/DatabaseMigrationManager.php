@@ -133,11 +133,15 @@ class DatabaseMigrationManager
         $filepath = $this->migrationsPath . $filename;
         $sql = file_get_contents($filepath);
 
+        // Strip SQL comments to avoid splitting on semicolons that appear inside them
+        $normalizedSql = preg_replace('/\/\*.*?\*\//s', '', $sql); // Remove block comments
+        $normalizedSql = preg_replace('/^\s*--.*$/m', '', $normalizedSql); // Remove line comments
+
         // Split by semicolon and execute each statement
         $statements = array_filter(
-            array_map('trim', explode(';', $sql)),
+            array_map('trim', explode(';', $normalizedSql)),
             function ($stmt) {
-                return !empty($stmt) && !preg_match('/^--/', $stmt);
+                return !empty($stmt);
             }
         );
 
