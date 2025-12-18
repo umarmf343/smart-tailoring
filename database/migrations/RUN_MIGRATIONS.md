@@ -16,6 +16,7 @@ php migrate.php run      # Execute pending migrations (admins + OTP columns)
 1. Open phpMyAdmin and select your database (e.g., `smart_tailoring`).
 2. Go to the **SQL** tab.
 3. Run the migrations in this order:
+   - `000_create_orders_table.sql` (creates `orders` table used by OTP + workflow features)
    - `001_create_admin_tables.sql` (creates `admins` and `admin_activity_log`)
    - `add_otp_columns.sql` (adds OTP tracking columns on `orders`)
    - `003_create_tailors_table.sql` (creates `tailors` table used by registration/login)
@@ -37,7 +38,8 @@ SHOW TABLES LIKE 'tailors';
 DESCRIBE tailors;
 SELECT COUNT(*) FROM tailors;
 
--- OTP columns on orders
+-- Orders table and OTP columns
+SHOW TABLES LIKE 'orders';
 DESCRIBE orders;
 -- Should include: start_otp, start_otp_verified_at, delivery_otp, delivery_otp_verified_at
 ```
