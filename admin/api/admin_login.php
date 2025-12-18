@@ -71,6 +71,15 @@ if (isset($_SESSION[$attempt_key]) && $_SESSION[$attempt_key] >= 5) {
 define('DB_ACCESS', true);
 require_once '../../config/db.php';
 
+if (!isset($conn) || !($conn instanceof mysqli)) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => $GLOBALS['db_connection_error'] ?? 'Database connection failed. Please try again later.'
+    ]);
+    exit;
+}
+
 try {
     // Prepare statement to prevent SQL injection
     $stmt = $conn->prepare("SELECT * FROM admins WHERE username = ? AND is_active = 1 LIMIT 1");
