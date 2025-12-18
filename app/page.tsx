@@ -44,6 +44,11 @@ export default function HomePage() {
                 Orders System
               </Button>
             </Link>
+            <Link href="/payments">
+              <Button size="lg" variant="secondary">
+                Payment System
+              </Button>
+            </Link>
           </div>
         </section>
 
