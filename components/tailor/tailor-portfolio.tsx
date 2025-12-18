@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -103,10 +104,12 @@ export function TailorPortfolio() {
                 className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer border border-border"
                 onClick={() => setSelectedItem(item)}
               >
-                <img
+                <Image
                   src={item.imageUrl || "/placeholder.svg"}
                   alt={item.title}
-                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                  fill
+                  sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                  className="object-cover transition-transform group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -135,10 +138,12 @@ export function TailorPortfolio() {
               <DialogDescription>Added on {selectedItem.date.toLocaleDateString()}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <img
+              <Image
                 src={selectedItem.imageUrl || "/placeholder.svg"}
                 alt={selectedItem.title}
-                className="w-full rounded-lg border border-border"
+                width={900}
+                height={900}
+                className="w-full h-auto rounded-lg border border-border"
               />
               <div>
                 <Badge>{selectedItem.category}</Badge>

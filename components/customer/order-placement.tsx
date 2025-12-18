@@ -12,7 +12,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, CreditCard, Wallet } from "lucide-react"
+import { AlertCircle, CheckCircle, CreditCard, Sparkles, Wallet } from "lucide-react"
+import {
+  MEASUREMENT_LIBRARY,
+  describeGarmentType,
+  formatConvertedMeasurement,
+  generateMeasurementAlerts,
+  getFieldsForGarment,
+  type GarmentType,
+} from "@/lib/measurement-system"
 
 interface OrderPlacementProps {
   user: User
@@ -29,19 +37,11 @@ const MOCK_TAILOR = {
   ],
 }
 
-// Mock measurements
-const MOCK_MEASUREMENTS = [
-  {
-    id: "1",
-    name: "Formal Suit",
-    measurements: { chest: 40, waist: 34, shoulder: 18, sleeveLength: 25, inseam: 32 },
-  },
-  {
-    id: "2",
-    name: "Casual Wear",
-    measurements: { chest: 39, waist: 33, hips: 38 },
-  },
-]
+const SERVICE_GARMENT_MAP: Record<string, GarmentType> = {
+  "Custom Suit": "blazer",
+  "Shirt Making": "shirt",
+  Alterations: "pants",
+}
 
 export function OrderPlacement({ user }: OrderPlacementProps) {
   const searchParams = useSearchParams()
@@ -58,7 +58,12 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
   })
   const [paymentMethod, setPaymentMethod] = useState<"wallet" | "card">("wallet")
 
+  const measurementProfiles = MEASUREMENT_LIBRARY
   const selectedService = MOCK_TAILOR.services.find((s) => s.name === orderData.service)
+  const recommendedGarmentType = (orderData.service && SERVICE_GARMENT_MAP[orderData.service]) || undefined
+  const requiredFields = recommendedGarmentType ? getFieldsForGarment(recommendedGarmentType) : []
+  const selectedMeasurementProfile = measurementProfiles.find((profile) => profile.id === orderData.measurementId)
+  const selectedMeasurementAlerts = selectedMeasurementProfile ? generateMeasurementAlerts(selectedMeasurementProfile) : []
   const price = selectedService?.price || 0
   const walletBalance = 250
 
@@ -186,37 +191,94 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Select Measurements</CardTitle>
-                <CardDescription>Choose from your saved measurements</CardDescription>
+                <CardDescription>Choose a saved profile and review alerts before sending to the tailor</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <RadioGroup
                   value={orderData.measurementId}
                   onValueChange={(value) => setOrderData({ ...orderData, measurementId: value })}
                 >
-                  {MOCK_MEASUREMENTS.map((measurement) => (
-                    <div
-                      key={measurement.id}
-                      className="flex items-start space-x-3 border border-border rounded-lg p-4"
-                    >
-                      <RadioGroupItem value={measurement.id} id={measurement.id} className="mt-1" />
-                      <div className="flex-1">
-                        <Label htmlFor={measurement.id} className="font-medium cursor-pointer">
-                          {measurement.name}
-                        </Label>
-                        <div className="grid grid-cols-2 gap-2 mt-3">
-                          {Object.entries(measurement.measurements).map(([key, value]) => (
-                            <div key={key} className="flex justify-between text-sm">
-                              <span className="text-muted-foreground capitalize">
-                                {key.replace(/([A-Z])/g, " $1")}:
-                              </span>
-                              <span className="font-medium">{value} inch</span>
+                  {measurementProfiles.map((measurement) => {
+                    const alerts = generateMeasurementAlerts(measurement)
+                    const recommended =
+                      recommendedGarmentType ? measurement.garmentType === recommendedGarmentType : false
+                    return (
+                      <div
+                        key={measurement.id}
+                        className="flex items-start space-x-3 border border-border rounded-lg p-4"
+                      >
+                        <RadioGroupItem value={measurement.id} id={measurement.id} className="mt-1" />
+                        <div className="flex-1">
+                          <Label htmlFor={measurement.id} className="font-medium cursor-pointer">
+                            {measurement.name}
+                          </Label>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            <Badge variant="secondary">{describeGarmentType(measurement.garmentType)}</Badge>
+                            <Badge variant="outline">{measurement.unit.toUpperCase()}</Badge>
+                            <Badge
+                              variant={measurement.status === "verified" ? "default" : "outline"}
+                              className={measurement.status === "verified" ? "" : "border-amber-500/40 text-amber-700"}
+                            >
+                              {measurement.status.replace("-", " ")}
+                            </Badge>
+                            {recommended && <Badge className="bg-primary/10 text-primary">Recommended for service</Badge>}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 mt-3">
+                            {Object.entries(measurement.measurements).map(([key, value]) => (
+                              <div key={key} className="flex justify-between text-sm">
+                                <span className="text-muted-foreground capitalize">
+                                  {key.replace(/([A-Z])/g, " $1")}:
+                                </span>
+                                <span className="font-medium">
+                                  {value} {measurement.unit}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {formatConvertedMeasurement(value, measurement.unit)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                          {alerts.length > 0 && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {alerts.map((alert, index) => (
+                                <Badge
+                                  key={index}
+                                  variant="outline"
+                                  className="border-amber-500/40 text-amber-700 dark:text-amber-200"
+                                >
+                                  <AlertCircle className="h-3 w-3 mr-1" />
+                                  {alert.message}
+                                </Badge>
+                              ))}
                             </div>
-                          ))}
+                          )}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </RadioGroup>
+
+                {recommendedGarmentType && (
+                  <Card className="bg-muted/70">
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Sparkles className="h-4 w-4" />
+                        Measurement checklist for {orderData.service}
+                      </CardTitle>
+                      <CardDescription>
+                        We&apos;ll forward these fields to your tailor and flag any values that need a second look.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid md:grid-cols-2 gap-3 text-sm">
+                      {requiredFields.map((field) => (
+                        <div key={field.key} className="p-3 border rounded-lg bg-background">
+                          <p className="font-medium">{field.label}</p>
+                          <p className="text-xs text-muted-foreground">{field.helper}</p>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
 
                 <div className="flex justify-between">
                   <Button variant="outline" onClick={handleBack}>
@@ -238,6 +300,38 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
                 <CardDescription>Choose your payment method</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                {selectedMeasurementProfile && (
+                  <Card className="bg-muted/70">
+                    <CardHeader>
+                      <CardTitle className="text-base">Measurement set attached</CardTitle>
+                      <CardDescription className="flex flex-wrap gap-2 items-center">
+                        <Badge variant="secondary">{selectedMeasurementProfile.name}</Badge>
+                        <Badge variant="outline">
+                          {describeGarmentType(selectedMeasurementProfile.garmentType)} • {selectedMeasurementProfile.unit}
+                        </Badge>
+                        {selectedMeasurementAlerts.length > 0 ? (
+                          <Badge variant="destructive" className="bg-amber-100 text-amber-800">
+                            {selectedMeasurementAlerts.length} alert(s) to confirm
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">No alerts</Badge>
+                        )}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-2 gap-2 text-sm">
+                      {Object.entries(selectedMeasurementProfile.measurements).map(([key, value]) => (
+                        <div key={key} className="flex justify-between border rounded-md p-2 bg-background">
+                          <span className="capitalize text-muted-foreground">{key.replace(/([A-Z])/g, " $1")}</span>
+                          <span className="font-medium">
+                            {value} {selectedMeasurementProfile.unit} (
+                            {formatConvertedMeasurement(value, selectedMeasurementProfile.unit)})
+                          </span>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
                 <div className="bg-muted p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-muted-foreground">Service:</span>

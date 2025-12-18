@@ -3,9 +3,9 @@ import { redirect } from "next/navigation"
 import { CustomerHeader } from "@/components/customer/customer-header"
 import { OrderDetail } from "@/components/customer/order-detail"
 
-export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function OrderDetailPage({ params }: { params: { id: string } }) {
   const user = await getSession()
-  const { id } = await params
+  const { id } = params
 
   if (!user || user.role !== "customer") {
     redirect("/auth/login")
