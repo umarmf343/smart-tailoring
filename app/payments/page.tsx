@@ -5,26 +5,33 @@ import {
   Activity,
   AlertTriangle,
   ArrowLeft,
+  Ban,
   BarChart3,
   BellRing,
   BookCheck,
   CalendarClock,
   CheckCircle2,
   CreditCard,
+  FileLock2,
   FileWarning,
+  Fingerprint,
   HandCoins,
+  HeartHandshake,
   Layers,
   Lock,
   Mail,
   PieChart,
   QrCode,
+  ReceiptText,
   RefreshCw,
   Repeat,
   Shield,
+  Siren,
   Sparkles,
   Split,
   Timer,
   TrendingUp,
+  Workflow,
   Wallet,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -221,6 +228,105 @@ const compliance = [
   },
 ]
 
+const feeIntegrity = [
+  {
+    title: "Locked admin fee",
+    detail: "Platform fee is injected into checkout and cannot be removed by either customer or tailor.",
+    badge: "Required",
+  },
+  {
+    title: "Gateway split",
+    detail: "Paystack/Flutterwave split payments route the admin fee to the platform subaccount at charge time.",
+    badge: "No bypass",
+  },
+  {
+    title: "Net preview",
+    detail: "Tailors see their net after fees before accepting work, mirroring the customer-facing breakdown.",
+    badge: "Transparent",
+  },
+]
+
+const checkoutGuardrails = [
+  {
+    title: "Frozen totals",
+    detail: "Order amount + admin fee + gateway fees are read-only in the payment modal; edits re-trigger approval.",
+  },
+  {
+    title: "Inline receipts",
+    detail: "Receipts show garment price, platform fee, and transaction fee so disputes are simplified.",
+  },
+  {
+    title: "Webhook verification",
+    detail: "Webhook signatures confirm the charged amount matches the locked total before order status updates.",
+  },
+]
+
+const offPlatformPrevention = [
+  {
+    title: "In-app only",
+    detail: "Messaging, design uploads, and approvals stay in-app so customers and tailors cannot swap external payment links.",
+    badge: "No external links",
+  },
+  {
+    title: "Policy enforcement",
+    detail: "Terms of Service highlights fee bypass consequences; repeated attempts trigger account holds.",
+    badge: "Escalations",
+  },
+  {
+    title: "Keyword guardrails",
+    detail: "Mentions of cash/bank details in chat raise admin reviews and guidance nudges to stay on-platform.",
+    badge: "Safe comms",
+  },
+]
+
+const auditAndAlerts = [
+  {
+    title: "Audit trail",
+    detail: "Charge, split, webhook, payout, and refund events are timestamped with actor and gateway references.",
+  },
+  {
+    title: "Anomaly alerts",
+    detail: "Alerts fire when tailors attempt direct payments, customers adjust totals, or payouts deviate from rules.",
+  },
+  {
+    title: "Exportable logs",
+    detail: "Admins download CSV/JSON for disputes or reconciliation, backed by signed URLs for security.",
+  },
+]
+
+const incentivePrograms = [
+  {
+    title: "Loyalty for compliance",
+    detail: "Customers earn points or discounts after successful on-platform payments over time.",
+    badge: "+Rewards",
+  },
+  {
+    title: "Tailor reliability score",
+    detail: "Tailors who always accept on-platform payments gain boosted visibility and quicker payouts.",
+    badge: "+Visibility",
+  },
+  {
+    title: "Graduated penalties",
+    detail: "Warnings, temporary holds, then suspensions apply for repeated bypass attempts.",
+    badge: "Fair but firm",
+  },
+]
+
+const apiBlueprint = [
+  {
+    title: "Fee calculation API",
+    detail: "Backend computes garment total, platform fee, and gateway fee before generating Paystack/Flutterwave links.",
+  },
+  {
+    title: "Split instruction",
+    detail: "Subaccount codes and split ratios are attached to the charge request; settlement follows the blueprint automatically.",
+  },
+  {
+    title: "Secure confirmations",
+    detail: "Webhook handlers verify signatures, compare expected vs. charged amounts, and unlock order state transitions.",
+  },
+]
+
 const payoutChartConfig = {
   earnings: {
     label: "Tailor earnings",
@@ -351,6 +457,69 @@ export default function PaymentsPage() {
         </section>
 
         <Separator className="my-10" />
+
+        <section className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+          <Card className="border-primary/30 shadow-lg shadow-primary/10">
+            <CardHeader className="space-y-3">
+              <Badge variant="secondary" className="gap-2">
+                <FileLock2 className="h-4 w-4" />
+                Admin fee integrity
+              </Badge>
+              <CardTitle className="text-2xl">Transparent, non-bypassable fees</CardTitle>
+              <CardDescription>
+                The admin service fee is injected into every checkout and routed via Paystack/Flutterwave splits so no
+                one can bypass the platform cut.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3 md:grid-cols-3">
+              {feeIntegrity.map((item) => (
+                <div key={item.title} className="rounded-lg border border-border bg-muted/40 p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold">{item.title}</p>
+                    <Badge variant="outline">{item.badge}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{item.detail}</p>
+                </div>
+              ))}
+              <div className="md:col-span-3 rounded-lg border border-dashed border-primary/40 bg-primary/5 p-4">
+                <div className="flex items-center gap-2">
+                  <Fingerprint className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-semibold text-primary">Gateway-confirmed truth</p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Fee amounts are computed server-side, signed, and echoed back by the gateway webhook to prevent client
+                  tampering.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="space-y-3">
+              <Badge variant="outline" className="w-fit gap-2">
+                <ReceiptText className="h-4 w-4" />
+                Checkout guardrails
+              </Badge>
+              <CardTitle className="text-xl">Locked totals and receipts</CardTitle>
+              <CardDescription>Customers and tailors see immutable totals before payment authorization.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {checkoutGuardrails.map((item) => (
+                <div key={item.title} className="rounded-lg border border-border bg-muted/40 p-3">
+                  <p className="font-semibold">{item.title}</p>
+                  <p className="text-sm text-muted-foreground">{item.detail}</p>
+                </div>
+              ))}
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+                <p className="text-sm font-semibold text-primary">Show the math</p>
+                <p className="text-sm text-muted-foreground">
+                  Order amount + admin fee + gateway fee are line items so customers know exactly why they are paying
+                  the total shown.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           <div className="space-y-4">
@@ -535,6 +704,71 @@ export default function PaymentsPage() {
         <Separator className="my-10" />
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+          <Card className="border-border/80">
+            <CardHeader className="space-y-3">
+              <Badge variant="secondary" className="gap-2">
+                <Shield className="h-4 w-4" />
+                Off-platform prevention
+              </Badge>
+              <CardTitle className="text-2xl">Keep payments inside the platform</CardTitle>
+              <CardDescription>
+                Messaging and collaboration are designed to discourage cash or side deals while keeping admins informed.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3 md:grid-cols-3">
+              {offPlatformPrevention.map((item) => (
+                <div key={item.title} className="rounded-lg border border-border bg-muted/40 p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold">{item.title}</p>
+                    <Badge variant="outline">{item.badge}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{item.detail}</p>
+                </div>
+              ))}
+              <div className="md:col-span-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+                <div className="flex items-center gap-2">
+                  <Ban className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-semibold text-primary">No external payments</p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Off-platform payment attempts pause order progress until admins review and guide both parties back to
+                  Paystack/Flutterwave checkout.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="h-full">
+            <CardHeader>
+              <Badge variant="outline" className="w-fit gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Audit & alerts
+              </Badge>
+              <CardTitle>Every payment has a paper trail</CardTitle>
+              <CardDescription>Admins have the evidence needed to intervene fast.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {auditAndAlerts.map((item) => (
+                <div key={item.title} className="rounded-lg border border-border bg-muted/40 p-3">
+                  <p className="font-semibold">{item.title}</p>
+                  <p className="text-sm text-muted-foreground">{item.detail}</p>
+                </div>
+              ))}
+              <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-3">
+                <div className="flex items-center gap-2">
+                  <Siren className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-semibold text-primary">Real-time nudge</p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Tailors and customers receive alerts if totals shift or if payouts are held for compliance, keeping
+                  everyone aligned.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
           <Card>
             <CardHeader className="space-y-3">
               <Badge variant="secondary" className="gap-2">
@@ -650,6 +884,63 @@ export default function PaymentsPage() {
         </section>
 
         <Separator className="my-10" />
+
+        <section className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+          <Card className="border-border/80">
+            <CardHeader className="space-y-3">
+              <Badge variant="secondary" className="gap-2">
+                <Workflow className="h-4 w-4" />
+                Gateway blueprint
+              </Badge>
+              <CardTitle className="text-2xl">API-first fee enforcement</CardTitle>
+              <CardDescription>How Paystack and Flutterwave stay in sync with platform rules.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {apiBlueprint.map((item) => (
+                <div key={item.title} className="rounded-lg border border-border bg-muted/40 p-3">
+                  <p className="font-semibold">{item.title}</p>
+                  <p className="text-sm text-muted-foreground">{item.detail}</p>
+                </div>
+              ))}
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+                <p className="text-sm font-semibold text-primary">Webhook safety</p>
+                <p className="text-sm text-muted-foreground">
+                  Signatures and idempotency keys prevent replay attacks and guarantee that only verified payments move
+                  orders forward.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="h-full">
+            <CardHeader>
+              <Badge variant="outline" className="w-fit gap-2">
+                <HeartHandshake className="h-4 w-4" />
+                Incentives
+              </Badge>
+              <CardTitle>Rewards for doing it right</CardTitle>
+              <CardDescription>Compliance is encouraged with perks and discouraged with time-bound holds.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {incentivePrograms.map((item) => (
+                <div key={item.title} className="rounded-lg border border-border bg-muted/40 p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold">{item.title}</p>
+                    <Badge variant="secondary">{item.badge}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{item.detail}</p>
+                </div>
+              ))}
+              <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-3">
+                <p className="text-sm font-semibold text-primary">Fair outcomes</p>
+                <p className="text-sm text-muted-foreground">
+                  Penalties escalate gradually with clear communication, ensuring the platform stays trusted without
+                  surprising loyal users.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
 
         <section className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
