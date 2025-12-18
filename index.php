@@ -8,6 +8,12 @@
 // Start session to maintain login state
 session_start();
 
+// Load environment and base URL configuration
+require_once __DIR__ . '/config/env_loader.php';
+$appConfig = load_env_config();
+$baseUrl = $appConfig['app_url'] ?? 'https://quranseed.com.ng';
+$logoUrl = $baseUrl . '/assets/images/logo.png';
+
 // Include database connection
 define('DB_ACCESS', true);
 require_once __DIR__ . '/config/db.php';
@@ -46,21 +52,21 @@ $user_type = $is_logged_in ? $_SESSION['user_type'] : '';
     <meta name="keywords" content="tailor, stitching, satna, alterations, designer wear, custom clothing, smart tailoring">
     <meta name="author" content="Smart Tailoring Service">
     <meta name="google-site-verification" content="EUH00pAOdVaFRbCLj71OVXC5ok5T30VsNn19_t-UEp8" />
-    <link rel="canonical" href="https://smart-tailoring-opv5.onrender.com/">
+    <link rel="canonical" href="<?php echo htmlspecialchars($baseUrl . '/', ENT_QUOTES, 'UTF-8'); ?>">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://smart-tailoring-opv5.onrender.com/">
+    <meta property="og:url" content="<?php echo htmlspecialchars($baseUrl . '/', ENT_QUOTES, 'UTF-8'); ?>">
     <meta property="og:title" content="Smart Tailoring Service - Find Best Tailors in Satna">
     <meta property="og:description" content="Smart Tailoring Service - Find the best tailors in Satna for custom stitching, alterations, and designer wear. Book online today!">
-    <meta property="og:image" content="https://smart-tailoring-opv5.onrender.com/assets/images/logo.png">
+    <meta property="og:image" content="<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://smart-tailoring-opv5.onrender.com/">
+    <meta property="twitter:url" content="<?php echo htmlspecialchars($baseUrl . '/', ENT_QUOTES, 'UTF-8'); ?>">
     <meta property="twitter:title" content="Smart Tailoring Service - Find Best Tailors in Satna">
     <meta property="twitter:description" content="Smart Tailoring Service - Find the best tailors in Satna for custom stitching, alterations, and designer wear. Book online today!">
-    <meta property="twitter:image" content="https://smart-tailoring-opv5.onrender.com/assets/images/logo.png">
+    <meta property="twitter:image" content="<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>">
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -68,9 +74,9 @@ $user_type = $is_logged_in ? $_SESSION['user_type'] : '';
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
             "name": "Smart Tailoring Service",
-            "image": "https://smart-tailoring-opv5.onrender.com/assets/images/logo.png",
-            "@id": "https://smart-tailoring-opv5.onrender.com/",
-            "url": "https://smart-tailoring-opv5.onrender.com/",
+            "image": "<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>",
+            "@id": "<?php echo htmlspecialchars($baseUrl . '/', ENT_QUOTES, 'UTF-8'); ?>",
+            "url": "<?php echo htmlspecialchars($baseUrl . '/', ENT_QUOTES, 'UTF-8'); ?>",
             "telephone": "+919876543210",
             "address": {
                 "@type": "PostalAddress",
