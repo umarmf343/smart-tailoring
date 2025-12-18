@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `admins` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `admins` (username, password, full_name, name, email, role, created_at)
-SELECT 'admin', '$2y$10$zAM5U232ptyS7eLA7pgS.OtX.0quZAVZdBhATPOzMYXYxN6eGYUe2', 'Administrator', 'Administrator', 'anupamkushwaha639@gmail.com', 'super_admin', NOW()
+SELECT 'admin', '$2y$10$MODBHPvBOti2/05IkJPgDOpJLRdrBf3bOcwhz4NQOSANVR8wUkZuu', 'Administrator', 'Administrator', 'anupamkushwaha639@gmail.com', 'super_admin', NOW()
 WHERE NOT EXISTS (
     SELECT 1 FROM `admins` WHERE `username` = 'admin' OR `email` = 'anupamkushwaha639@gmail.com'
 );
