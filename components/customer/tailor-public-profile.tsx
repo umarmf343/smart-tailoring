@@ -2,6 +2,7 @@
 
 import type { User } from "@/lib/types"
 import Link from "next/link"
+import Image from "next/image"
 import { CustomerHeader } from "./customer-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -156,11 +157,16 @@ export function TailorPublicProfile({ tailorId, user }: TailorPublicProfileProps
               <CardContent>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {MOCK_TAILOR.portfolio.map((item) => (
-                    <div key={item.id} className="aspect-square overflow-hidden rounded-lg border border-border">
-                      <img
+                    <div
+                      key={item.id}
+                      className="aspect-square relative overflow-hidden rounded-lg border border-border"
+                    >
+                      <Image
                         src={item.imageUrl || "/placeholder.svg"}
                         alt="Portfolio item"
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
+                        className="object-cover"
                       />
                     </div>
                   ))}

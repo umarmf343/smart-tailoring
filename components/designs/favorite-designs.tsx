@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -62,10 +63,12 @@ export function FavoriteDesigns() {
             {favorites.map((design) => (
               <div key={design.id} className="border border-border rounded-lg overflow-hidden">
                 <div className="aspect-video relative">
-                  <img
+                  <Image
                     src={design.imageUrl || "/placeholder.svg"}
                     alt={design.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover"
                   />
                   <Badge className="absolute top-2 right-2">{design.category}</Badge>
                 </div>

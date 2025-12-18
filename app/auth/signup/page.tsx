@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { SignupForm } from "@/components/auth/signup-form"
 import Link from "next/link"
 import { Scissors } from "lucide-react"
@@ -16,7 +17,11 @@ export default function SignupPage() {
         </div>
 
         <div className="bg-background border border-border rounded-lg p-8">
-          <SignupForm />
+          <Suspense
+            fallback={<div className="text-center text-muted-foreground py-4">Preparing signup options...</div>}
+          >
+            <SignupForm />
+          </Suspense>
 
           <div className="mt-6 text-center text-sm">
             <p className="text-muted-foreground">
