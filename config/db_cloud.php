@@ -42,6 +42,104 @@ $use_ssl = filter_var(getenv('DB_USE_SSL') ?: ($_ENV['DB_USE_SSL'] ?? 'false'), 
 // SSL Certificate Path (for Aiven MySQL)
 $ca_cert_path = __DIR__ . '/../ca.pem';
 
+// Migration manager for schema auto-healing
+require_once __DIR__ . '/../database/DatabaseMigrationManager.php';
+
+/**
+ * Identify missing core account tables.
+ */
+function getMissingCoreAccountTables($conn)
+{
+    $coreTables = ['tailors', 'customers'];
+    $missing = [];
+
+    foreach ($coreTables as $table) {
+        $safeTable = $conn ? $conn->real_escape_string($table) : $table;
+        $result = $conn ? $conn->query("SHOW TABLES LIKE '{$safeTable}'") : false;
+
+        if (!$result || $result->num_rows === 0) {
+            $missing[] = $table;
+        }
+
+        if ($result instanceof mysqli_result) {
+            $result->free();
+        }
+    }
+
+    return $missing;
+}
+
+/**
+ * Execute a SQL file (used for last-resort schema recreation).
+ */
+function executeSqlFile($conn, $filepath)
+{
+    if (!$conn || !file_exists($filepath)) {
+        return false;
+    }
+
+    $sql = file_get_contents($filepath);
+
+    // Remove comments to avoid accidental splits
+    $normalizedSql = preg_replace('/\/\*.*?\*\//s', '', $sql);
+    $normalizedSql = preg_replace('/^\s*--.*$/m', '', $normalizedSql);
+
+    $statements = array_filter(array_map('trim', explode(';', $normalizedSql)));
+
+    foreach ($statements as $statement) {
+        if (empty($statement)) {
+            continue;
+        }
+
+        if (!$conn->query($statement)) {
+            error_log("Schema bootstrap failed at {$filepath}: " . $conn->error);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Ensure critical account tables exist by auto-running migrations or the fallback schema.
+ */
+function ensureCoreAccountTables($conn)
+{
+    static $schemaVerified = false;
+
+    if ($schemaVerified || !$conn) {
+        return;
+    }
+
+    $schemaVerified = true;
+    $missing = getMissingCoreAccountTables($conn);
+
+    if (empty($missing)) {
+        return;
+    }
+
+    // Attempt to run all pending migrations automatically
+    try {
+        $manager = new DatabaseMigrationManager($conn, __DIR__ . '/../database/migrations/');
+        $manager->runMigrations();
+    } catch (Throwable $e) {
+        error_log('Automatic migration run failed: ' . $e->getMessage());
+    }
+
+    $missing = getMissingCoreAccountTables($conn);
+
+    // As a last resort, recreate core account tables directly
+    if (!empty($missing)) {
+        $fallbackFile = __DIR__ . '/../database/migrations/005_recreate_core_account_tables.sql';
+        executeSqlFile($conn, $fallbackFile);
+    }
+
+    $stillMissing = getMissingCoreAccountTables($conn);
+    if (!empty($stillMissing)) {
+        error_log('Critical database schema missing: ' . implode(', ', $stillMissing));
+    }
+}
+
 /**
  * Establish Database Connection with SSL Support
  */
@@ -137,6 +235,11 @@ function getCloudDatabaseConnection()
 
 // Establish connection
 $conn = getCloudDatabaseConnection();
+
+// Auto-heal schema if core tables are missing
+if ($conn) {
+    ensureCoreAccountTables($conn);
+}
 
 if (!$conn) {
     // Critical error - cannot proceed without database
