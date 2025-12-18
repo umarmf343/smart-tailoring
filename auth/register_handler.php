@@ -18,19 +18,12 @@ define('DB_ACCESS', true);
 // Include database connection
 require_once '../config/db.php';
 require_once '../services/EmailOTPService.php';
+require_once '../services/RegistrationQueue.php';
 
 // Set JSON response header
 header('Content-Type: application/json');
 
-// Ensure database connection is available
-if (!isset($conn) || !$conn instanceof mysqli) {
-    http_response_code(503);
-    echo json_encode([
-        'success' => false,
-        'message' => $GLOBALS['db_connection_error'] ?? 'Database connection unavailable. Please try again later.'
-    ]);
-    exit;
-}
+$hasDbConnection = isset($conn) && $conn instanceof mysqli;
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -82,6 +75,53 @@ try {
 
     // Hash password
     $password_hash = password_hash($password, PASSWORD_BCRYPT);
+
+    // Collect optional/common fields ahead of DB/queue decision
+    $address = isset($_POST['address']) ? trim($_POST['address']) : '';
+
+    $tailorProfile = null;
+    if ($user_type === 'tailor') {
+        $shop_address = isset($_POST['shop_address']) ? trim($_POST['shop_address']) : '';
+        $area = isset($_POST['area']) ? trim($_POST['area']) : 'Satna';
+        $speciality = isset($_POST['speciality']) ? trim($_POST['speciality']) : 'General Tailoring';
+        $services = isset($_POST['services']) ? trim($_POST['services']) : 'Stitching, Alteration';
+        $experience = isset($_POST['experience']) ? (int)$_POST['experience'] : 0;
+
+        if (empty($shop_address)) {
+            throw new Exception('Shop address is required for tailor registration');
+        }
+
+        $tailorProfile = [
+            'shop_address' => $shop_address,
+            'area' => $area,
+            'speciality' => $speciality,
+            'services' => $services,
+            'experience' => $experience
+        ];
+    }
+
+    // If the database is offline, queue the request instead of failing
+    if (!$hasDbConnection) {
+        $queue = new RegistrationQueue();
+        $queued = $queue->enqueue([
+            'user_type' => $user_type,
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'password_hash' => $password_hash,
+            'address' => $address,
+            'tailor_profile' => $tailorProfile
+        ]);
+
+        http_response_code(202);
+        echo json_encode([
+            'success' => true,
+            'queued' => true,
+            'message' => 'Registration queued while we restore database connectivity. Your reference is ' . $queued['reference'],
+            'reference' => $queued['reference']
+        ]);
+        exit;
+    }
 
     // Register based on user type
     if ($user_type === 'customer') {
@@ -142,9 +182,6 @@ try {
         if ($existing_phone) {
             throw new Exception('Phone number already registered.');
         }
-
-        // Get optional address
-        $address = isset($_POST['address']) ? trim($_POST['address']) : '';
 
         // Insert customer using prepared statement
         $stmt = $conn->prepare("INSERT INTO customers (full_name, email, phone, password, address, email_verified) VALUES (?, ?, ?, ?, ?, 0)");
@@ -255,18 +292,6 @@ try {
 
         if ($existing_phone) {
             throw new Exception('Phone number already registered.');
-        }
-
-        // Get tailor-specific fields
-        $shop_address = isset($_POST['shop_address']) ? trim($_POST['shop_address']) : '';
-        $area = isset($_POST['area']) ? trim($_POST['area']) : 'Satna';
-        $speciality = isset($_POST['speciality']) ? trim($_POST['speciality']) : 'General Tailoring';
-        $services = isset($_POST['services']) ? trim($_POST['services']) : 'Stitching, Alteration';
-        $experience = isset($_POST['experience']) ? (int)$_POST['experience'] : 0;
-
-        // Validate tailor required fields
-        if (empty($shop_address)) {
-            throw new Exception('Shop address is required for tailor registration');
         }
 
         // Insert tailor using prepared statement

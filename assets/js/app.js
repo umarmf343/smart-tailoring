@@ -160,6 +160,8 @@ function scrollToTailors() {
 function loadTailors() {
     const tailorsGrid = document.getElementById('tailorsGrid');
 
+    clearTailorStatusNotice();
+
     // Show loading state
     tailorsGrid.innerHTML = `
         <div class="loading">
@@ -172,6 +174,13 @@ function loadTailors() {
         .then(response => response.json())
         .then(data => {
             if (data.success && data.tailors.length > 0) {
+                if (data.from_cache) {
+                    const lastUpdated = data.cache_last_updated ? ` (updated ${new Date(data.cache_last_updated).toLocaleString()})` : '';
+                    showTailorStatusNotice(`Showing cached tailor profiles while we restore database connectivity${lastUpdated}.`);
+                } else {
+                    clearTailorStatusNotice();
+                }
+
                 displayTailors(data.tailors);
             } else {
                 tailorsGrid.innerHTML = `
@@ -191,6 +200,30 @@ function loadTailors() {
                 </div>
             `;
         });
+}
+
+// Show a notice above the tailor grid (used for cached data/failover)
+function showTailorStatusNotice(message) {
+    const container = document.querySelector('.tailors-section .section-container');
+    const grid = document.getElementById('tailorsGrid');
+
+    if (!container || !grid) return;
+
+    let notice = document.querySelector('.tailor-cache-notice');
+    if (!notice) {
+        notice = document.createElement('div');
+        notice.className = 'tailor-cache-notice';
+        container.insertBefore(notice, grid);
+    }
+
+    notice.innerHTML = `<i class="fas fa-info-circle"></i><span>${message}</span>`;
+}
+
+function clearTailorStatusNotice() {
+    const notice = document.querySelector('.tailor-cache-notice');
+    if (notice) {
+        notice.remove();
+    }
 }
 
 // ============================================
@@ -1531,4 +1564,3 @@ function showOTPMessage(message, type) {
         }, 5000);
     }
 }
-
