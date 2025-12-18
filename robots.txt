@@ -6,4 +6,4 @@ Disallow: /config/
 Disallow: /vendor/
 Disallow: /logs/
 
-Sitemap: https://smart-tailoring-opv5.onrender.com/sitemap.xml
+Sitemap: https://quranseed.com.ng/sitemap.xml
