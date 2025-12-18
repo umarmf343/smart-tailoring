@@ -2,8 +2,8 @@ import { ResetPasswordForm } from "@/components/auth/reset-password-form"
 import Link from "next/link"
 import { Scissors } from "lucide-react"
 
-export default async function ResetPasswordPage({ params }: { params: Promise<{ token: string }> }) {
-  const { token } = await params
+export default async function ResetPasswordPage({ params }: { params: { token: string } }) {
+  const { token } = params
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted p-4">

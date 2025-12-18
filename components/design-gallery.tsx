@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -94,11 +95,13 @@ export function DesignGallery() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredDesigns.map((design) => (
               <Card key={design.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="relative">
-                  <img
+                <div className="relative h-80">
+                  <Image
                     src={design.imageUrl || "/placeholder.svg"}
                     alt={design.name}
-                    className="w-full h-80 object-cover"
+                    fill
+                    sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover"
                   />
                   {design.popular && (
                     <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground">Popular</Badge>
@@ -135,10 +138,12 @@ export function DesignGallery() {
           {selectedDesign && (
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <img
+                <Image
                   src={selectedDesign.imageUrl || "/placeholder.svg"}
                   alt={selectedDesign.name}
-                  className="w-full rounded-lg object-cover"
+                  width={600}
+                  height={800}
+                  className="w-full rounded-lg object-cover h-auto"
                 />
               </div>
               <div className="space-y-4">

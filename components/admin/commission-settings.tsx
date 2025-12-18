@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DollarSign, Percent } from "lucide-react"
 
-interface CommissionSettings {
+interface CommissionSettingsState {
   defaultRate: number
   minimumCommission: number
   customRates: Array<{
@@ -18,7 +18,7 @@ interface CommissionSettings {
 }
 
 export function CommissionSettings() {
-  const [settings, setSettings] = useState<CommissionSettings>({
+  const [settings, setSettings] = useState<CommissionSettingsState>({
     defaultRate: 10,
     minimumCommission: 5,
     customRates: [
