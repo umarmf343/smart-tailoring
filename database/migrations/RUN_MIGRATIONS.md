@@ -18,6 +18,7 @@ php migrate.php run      # Execute pending migrations (admins + OTP columns)
 3. Run the migrations in this order:
    - `001_create_admin_tables.sql` (creates `admins` and `admin_activity_log`)
    - `add_otp_columns.sql` (adds OTP tracking columns on `orders`)
+   - `003_create_tailors_table.sql` (creates `tailors` table used by registration/login)
 
 ## Verify Migrations
 
@@ -30,6 +31,11 @@ SHOW TABLES LIKE 'admin_activity_log';
 
 -- Admin structure (should include username, password, role, is_active, email_verified, last_login)
 DESCRIBE admins;
+
+-- Tailor accounts
+SHOW TABLES LIKE 'tailors';
+DESCRIBE tailors;
+SELECT COUNT(*) FROM tailors;
 
 -- OTP columns on orders
 DESCRIBE orders;
