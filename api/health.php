@@ -17,30 +17,65 @@
 ini_set('display_errors', 0);
 error_reporting(0);
 
-
 header('Content-Type: application/json');
-
-// Load environment
-require_once __DIR__ . '/../vendor/autoload.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
+require_once __DIR__ . '/../config/env_loader.php';
+$appConfig = load_env_config();
 
 $health = [
     'status' => 'ok',
     'timestamp' => date('c'), // ISO 8601 format
-    'environment' => $_ENV['APP_ENV'] ?? 'unknown',
+    'environment' => $appConfig['app_env'] ?? 'unknown',
+    'app_url' => $appConfig['app_url'] ?? null,
     'checks' => []
 ];
+
+// Safety net: always return a JSON body even if a fatal error occurs
+ob_start();
+register_shutdown_function(function () use (&$health) {
+    $error = error_get_last();
+    $fatalTypes = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR];
+
+    if ($error && in_array($error['type'], $fatalTypes, true)) {
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        if (!headers_sent()) {
+            http_response_code(503);
+            header('Content-Type: application/json');
+        }
+
+        $health['status'] = 'error';
+        $health['checks']['fatal'] = [
+            'status' => 'error',
+            'message' => 'Unexpected server error',
+        ];
+
+        echo json_encode($health, JSON_PRETTY_PRINT);
+    } elseif (ob_get_length() === 0) {
+        // Ensure a JSON body is present even if nothing was echoed
+        if (!headers_sent()) {
+            http_response_code(503);
+            header('Content-Type: application/json');
+        }
+
+        $health['status'] = 'error';
+        $health['checks']['fatal'] = [
+            'status' => 'error',
+            'message' => 'Empty response generated',
+        ];
+
+        echo json_encode($health, JSON_PRETTY_PRINT);
+    }
+});
 
 // Check database connection
 try {
     define('DB_ACCESS', true);
     require_once __DIR__ . '/../config/db.php';
 
-    // Test query using mysqli connection
-    $result = $conn->query('SELECT 1 as test');
-
-    if ($result && $result->num_rows > 0) {
+    // Test query using mysqli connection when available
+    if (isset($conn) && $conn instanceof mysqli && db_health_check()) {
         $health['checks']['database'] = [
             'status' => 'ok',
             'message' => 'Database connection successful'
@@ -49,10 +84,10 @@ try {
         $health['status'] = 'degraded';
         $health['checks']['database'] = [
             'status' => 'warning',
-            'message' => 'Database query returned no result'
+            'message' => $GLOBALS['db_connection_error'] ?? 'Database unavailable or not configured'
         ];
     }
-} catch (Exception $e) {
+} catch (Throwable $e) {
     $health['status'] = 'error';
     $health['checks']['database'] = [
         'status' => 'error',
@@ -60,7 +95,7 @@ try {
     ];
 
     // Include error details only in development
-    if (isset($_ENV['APP_DEBUG']) && $_ENV['APP_DEBUG'] === 'true') {
+    if (!empty($appConfig['app_debug'])) {
         $health['checks']['database']['error'] = $e->getMessage();
     }
 }
@@ -105,6 +140,18 @@ if (file_exists(__DIR__ . '/../composer.json')) {
 }
 
 // Set appropriate HTTP status code
-http_response_code($health['status'] === 'ok' ? 200 : ($health['status'] === 'degraded' ? 500 : 503));
+$statusCode = 200;
+if ($health['status'] === 'error') {
+    $statusCode = 503;
+} elseif ($health['status'] === 'degraded') {
+    $statusCode = 206; // Partial availability but endpoint still answers
+}
+
+http_response_code($statusCode);
 
 echo json_encode($health, JSON_PRETTY_PRINT);
+
+// Flush output buffer (safe for shutdown handler)
+if (ob_get_level()) {
+    ob_end_flush();
+}

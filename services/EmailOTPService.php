@@ -5,11 +5,20 @@
  * Handles OTP generation, verification, and email sending using PHPMailer
  */
 
+require_once __DIR__ . '/../config/env_loader.php';
+load_env_config();
+
 // Load PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+$autoloadPath = __DIR__ . '/../vendor/autoload.php';
+if (file_exists($autoloadPath)) {
+    require_once $autoloadPath;
+} else {
+    error_log('Composer autoload not found. Run "composer install" to enable PHPMailer-based OTP emails.');
+}
+
 require_once __DIR__ . '/../config/email.php';
 require_once __DIR__ . '/BrevoEmailService.php';
 
@@ -19,18 +28,24 @@ class EmailOTPService
     private $mailer;
     private $useBrevo = false;
     private $brevoService;
+    private $mailerReady = true;
 
     public function __construct($db_connection)
     {
         $this->conn = $db_connection;
+        $this->mailerReady = class_exists(PHPMailer::class);
 
         // Check if Brevo API Key is set
-        $apiKey = getenv('BREVO_API_KEY') ?: ($_ENV['BREVO_API_KEY'] ?? '');
+        $apiKey = env_value('BREVO_API_KEY', '');
         if (!empty($apiKey)) {
             $this->useBrevo = true;
             $this->brevoService = new BrevoEmailService();
         } else {
-            $this->initializeMailer();
+            if (!$this->mailerReady) {
+                error_log('PHPMailer is unavailable and BREVO_API_KEY is not set. OTP emails cannot be delivered until one of these is configured.');
+            } else {
+                $this->initializeMailer();
+            }
         }
     }
 
@@ -39,6 +54,10 @@ class EmailOTPService
      */
     private function initializeMailer()
     {
+        if (!$this->mailerReady) {
+            return;
+        }
+
         $this->mailer = new PHPMailer(true);
 
         try {
@@ -89,6 +108,13 @@ class EmailOTPService
                 return [
                     'success' => false,
                     'message' => 'Invalid email address'
+                ];
+            }
+
+            if (!$this->useBrevo && !$this->mailerReady) {
+                return [
+                    'success' => false,
+                    'message' => 'Email delivery is not configured. Install Composer dependencies or add BREVO_API_KEY.'
                 ];
             }
 
@@ -186,6 +212,11 @@ class EmailOTPService
             // Use Brevo if enabled
             if ($this->useBrevo) {
                 return $this->brevoService->sendEmail($email, $user_name ?? 'User', $subject, $email_body);
+            }
+
+            if (!$this->mailerReady || !$this->mailer) {
+                error_log('Mailer not initialized; cannot send OTP email.');
+                return false;
             }
 
             // Fallback to PHPMailer

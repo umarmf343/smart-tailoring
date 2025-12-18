@@ -21,6 +21,8 @@ if (!defined('DB_ACCESS')) {
     define('DB_ACCESS', true);
 }
 
+require_once __DIR__ . '/env_loader.php';
+
 // Load environment variables from .env file (development) or system environment (production)
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     require_once __DIR__ . '/../vendor/autoload.php';
@@ -32,13 +34,13 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
 }
 
 // Database Configuration from Environment Variables
-$db_host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'localhost');
-$db_user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? 'root');
-$db_pass = getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? '');
-$db_name = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'smart_tailoring');
-$db_port = (int)(getenv('DB_PORT') ?: ($_ENV['DB_PORT'] ?? 3306));
-$use_ssl = filter_var(getenv('DB_USE_SSL') ?: ($_ENV['DB_USE_SSL'] ?? 'false'), FILTER_VALIDATE_BOOLEAN);
-$allow_ssl_fallback = filter_var(getenv('DB_SSL_FALLBACK') ?: ($_ENV['DB_SSL_FALLBACK'] ?? 'true'), FILTER_VALIDATE_BOOLEAN);
+$db_host = env_value('DB_HOST', 'localhost');
+$db_user = env_value('DB_USER', 'root');
+$db_pass = env_value('DB_PASS', '');
+$db_name = env_value('DB_NAME', 'smart_tailoring');
+$db_port = (int)env_value('DB_PORT', 3306);
+$use_ssl = filter_var(env_value('DB_USE_SSL', 'false'), FILTER_VALIDATE_BOOLEAN);
+$allow_ssl_fallback = filter_var(env_value('DB_SSL_FALLBACK', 'true'), FILTER_VALIDATE_BOOLEAN);
 
 // SSL Certificate Path (for Aiven MySQL)
 $ca_cert_path = __DIR__ . '/../ca.pem';
@@ -161,7 +163,7 @@ function getCloudDatabaseConnection()
     }
 
     // Set connection timeout (important for cloud deployments)
-    mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 30); // Increased for slow connections
+    mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 8); // Keep short to avoid long 500s
 
     // Set read timeout (if supported)
     if (defined('MYSQLI_OPT_READ_TIMEOUT')) {
@@ -250,9 +252,11 @@ if ($conn) {
 
 if (!$conn) {
     // Critical error - cannot proceed without database
-    $GLOBALS['db_connection_error'] = getenv('APP_ENV') === 'production'
+    $dbHostLabel = $db_host ?: 'unknown';
+    $appEnv = env_value('APP_ENV', 'development');
+    $GLOBALS['db_connection_error'] = $appEnv === 'production'
         ? "Database service unavailable. Please try again later."
-        : "Database Connection Failed. Check your .env configuration.";
+        : "Database connection failed for host '{$dbHostLabel}'. Verify DB_* settings in your environment.";
 
     // Keep the script running so callers can handle the error gracefully
     $conn = null;
@@ -415,7 +419,7 @@ function db_health_check()
 }
 
 // Set error handling based on environment
-$app_env = getenv('APP_ENV') ?: ($_ENV['APP_ENV'] ?? 'development');
+$app_env = env_value('APP_ENV', 'development');
 
 if ($app_env === 'production') {
     // Production: Log errors, don't display
