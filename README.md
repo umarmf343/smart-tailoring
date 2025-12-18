@@ -146,6 +146,22 @@ Run the SQL migrations via Node (reuses the existing schema files):
 npm run migrate
 ```
 
+### 3️⃣.5 🧑‍💻 Local Development Quickstart
+
+- **Start MySQL for local dev (Docker):**
+  ```bash
+  npm run dev:db
+  # or: docker compose -f docker-compose.dev.yml up -d db
+  ```
+  - The container exposes **port 3306** with user `root` / password `secret` and a `smart_tailoring` database. Adjust `.env` if you change these values.
+  - Stop it later with `npm run dev:db-down`.
+
+- **Run migrations + start the watcher:**
+  ```bash
+  npm run dev
+  ```
+  `npm run dev` now waits for MySQL to become available and applies SQL migrations before starting the server in watch mode.
+
 ### 4️⃣ Start the API
 
 ```bash

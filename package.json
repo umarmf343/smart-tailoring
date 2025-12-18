@@ -8,7 +8,9 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
+    "dev": "npm run migrate && node --watch src/server.js",
+    "dev:db": "docker compose -f docker-compose.dev.yml up -d db",
+    "dev:db-down": "docker compose -f docker-compose.dev.yml down",
     "migrate": "node src/scripts/runMigrations.js",
     "lint": "node --check src/server.js || exit 0",
     "test": "echo \"No automated tests are configured yet\""
