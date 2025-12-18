@@ -29,6 +29,10 @@ import {
   MessageSquare,
   PackageCheck,
   PhoneCall,
+  Award,
+  BadgeCheck,
+  Star,
+  Zap,
   Send,
   Shield,
   ShieldCheck,
@@ -457,6 +461,98 @@ const uiNotes = [
   },
 ]
 
+const expressFeatureHighlights = [
+  {
+    title: "Express upgrade",
+    icon: Zap,
+    points: [
+      "Customers toggle Express during checkout with instant SLA preview (2–4 days).",
+      "Order summary shows surcharge math and the promised-by date before payment is captured.",
+    ],
+  },
+  {
+    title: "Premium pricing",
+    icon: CreditCard,
+    points: [
+      "Dynamic fee: 20–30% uplift or minimum fixed fee per garment category.",
+      "Line-item breakdown in invoice so customers see base vs. express surcharge.",
+    ],
+  },
+  {
+    title: "Trust & visibility",
+    icon: CalendarClock,
+    points: [
+      "Order tracker highlights Express with a lightning badge and countdown to the promise date.",
+      "Mid-progress nudges to tailors and real-time alerts to customers on status changes.",
+    ],
+  },
+]
+
+const expressCapacityRules = [
+  {
+    title: "Capacity guardrails",
+    icon: AlarmClock,
+    detail: "Tailors set weekly and concurrent express caps; intake auto-blocks when thresholds are hit.",
+  },
+  {
+    title: "Routing",
+    icon: Bell,
+    detail: "Only tailors with free express slots appear in search/assignment; reassign if risk is detected.",
+  },
+  {
+    title: "Oversight",
+    icon: ShieldCheck,
+    detail: "Admins view an express queue with SLA risk, can nudge, extend grace, or reassign on behalf of customers.",
+  },
+]
+
+const badgeCatalog = [
+  {
+    label: "Professional Tailor",
+    description: "6+ months tenure and 100+ successful orders.",
+    icon: Award,
+  },
+  {
+    label: "Top-Rated",
+    description: "4.5★+ rating with strong review volume.",
+    icon: Star,
+  },
+  {
+    label: "Express Specialist",
+    description: "On-time express delivery streak with high satisfaction.",
+    icon: Zap,
+  },
+  {
+    label: "Verified",
+    description: "Identity and skills verified by Haib admins.",
+    icon: BadgeCheck,
+  },
+  {
+    label: "Style Specialist",
+    description: "Expertise in a niche (bridal, traditional wear, formal suits, etc.).",
+    icon: Sparkles,
+  },
+]
+
+const badgeOperations = [
+  {
+    title: "Automatic awards",
+    detail: "Top-Rated, Professional, and Express Specialist badges unlock via ratings, tenure, and on-time delivery.",
+  },
+  {
+    title: "Manual verification",
+    detail: "Verified badge requires admin checks of identity and portfolio before activation.",
+  },
+  {
+    title: "Renewal & expiry",
+    detail: "Badges re-evaluate every 6 months; drops in rating or SLA compliance auto-expire until requirements return.",
+  },
+  {
+    title: "Search ranking",
+    detail: "Badge weight boosts tailors in search and order selection filters (e.g., express-first, top-rated-first).",
+  },
+]
+
 export default function OrdersSystemPage() {
   return (
     <div className="min-h-screen bg-background">
@@ -503,6 +599,93 @@ export default function OrdersSystemPage() {
               </Button>
             </Link>
           </div>
+        </section>
+
+        <section className="grid lg:grid-cols-[1.5fr,1fr] gap-6">
+          <Card>
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle>Express service for urgent orders</CardTitle>
+                <CardDescription>Upgrade flow, pricing, and visibility</CardDescription>
+              </div>
+              <Badge className="bg-orange-600 text-white">Express</Badge>
+            </CardHeader>
+            <CardContent className="grid md:grid-cols-3 gap-4">
+              {expressFeatureHighlights.map((item) => (
+                <div key={item.title} className="rounded-lg border border-border p-4 h-full">
+                  <div className="flex items-center gap-2 mb-2">
+                    <item.icon className="h-4 w-4 text-orange-600" />
+                    <p className="font-semibold">{item.title}</p>
+                  </div>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                    {item.points.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Express guardrails</CardTitle>
+              <CardDescription>Capacity, routing, and oversight</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              {expressCapacityRules.map((rule) => (
+                <div key={rule.title} className="flex items-start gap-3">
+                  <rule.icon className="h-4 w-4 text-orange-600 mt-1" />
+                  <div>
+                    <p className="font-semibold text-foreground">{rule.title}</p>
+                    <p>{rule.detail}</p>
+                  </div>
+                </div>
+              ))}
+              <Separator />
+              <p className="text-xs">Admins can override caps, approve fee waivers, and monitor SLA risk from a dedicated express queue.</p>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section className="grid lg:grid-cols-[1.5fr,1fr] gap-6">
+          <Card>
+            <CardHeader className="flex items-center justify-between">
+              <div>
+                <CardTitle>Badge system for tailor credibility</CardTitle>
+                <CardDescription>Badges visible on search, profiles, and order selection</CardDescription>
+              </div>
+              <Badge variant="secondary">Trust & Ranking</Badge>
+            </CardHeader>
+            <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {badgeCatalog.map((badge) => (
+                <div key={badge.label} className="rounded-lg border border-border p-4 h-full">
+                  <div className="flex items-center gap-2 mb-2">
+                    <badge.icon className="h-4 w-4 text-primary" />
+                    <p className="font-semibold">{badge.label}</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{badge.description}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Badge lifecycle & ranking</CardTitle>
+              <CardDescription>How badges are awarded, renewed, and surfaced</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              {badgeOperations.map((op) => (
+                <div key={op.title} className="p-3 rounded-md border border-border">
+                  <p className="font-semibold text-foreground">{op.title}</p>
+                  <p>{op.detail}</p>
+                </div>
+              ))}
+              <Separator />
+              <p className="text-xs">Badge filters let customers find Verified, Express Specialist, or style-specific experts instantly.</p>
+            </CardContent>
+          </Card>
         </section>
 
         <section className="grid lg:grid-cols-3 gap-6">

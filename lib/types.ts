@@ -36,6 +36,8 @@ export interface Tailor extends User {
   reviewCount: number
   approved: boolean
   commission: number
+  expressSettings?: TailorExpressSettings
+  badges?: TailorBadge[]
 }
 
 export interface Admin extends User {
@@ -102,6 +104,9 @@ export interface Order {
   specialInstructions?: string
   status: OrderStatus
   price: number
+  expressRequested?: boolean
+  expressFee?: number
+  expressPromiseAt?: Date
   estimatedDelivery?: Date
   createdAt: Date
   updatedAt: Date
@@ -199,7 +204,7 @@ export interface SupportTicket {
   subject: string
   description: string
   status: "open" | "in-progress" | "resolved" | "closed"
-  priority: "low" | "medium" | "high"
+  priority: "low" | "medium" | "high" | "critical"
   responses: SupportResponse[]
   createdAt: Date
   updatedAt: Date
@@ -248,4 +253,37 @@ export interface ServiceArea {
   zipCode: string
   city: string
   deliveryFee: number
+}
+
+// Tailor badge system
+export type TailorBadgeType =
+  | "professional"
+  | "top-rated"
+  | "express-specialist"
+  | "verified"
+  | "style-specialist"
+
+export interface TailorBadge {
+  id: string
+  type: TailorBadgeType
+  label: string
+  description: string
+  awardedAt: Date
+  expiresAt?: Date
+  status: "active" | "pending" | "expired"
+  source: "automated" | "manual"
+  specialty?: string
+}
+
+// Express service capacity
+export interface TailorExpressSettings {
+  enabled: boolean
+  expressSlaDays: number
+  standardSlaDays: number
+  feeRate: number // e.g., 0.2 = 20%
+  minimumFee?: number
+  weeklyCap: number
+  weeklyInUse: number
+  concurrentCap: number
+  concurrentInUse: number
 }
