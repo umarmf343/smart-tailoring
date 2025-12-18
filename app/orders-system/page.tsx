@@ -15,12 +15,25 @@ import {
   History,
   ImageUp,
   Lock,
+  AlarmClock,
+  AlertTriangle,
+  BellRing,
+  CalendarClock,
+  CircleCheck,
+  ClipboardCheck,
+  ClipboardList,
+  Flag,
+  Info,
+  Inbox,
   Mail,
   MessageSquare,
   PackageCheck,
+  PhoneCall,
+  Send,
   Shield,
   ShieldCheck,
   Sparkles,
+  TimerReset,
   Timer,
 } from "lucide-react"
 
@@ -242,6 +255,208 @@ const futureIdeas = [
   "Tailor performance metrics (completion time, satisfaction, rework rate) surfaced to admins.",
 ]
 
+const completionTimeFlow = [
+  {
+    title: "Customer proposes date",
+    icon: CalendarClock,
+    items: [
+      "Order form includes preferred completion or delivery date/time with timezone awareness.",
+      "Customers can add flexibility notes (e.g., ‘pickup anytime after 5pm’).",
+      "Validation warns if the date is too soon for the garment type or queue length.",
+    ],
+  },
+  {
+    title: "Tailor reviews & negotiates",
+    icon: MessageSquare,
+    items: [
+      "Tailor sees requested date beside effort estimate and current workload.",
+      "If unavailable, tailor proposes an alternative time with a short reason.",
+      "In-app thread tracks the negotiation; timestamps show who proposed what and when.",
+    ],
+  },
+  {
+    title: "Agreement & lock-in",
+    icon: ShieldCheck,
+    items: [
+      "Once both confirm, the ‘Agreed Delivery Date’ is pinned to the order header.",
+      "Notifications go to customer and tailor confirming the locked date/time.",
+      "Admins see the agreement in the audit log for SLA monitoring and disputes.",
+    ],
+  },
+]
+
+const completionGuardrails = [
+  {
+    label: "Deadline math",
+    detail: "Stores both absolute time and timezone; converts to customer/tailor local time in UI.",
+  },
+  {
+    label: "Grace period",
+    detail: "Configurable 1–2 hour window with reminders 15 minutes before the grace end.",
+  },
+  {
+    label: "Status syncing",
+    detail: "Agreed date feeds reminder engine, progress tracker, and admin SLA alerts automatically.",
+  },
+]
+
+const tailorReminderPlan = [
+  {
+    title: "Pre-deadline reminder",
+    badge: "X hours before",
+    icon: BellRing,
+    description:
+      "Push, email, and optional SMS remind the tailor of the upcoming completion time with the order link and measurements context.",
+  },
+  {
+    title: "Deadline reached",
+    badge: "At agreed time",
+    icon: AlarmClock,
+    description: "Notification prompts the tailor to mark ready or request a delay with a reason and new estimate.",
+  },
+  {
+    title: "Grace period buffer",
+    badge: "15m before grace end",
+    icon: AlertTriangle,
+    description:
+      "Gentle alert to update status before the grace window closes; offers quick actions to mark Not Ready or Ready for Pickup.",
+  },
+]
+
+const customerNotificationPlan = [
+  {
+    status: "Ready for Pickup",
+    description: "Immediate push/email: ‘Your order is ready for pickup!’ with slot scheduling or delivery request CTA.",
+    badge: "Real-time",
+  },
+  {
+    status: "Pickup confirmed",
+    description: "After customer confirms collection, a receipt-style notification and history log entry are sent.",
+    badge: "After handoff",
+  },
+  {
+    status: "Delay notice",
+    description:
+      "Tailor selects Not Ready, adds reason and extra days; customer sees ‘Not Ready’ status with new estimated date.",
+    badge: "If delayed",
+  },
+  {
+    status: "Automatic delay math",
+    description: "System can auto-calculate ‘delayed by X days’ messaging when the ETA shifts materially.",
+    badge: "Auto",
+  },
+]
+
+const orderTrackerStages = [
+  {
+    label: "Order Placed",
+    detail: "Payment method locked, measurements attached, and order ID generated.",
+  },
+  {
+    label: "In Progress",
+    detail: "Tailor working; customers can message or request images; shows agreed completion date.",
+  },
+  {
+    label: "Ready for Pickup",
+    detail: "Completion marked; customer can schedule pickup/delivery and see invoice.",
+  },
+  {
+    label: "Not Ready",
+    detail: "Displays delay reason, added days, and updated ETA; keeps prior agreed date for history.",
+  },
+  {
+    label: "Order Picked Up",
+    detail: "Customer confirms handoff; final notification and review prompt are triggered.",
+  },
+]
+
+const complaintFlow = [
+  {
+    title: "Submit issue",
+    icon: Inbox,
+    points: [
+      "Accessible from the order card with Order ID pre-filled.",
+      "Customer chooses a category (Delayed Order, Quality Issue, Payment Problem, etc.).",
+      "Text area captures description; optional attachments can be added later.",
+    ],
+  },
+  {
+    title: "Admin triage",
+    icon: ClipboardList,
+    points: [
+      "Admins receive instant notification and see the complaint in the Customer Complaints queue.",
+      "Timeline shows order status, agreed date, grace usage, and prior messages.",
+      "Automated response templates help acknowledge receipt while investigation starts.",
+    ],
+  },
+  {
+    title: "Resolution & feedback",
+    icon: ClipboardCheck,
+    points: [
+      "Admin coordinates with customer and tailor, proposes refund/extension/adjustment, and logs resolution.",
+      "Customer gets push/email with the resolution summary and can provide feedback on the outcome.",
+      "Unresolved items past 24h auto-escalate to a higher-level admin or support lead.",
+    ],
+  },
+]
+
+const adminDashboard = [
+  {
+    label: "Order health",
+    description: "Filter by pending, completed, delayed, or grace-period usage; drill into per-order SLA details.",
+    icon: BarChart3,
+  },
+  {
+    label: "Complaints",
+    description: "Live queue with statuses (Open, Investigating, Resolved, Escalated) and response timers.",
+    icon: Flag,
+  },
+  {
+    label: "Escalation",
+    description: "If no resolution within 24h, auto-route to a senior admin with phone/email alert and audit trail.",
+    icon: PhoneCall,
+  },
+  {
+    label: "Templates",
+    description: "Reusable response templates for delays, refunds, and quality fixes to keep messaging consistent.",
+    icon: Send,
+  },
+]
+
+const reminderSummary = [
+  {
+    title: "Tailor timeline",
+    steps: ["X hours before deadline reminder", "At deadline prompt", "15m before grace end alert"],
+  },
+  {
+    title: "Customer updates",
+    steps: ["Ready for Pickup push/email", "Not Ready with new ETA", "Pickup confirmation receipt"],
+  },
+  {
+    title: "Complaint flow",
+    steps: ["Customer submits", "Admin investigates/updates", "Customer receives resolution"],
+  },
+]
+
+const uiNotes = [
+  {
+    label: "Dashboard badges",
+    detail: "Use color-coded badges for Ready, Not Ready, Delayed, and Grace to keep status scannable.",
+  },
+  {
+    label: "Gentle nudges",
+    detail: "Tailor reminders appear as subtle toasts/popovers to avoid interrupting work while staying actionable.",
+  },
+  {
+    label: "Confirmation blocks",
+    detail: "When Not Ready is selected, show a mini-form for reason and added days before submitting.",
+  },
+  {
+    label: "Accessibility",
+    detail: "Progress tracker supports screen readers; notifications have concise titles and bodies.",
+  },
+]
+
 export default function OrdersSystemPage() {
   return (
     <div className="min-h-screen bg-background">
@@ -288,6 +503,100 @@ export default function OrdersSystemPage() {
               </Button>
             </Link>
           </div>
+        </section>
+
+        <section className="grid lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2">
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle>Agreed completion time</CardTitle>
+                <CardDescription>Customer-tailer negotiation and lock-in</CardDescription>
+              </div>
+              <Badge variant="secondary">Deadline-aware</Badge>
+            </CardHeader>
+            <CardContent className="grid sm:grid-cols-3 gap-4">
+              {completionTimeFlow.map((block) => (
+                <div key={block.title} className="rounded-lg border border-border p-4 h-full">
+                  <div className="flex items-center gap-2 mb-2">
+                    <block.icon className="h-4 w-4 text-primary" />
+                    <p className="font-semibold">{block.title}</p>
+                  </div>
+                  <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
+                    {block.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Completion guardrails</CardTitle>
+              <CardDescription>How deadlines stay reliable</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              {completionGuardrails.map((rule) => (
+                <div key={rule.label} className="flex items-start gap-3">
+                  <CircleCheck className="h-4 w-4 text-primary mt-1" />
+                  <div>
+                    <p className="font-semibold text-foreground">{rule.label}</p>
+                    <p>{rule.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </section>
+
+        <section className="grid lg:grid-cols-[2fr,1fr] gap-6">
+          <Card className="lg:col-span-2">
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle>Tailor reminders & grace period</CardTitle>
+                <CardDescription>Real-time prompts around the agreed time</CardDescription>
+              </div>
+              <Badge variant="outline">Notifications</Badge>
+            </CardHeader>
+            <CardContent className="grid md:grid-cols-3 gap-4">
+              {tailorReminderPlan.map((item) => (
+                <div key={item.title} className="rounded-lg border border-border p-4 h-full">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <item.icon className="h-4 w-4 text-primary" />
+                      <p className="font-semibold">{item.title}</p>
+                    </div>
+                    <Badge variant="secondary">{item.badge}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{item.description}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Reminder channels</CardTitle>
+              <CardDescription>Reach tailors where they work</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <div className="flex items-start gap-3">
+                <Bell className="h-4 w-4 text-primary mt-1" />
+                <p>In-app toasts with deep links to the order; persistent bell center until acknowledged.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <Mail className="h-4 w-4 text-primary mt-1" />
+                <p>Email reminders include agreed date, grace end, and quick actions.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <PhoneCall className="h-4 w-4 text-primary mt-1" />
+                <p>Optional SMS for urgent deadlines or escalations when grace is nearly exhausted.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <TimerReset className="h-4 w-4 text-primary mt-1" />
+                <p>All reminders log to the audit trail so admins can verify nudges were sent.</p>
+              </div>
+            </CardContent>
+          </Card>
         </section>
 
         <section className="grid md:grid-cols-2 gap-6">
@@ -407,6 +716,48 @@ export default function OrdersSystemPage() {
           </Card>
         </section>
 
+        <section className="grid lg:grid-cols-[1.3fr,1fr] gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Customer-facing updates</CardTitle>
+              <CardDescription>What customers see in real time</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {customerNotificationPlan.map((item) => (
+                <div key={item.status} className="rounded-lg border border-border p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">{item.badge}</Badge>
+                      <p className="font-semibold">{item.status}</p>
+                    </div>
+                    <CircleCheck className="h-4 w-4 text-primary" />
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Order status tracker</CardTitle>
+              <CardDescription>Customer dashboard states</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              {orderTrackerStages.map((stage, index) => (
+                <div key={stage.label} className="rounded-lg border border-border p-3 flex items-start gap-3">
+                  <div className="h-8 w-8 flex items-center justify-center rounded-full bg-muted text-xs font-semibold">
+                    {index + 1}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">{stage.label}</p>
+                    <p>{stage.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </section>
+
         <section className="grid lg:grid-cols-[2fr,1fr] gap-6">
           <Card className="lg:col-span-2">
             <CardHeader>
@@ -504,6 +855,47 @@ export default function OrdersSystemPage() {
           </Card>
         </section>
 
+        <section className="grid lg:grid-cols-[1.2fr,1fr] gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Complaint system</CardTitle>
+              <CardDescription>Direct line to admins for issues</CardDescription>
+            </CardHeader>
+            <CardContent className="grid sm:grid-cols-3 gap-4">
+              {complaintFlow.map((step) => (
+                <div key={step.title} className="rounded-lg border border-border p-4 h-full">
+                  <div className="flex items-center gap-2 mb-2">
+                    <step.icon className="h-4 w-4 text-primary" />
+                    <p className="font-semibold">{step.title}</p>
+                  </div>
+                  <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
+                    {step.points.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Admin dashboard</CardTitle>
+              <CardDescription>Oversight for orders and complaints</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              {adminDashboard.map((item) => (
+                <div key={item.label} className="flex items-start gap-3 rounded-lg border border-border p-3">
+                  <item.icon className="h-4 w-4 text-primary mt-1" />
+                  <div>
+                    <p className="font-semibold text-foreground">{item.label}</p>
+                    <p>{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </section>
+
         <section className="grid lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-2">
             <CardHeader>
@@ -557,6 +949,47 @@ export default function OrdersSystemPage() {
                   <li key={idea}>{idea}</li>
                 ))}
               </ul>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section className="grid lg:grid-cols-[1.2fr,1fr] gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Reminder & notification summary</CardTitle>
+              <CardDescription>End-to-end alert flow</CardDescription>
+            </CardHeader>
+            <CardContent className="grid sm:grid-cols-3 gap-4">
+              {reminderSummary.map((block) => (
+                <div key={block.title} className="rounded-lg border border-border p-4 h-full">
+                  <p className="font-semibold mb-2 flex items-center gap-2">
+                    <Timer className="h-4 w-4 text-primary" />
+                    {block.title}
+                  </p>
+                  <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
+                    {block.steps.map((step) => (
+                      <li key={step}>{step}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>UI/UX considerations</CardTitle>
+              <CardDescription>Keep notifications useful, not noisy</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              {uiNotes.map((note) => (
+                <div key={note.label} className="flex items-start gap-3 rounded-lg border border-border p-3">
+                  <Info className="h-4 w-4 text-primary mt-1" />
+                  <div>
+                    <p className="font-semibold text-foreground">{note.label}</p>
+                    <p>{note.detail}</p>
+                  </div>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </section>
