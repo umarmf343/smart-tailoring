@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2/promise');
 const env = require('../config/env');
+const waitForDb = require('../utils/waitForDb');
 
 const migrationsDir = path.resolve(__dirname, '../../database/migrations');
 
@@ -21,6 +22,8 @@ const run = async () => {
   const migrations = loadMigrations();
   // eslint-disable-next-line no-console
   console.log(`Running ${migrations.length} SQL migrations against ${env.db.name}`);
+
+  await waitForDb({ retries: 12, delay: 1000 });
 
   const adminConnection = await mysql.createConnection({
     host: env.db.host,
