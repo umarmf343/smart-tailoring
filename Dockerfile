@@ -1,64 +1,17 @@
-# Dockerfile for Render Deployment
-# PHP 8.2 with Apache
+# Node.js backend for Smart Tailoring
+FROM node:20-alpine AS base
+WORKDIR /app
 
-FROM php:8.2-apache
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm ci --quiet
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Copy source
+COPY . .
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip
+# Expose API port
+EXPOSE 4000
 
-# Enable Apache modules
-RUN a2enmod rewrite headers ssl expires deflate
-
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Set working directory
-WORKDIR /var/www/html
-
-# Copy application files
-COPY . /var/www/html
-
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# Create required directories
-RUN mkdir -p logs uploads && \
-    chmod -R 755 logs uploads
-
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html
-
-# Apache configuration for root directory
-RUN echo '<Directory /var/www/html>\n\
-    Options -Indexes +FollowSymLinks\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>' > /etc/apache2/conf-available/smart-tailoring.conf \
-    && a2enconf smart-tailoring
-
-# Copy entrypoint script
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-# Expose port 80
-EXPOSE 80
-
-# Set entrypoint
-ENTRYPOINT ["docker-entrypoint.sh"]
-
-# Start Apache
-CMD ["apache2-foreground"]
+# Run migrations at container start via entrypoint
+ENTRYPOINT ["/bin/sh", "/app/docker-entrypoint.sh"]
+CMD ["npm", "start"]

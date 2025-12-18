@@ -28,10 +28,6 @@ uploads/shops/*
 !uploads/profiles/.gitkeep
 !uploads/shops/.gitkeep
 
-# Composer dependencies (optional - uncomment if using composer)
-vendor/
-composer.lock
-
 # System files
 .DS_Store
 Thumbs.db

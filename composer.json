@@ -1,9 +1,0 @@
-{
-    "name": "anupamkushwaha85/smart-tailoring",
-    "description": "Smart Tailoring Service - A web platform connecting customers with tailors.",
-    "license": "MIT",
-    "require": {
-        "phpmailer/phpmailer": "^7.0",
-        "vlucas/phpdotenv": "^5.5"
-    }
-}

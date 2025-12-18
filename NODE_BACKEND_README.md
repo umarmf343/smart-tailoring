@@ -1,6 +1,6 @@
 # Smart Tailoring Node.js Backend
 
-This directory introduces a full Express + Sequelize backend that mirrors the existing PHP functionality while keeping the same MySQL schema.
+This repository now ships a full Express + Sequelize backend that replaces the legacy PHP implementation while keeping the same MySQL schema.
 
 ## What was added
 - Express server with JWT authentication for admins, customers, and tailors.
