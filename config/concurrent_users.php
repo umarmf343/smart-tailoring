@@ -14,9 +14,16 @@ class ConcurrentUserManager
     private $conn;
     private $max_users;
     private $session_timeout = 1800; // 30 minutes
+    private $available = true;
 
     public function __construct($db_connection, $max_concurrent_users = 100)
     {
+        if (!$db_connection instanceof mysqli) {
+            $this->available = false;
+            $this->conn = null;
+            return;
+        }
+
         $this->conn = $db_connection;
         $this->max_users = $max_concurrent_users;
         $this->createTableIfNotExists();
@@ -27,6 +34,10 @@ class ConcurrentUserManager
      */
     private function createTableIfNotExists()
     {
+        if (!$this->available) {
+            return;
+        }
+
         $sql = "CREATE TABLE IF NOT EXISTS active_sessions (
             session_id VARCHAR(255) PRIMARY KEY,
             user_id INT NULL,
@@ -47,6 +58,10 @@ class ConcurrentUserManager
      */
     public function registerSession($user_id = null, $user_type = null)
     {
+        if (!$this->available) {
+            return true; // Soft-pass when DB is unavailable
+        }
+
         // Clean up expired sessions first
         $this->cleanupExpiredSessions();
 
@@ -81,6 +96,10 @@ class ConcurrentUserManager
      */
     public function updateActivity()
     {
+        if (!$this->available) {
+            return;
+        }
+
         $session_id = session_id();
 
         $sql = "UPDATE active_sessions 
@@ -98,6 +117,10 @@ class ConcurrentUserManager
      */
     public function removeSession($session_id = null)
     {
+        if (!$this->available) {
+            return;
+        }
+
         if ($session_id === null) {
             $session_id = session_id();
         }
@@ -114,6 +137,10 @@ class ConcurrentUserManager
      */
     private function canAcceptNewUser($session_id)
     {
+        if (!$this->available) {
+            return true;
+        }
+
         // Check if session already exists (updating existing session is always allowed)
         $sql = "SELECT COUNT(*) as count FROM active_sessions WHERE session_id = ?";
         $stmt = mysqli_prepare($this->conn, $sql);
@@ -138,6 +165,10 @@ class ConcurrentUserManager
      */
     public function getActiveUserCount()
     {
+        if (!$this->available) {
+            return 0;
+        }
+
         $timeout = date('Y-m-d H:i:s', time() - $this->session_timeout);
 
         $sql = "SELECT COUNT(*) as count 
@@ -159,6 +190,10 @@ class ConcurrentUserManager
      */
     private function cleanupExpiredSessions()
     {
+        if (!$this->available) {
+            return;
+        }
+
         $timeout = date('Y-m-d H:i:s', time() - $this->session_timeout);
 
         $sql = "DELETE FROM active_sessions WHERE last_activity < ?";
@@ -191,6 +226,10 @@ class ConcurrentUserManager
      */
     public function isServerFull()
     {
+        if (!$this->available) {
+            return false; // Don't block traffic when DB is down
+        }
+
         $this->cleanupExpiredSessions();
         $active_count = $this->getActiveUserCount();
         return $active_count >= $this->max_users;
