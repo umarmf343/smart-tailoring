@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /includes/
-Disallow: /config/
-Disallow: /vendor/
-Disallow: /logs/
-
-Sitemap: https://quranseed.com.ng/sitemap.xml
