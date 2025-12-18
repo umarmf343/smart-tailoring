@@ -22,6 +22,7 @@ php migrate.php run      # Execute pending migrations (admins + OTP columns)
    - `003_create_tailors_table.sql` (creates `tailors` table used by registration/login)
    - `004_create_customers_table.sql` (creates `customers` table used by customer login)
    - `005_recreate_core_account_tables.sql` (re-creates `tailors`/`customers` if they were missed or dropped)
+   - `006_create_supporting_tables.sql` (creates email_otp, password_resets, notifications, reviews, measurements, order_history, measurement_fields/values)
 
 ## Verify Migrations
 
