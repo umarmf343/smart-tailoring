@@ -12,6 +12,10 @@ Production-ready web platform connecting customers with tailors for custom cloth
 
 **Live Demo:** [https://smart-tailoring.onrender.com](https://smart-tailoring.onrender.com)
 
+## 🚀 Node.js Migration Backend
+
+An Express + Sequelize backend now ships alongside the PHP implementation. It reuses the existing MySQL schema, offers JWT authentication for admins/customers/tailors, and exposes REST APIs for orders, measurements, and profile management. See [`NODE_BACKEND_README.md`](NODE_BACKEND_README.md) for setup, migrations, and routes.
+
 ## 🏗️ System Architecture
 
 ```

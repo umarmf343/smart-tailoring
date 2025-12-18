@@ -47,7 +47,6 @@ tmp/
 
 # Node modules (if using any frontend build tools)
 node_modules/
-package-lock.json
 
 # Database backups
 *.sql

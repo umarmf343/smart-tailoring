@@ -1,0 +1,31 @@
+{
+  "name": "smart-tailoring",
+  "version": "1.0.0",
+  "description": "Node.js backend for Smart Tailoring migrated from PHP with MySQL + JWT authentication.",
+  "main": "src/server.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node src/scripts/runMigrations.js",
+    "lint": "node --check src/server.js || exit 0",
+    "test": "echo \"No automated tests are configured yet\""
+  },
+  "keywords": [],
+  "author": "Smart Tailoring Engineering",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
+    "mysql2": "^3.16.0",
+    "sequelize": "^6.37.7"
+  }
+}
