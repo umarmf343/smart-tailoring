@@ -46,7 +46,7 @@ $total_orders = $order_data['count'] ?? 0;
     <title>Customer Dashboard - Smart Tailoring Service</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/jpg" href="../assets/images/STP-favicon.jpg">
+    <link rel="icon" type="image/svg+xml" href="../assets/images/STP-favicon.svg">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">

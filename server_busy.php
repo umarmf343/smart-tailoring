@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Server Busy - Smart Tailoring Service</title>
-    <link rel="icon" type="image/jpg" href="assets/images/STP-favicon.jpg">
+    <link rel="icon" type="image/svg+xml" href="assets/images/STP-favicon.svg">
     <style>
         * {
             margin: 0;

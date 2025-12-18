@@ -27,6 +27,16 @@ require_once '../config/db.php';
 // Set JSON response header
 header('Content-Type: application/json');
 
+// Ensure database connection is available before proceeding
+if (!isset($conn) || !$conn instanceof mysqli) {
+    http_response_code(503);
+    echo json_encode([
+        'success' => false,
+        'message' => $GLOBALS['db_connection_error'] ?? 'Database service unavailable. Please try again later.'
+    ]);
+    exit;
+}
+
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode([
