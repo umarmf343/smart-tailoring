@@ -1,23 +1,32 @@
 # Smart Tailoring Service 🧵
 
-![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat&logo=php&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-20+-3C873A?style=flat&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-5.x-000000?style=flat&logo=express&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-5.7+-4479A1?style=flat&logo=mysql&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat&logo=javascript&logoColor=black)
-![MapLibre](https://img.shields.io/badge/MapLibre-GL-396CB2?style=flat&logo=mapbox&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT%20with%20Restrictions-red?style=flat)
+![JWT](https://img.shields.io/badge/Auth-JWT%20%2B%20bcrypt-orange?style=flat)
+![License](https://img.shields.io/badge/License-MIT-red?style=flat)
 
 ## 📋 Overview
 
-Production-ready web platform connecting customers with tailors for custom clothing orders. Features real-time notifications, geolocation-based tailor discovery, comprehensive measurement management, and automated deployment via CI/CD pipeline.
+Production-ready web platform connecting customers with tailors for custom clothing orders. The project has been fully rebuilt in **Node.js + Express**, using Sequelize with MySQL while preserving the original database schema and user flows (customers, tailors, admins).
 
-**Live Demo:** [https://smart-tailoring.onrender.com](https://smart-tailoring.onrender.com)
+## 🚀 Stack Overview
+
+- **Backend:** Node.js 20+, Express 5, Sequelize ORM
+- **Database:** MySQL (existing schema reused via SQL migrations)
+- **Auth:** JWT + bcrypt
+- **Validation:** Joi
+- **Logging:** morgan
+- **Deployment:** Docker + Render blueprint
+
+See [`NODE_BACKEND_README.md`](NODE_BACKEND_README.md) for API setup, migrations, and route details.
 
 ## 🏗️ System Architecture
 
 ```
-Customer → Authentication → Measurement Management → Tailor Discovery (Maps) → Order Placement
-                                                                                      ↓
-Admin Panel ← Notifications ← Order Tracking ← Payment ← Tailor Dashboard
+Customer → Authentication → Measurement Management → Tailor Discovery → Order Placement
+                                                                                    ↓
+Admin APIs ← Notifications ← Order Tracking ← Payment ← Tailor Management
 ```
 
 ### System Flow
@@ -56,65 +65,35 @@ Admin Panel ← Notifications ← Order Tracking ← Payment ← Tailor Dashboar
 ## 🛠️ Technology Stack
 
 ### Backend
-- **Language:** PHP 8.2+
-- **Database:** MySQL 5.7+ / MariaDB 10.3+
-- **Email:** PHPMailer 6.x
-- **Configuration:** PHP Dotenv
-
-### Frontend
-- **UI:** HTML5, CSS3, JavaScript (ES6+)
-- **Maps:** MapLibre GL JS + OpenStreetMap
-- **Notifications:** Server-Sent Events (SSE)
-- **Styling:** Custom CSS with responsive design
+- **Language:** Node.js 20+
+- **Framework:** Express 5
+- **ORM:** Sequelize (mysql2)
+- **Auth:** JWT + bcryptjs
+- **Validation:** Joi
 
 ### DevOps
-- **Version Control:** Git + GitHub
-- **CI/CD:** GitHub Actions
-- **Deployment:** Automated SSH deployment
-- **Server:** Apache/Nginx
-- **Environment:** Docker-ready
+- **Runtime:** Dockerized Node.js service
+- **Deploy:** Render blueprint (`render.yaml`)
+- **Process manager:** PM2 recommended for on-prem/VMs
 
 ## 📁 Project Structure
 
 ```
 smart-tailoring/
-├── admin/                         # Admin panel
-│   ├── dashboard.php             # Analytics & statistics
-│   ├── customers.php             # Customer management
-│   ├── tailors.php               # Tailor management
-│   ├── orders.php                # Order monitoring
-│   ├── api/                      # Admin API endpoints
-│   └── includes/                 # Admin navigation & security
-├── api/                          # REST API
-│   ├── auth/                     # Authentication endpoints
-│   ├── measurements/             # Measurement CRUD
-│   ├── orders/                   # Order management
-│   ├── notifications/            # Real-time notifications
-│   ├── profile/                  # User profile management
-│   └── reviews/                  # Review system
-├── config/                       # Configuration
-│   ├── db.php                    # Database connection + pooling
-│   ├── security.php              # Security functions (CSRF, XSS)
-│   ├── session.php               # Session management
-│   └── email.php                 # SMTP configuration
-├── database/                     # Database layer
-│   ├── DatabaseConnectionPool.php # Connection pooling
-│   ├── DatabaseMigrationManager.php # Migration runner
-│   └── migrations/               # Schema version control
-├── repositories/                 # Data access layer
-│   └── CustomerRepository.php    # Repository pattern
-├── services/                     # Business logic layer
-├── customer/                     # Customer dashboard
-├── tailor/                       # Tailor dashboard
-├── .github/workflows/            # CI/CD pipelines
-│   └── deploy.yml               # Automated deployment
-├── tests/                        # Testing suite
-│   ├── integration_test.php     # 70+ manual tests
-│   └── run_tests.php            # 50+ automated tests
-└── docs/                         # Documentation
-    ├── DEPLOYMENT_GUIDE.md      # Production deployment
-    ├── DATABASE_README.md       # Database documentation
-    └── SECURITY_QUICKSTART.md   # Security guidelines
+├── src/                          # Node.js source
+│   ├── config/                   # Env + Sequelize config
+│   ├── controllers/              # Route handlers
+│   ├── middleware/               # Auth + errors
+│   ├── models/                   # Sequelize models (match MySQL schema)
+│   ├── routes/                   # Express routers
+│   ├── scripts/                  # Migration runner
+│   └── server.js                 # Entry point
+├── database/                     # SQL migrations (reused from legacy)
+├── public/                       # Static assets (served by Express)
+├── docs/                         # Documentation
+├── Dockerfile                    # Node runtime image
+├── render.yaml                   # Render blueprint
+└── build.sh                      # Build helper for Render
 ```
 
 ## ⚙️ Setup Instructions
@@ -129,7 +108,7 @@ smart-tailoring/
 ### 1️⃣ Install Dependencies
 
 ```bash
-composer install
+npm install
 ```
 
 ### 2️⃣ Environment Configuration
@@ -141,63 +120,39 @@ cp .env.example .env
 Edit `.env` with your configuration:
 
 ```env
-# Application Settings
-APP_ENV=development
-APP_DEBUG=true
-APP_URL=http://localhost/smart-tailoring
-
-# Database Configuration
+NODE_ENV=development
+PORT=4000
 DB_HOST=localhost
+DB_PORT=3306
 DB_NAME=smart_tailoring
 DB_USER=root
-DB_PASS=
-
-# SMTP Configuration (Gmail example)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-SMTP_FROM=your-email@gmail.com
-
-# Session Security
-SESSION_LIFETIME=7200
-SESSION_SECURE=false
-SESSION_HTTPONLY=true
-
-# Database Connection Pool
-DB_POOL_MIN=2
-DB_POOL_MAX=10
+DB_PASS=secret
+JWT_SECRET=change-me
+JWT_EXPIRES_IN=2h
+BCRYPT_ROUNDS=10
 ```
 
 ### 3️⃣ Database Setup
 
-Create database:
+Create the database if it does not exist:
 
 ```sql
 CREATE DATABASE smart_tailoring CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-Run migrations:
+Run the SQL migrations via Node (reuses the existing schema files):
 
 ```bash
-php migrate.php run
+npm run migrate
 ```
 
-This creates:
-- `customers` - Customer accounts and profiles
-- `tailors` - Tailor profiles with shop details
-- `orders` - Order management with status tracking
-- `measurements` - Customer measurement profiles
-- `measurement_fields` - Dynamic measurement data
-- `reviews` - Customer reviews and ratings
-- `notifications` - Real-time notification system
-- `admins` - Admin user management
-- `contact_messages` - Contact form submissions
-- `email_otp` - Email verification codes
-- `admin_activity_log` - Admin action tracking
-- `dispute_reports` - Dispute management
+### 4️⃣ Start the API
 
-### 4️⃣ Create Admin Account
+```bash
+npm start
+```
+
+API base path: `http://localhost:4000/api`
 
 > Migrations now seed a default super admin so you can sign in immediately after `php migrate.php run` (which also creates the `admins` table if it's missing).
 
