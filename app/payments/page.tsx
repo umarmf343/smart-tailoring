@@ -25,6 +25,7 @@ import {
   ReceiptText,
   RefreshCw,
   Repeat,
+  Scale,
   Shield,
   Siren,
   Sparkles,
@@ -344,6 +345,114 @@ const payoutChartData = [
   { day: "Sun", earnings: 200 },
 ]
 
+const feeExamples = [
+  {
+    scenario: "Checkout — customer pays $100",
+    customerPays: "$100",
+    adminFee: "$10 (10%) auto-deducted",
+    tailorGets: "$90",
+    note: "Split payment routes the fee to the platform subaccount at charge time.",
+  },
+  {
+    scenario: "Tailor withdraws $90 earnings",
+    customerPays: "$90",
+    adminFee: "$9 (10%) held on payout",
+    tailorGets: "$81",
+    note: "Withdrawal engine re-applies the platform fee before initiating the transfer.",
+  },
+  {
+    scenario: "Escrow release for $250 job",
+    customerPays: "$250",
+    adminFee: "$25 (10%)",
+    tailorGets: "$225",
+    note: "Escrow unlock verifies the original fee and nets the tailor automatically.",
+  },
+]
+
+const enforcementPolicies = [
+  {
+    title: "Locked admin fee",
+    detail: "10% platform fee is injected into checkout payloads and removed only by admin policy updates.",
+    badge: "Mandatory",
+  },
+  {
+    title: "Withdrawal netting",
+    detail: "Payouts recompute commissions on current balance so tailors cannot skip the fee at cash-out.",
+    badge: "At payout",
+  },
+  {
+    title: "Immutable invoices",
+    detail: "Receipts show garment price, platform fee, and tailor net so disputes reference the same math.",
+    badge: "Audit ready",
+  },
+]
+
+const tosControls = [
+  {
+    title: "TOS & contracts",
+    detail: "Order acceptance binds customers and tailors to platform-only payments with clear penalties.",
+    badge: "Binding",
+  },
+  {
+    title: "Anti-circumvention",
+    detail: "Chat filters block bank details or external links; attempts trigger warnings and holds.",
+    badge: "No side deals",
+  },
+  {
+    title: "Admin interventions",
+    detail: "Repeated bypass attempts escalate from nudges to temporary holds to account suspension.",
+    badge: "Escalation",
+  },
+]
+
+const monitoringControls = [
+  {
+    title: "Real-time flags",
+    detail: "Payment monitor detects amount deltas, cash keywords, and offline receipts; orders pause until reviewed.",
+    icon: Siren,
+  },
+  {
+    title: "Evidence & audit trail",
+    detail: "Webhook events, payout runs, and chat warnings are timestamped for dispute resolution.",
+    icon: FileWarning,
+  },
+  {
+    title: "Automatic holds",
+    detail: "If webhook totals differ from the locked checkout, payouts halt and admins get alerted instantly.",
+    icon: Lock,
+  },
+]
+
+const alertEscalations = [
+  {
+    stage: "Warning",
+    detail: "First external-payment attempt sends in-app + email notice with guidance to complete checkout on-platform.",
+  },
+  {
+    stage: "Temporary hold",
+    detail: "Repeat violations freeze order progress and payouts until the admin reviews documentation.",
+  },
+  {
+    stage: "Account action",
+    detail: "Persistent bypassing leads to suspension or monetary penalties per the Terms of Service.",
+  },
+]
+
+const escrowSteps = [
+  {
+    title: "Payment captured",
+    detail: "Customer pays into escrow; totals include admin fee and gateway fee.",
+  },
+  {
+    title: "Work completed",
+    detail: "Customer approves delivery; system re-validates against original charge and fee signature.",
+  },
+  {
+    title: "Release & net",
+    detail: "Escrow releases funds, auto-deducts the 10% platform fee, and pays the tailor the net amount.",
+  },
+]
+
 export default function PaymentsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/40">
@@ -451,6 +560,96 @@ export default function PaymentsPage() {
                   <Split className="h-4 w-4" />
                   Splits & commissions applied automatically
                 </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+          <Card className="border-primary/30 shadow-lg shadow-primary/10">
+            <CardHeader className="space-y-3">
+              <Badge variant="secondary" className="gap-2">
+                <Scale className="h-4 w-4" />
+                Auto-fee enforcement
+              </Badge>
+              <CardTitle className="text-2xl">Admin fee on every charge and payout</CardTitle>
+              <CardDescription>
+                Checkout, escrow release, and tailor withdrawals always deduct the platform fee so it cannot be
+                bypassed.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="overflow-hidden rounded-lg border border-border bg-muted/40">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Scenario</TableHead>
+                      <TableHead>Admin fee</TableHead>
+                      <TableHead>Tailor receives</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {feeExamples.map((example) => (
+                      <TableRow key={example.scenario}>
+                        <TableCell className="font-medium">
+                          <div className="flex flex-col">
+                            <span>{example.scenario}</span>
+                            <span className="text-xs text-muted-foreground">Customer pays {example.customerPays}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{example.adminFee}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-foreground">{example.tailorGets}</span>
+                            <span className="text-xs text-muted-foreground">{example.note}</span>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="grid gap-3 md:grid-cols-3">
+                {enforcementPolicies.map((item) => (
+                  <div key={item.title} className="rounded-lg border border-border bg-background/70 p-3">
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold">{item.title}</p>
+                      <Badge variant="outline">{item.badge}</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{item.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="h-full border-border/80">
+            <CardHeader className="space-y-3">
+              <Badge variant="outline" className="w-fit gap-2">
+                <FileLock2 className="h-4 w-4" />
+                Terms & enforcement
+              </Badge>
+              <CardTitle className="text-xl">Bound to platform payments</CardTitle>
+              <CardDescription>
+                Clear Terms of Service, binding contracts, and automated holds keep transactions inside the platform.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {tosControls.map((item) => (
+                <div key={item.title} className="rounded-lg border border-border bg-muted/40 p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold">{item.title}</p>
+                    <Badge variant="secondary">{item.badge}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{item.detail}</p>
+                </div>
+              ))}
+              <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-3">
+                <p className="text-sm font-semibold text-primary">Binding acceptance</p>
+                <p className="text-sm text-muted-foreground">
+                  Customers and tailors must accept platform-only payments before work starts; order progress halts if
+                  off-platform behavior is detected.
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -762,6 +961,77 @@ export default function PaymentsPage() {
                 <p className="text-sm text-muted-foreground">
                   Tailors and customers receive alerts if totals shift or if payouts are held for compliance, keeping
                   everyone aligned.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator className="my-10" />
+
+        <section className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+          <Card>
+            <CardHeader className="space-y-3">
+              <Badge variant="secondary" className="gap-2">
+                <Siren className="h-4 w-4" />
+                Monitoring & alerts
+              </Badge>
+              <CardTitle className="text-2xl">Detect and block fee bypass attempts</CardTitle>
+              <CardDescription>
+                Real-time signals pause risky orders, keep payouts on hold, and alert admins before money moves.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-3 md:grid-cols-3">
+                {monitoringControls.map((item) => (
+                  <div key={item.title} className="rounded-lg border border-border bg-muted/40 p-3">
+                    <div className="flex items-center gap-2">
+                      <item.icon className="h-5 w-5 text-primary" />
+                      <p className="font-semibold">{item.title}</p>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{item.detail}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+                <p className="text-sm font-semibold text-primary">Escalation ladder</p>
+                <ol className="mt-2 space-y-2 text-sm text-muted-foreground">
+                  {alertEscalations.map((alert) => (
+                    <li key={alert.stage}>
+                      <span className="font-semibold text-foreground">{alert.stage}:</span> {alert.detail}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="h-full">
+            <CardHeader className="space-y-3">
+              <Badge variant="outline" className="w-fit gap-2">
+                <Shield className="h-4 w-4" />
+                Escrow & releases
+              </Badge>
+              <CardTitle>Secure payouts with auto deductions</CardTitle>
+              <CardDescription>
+                Funds stay in escrow until completion; release automatically recomputes and deducts the admin fee.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {escrowSteps.map((step, index) => (
+                <div key={step.title} className="rounded-lg border border-border bg-muted/40 p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold">{step.title}</p>
+                    <Badge variant="secondary">Step {index + 1}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{step.detail}</p>
+                </div>
+              ))}
+              <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-3">
+                <p className="text-sm font-semibold text-primary">Fee integrity on release</p>
+                <p className="text-sm text-muted-foreground">
+                  Escrow release compares gateway webhook amounts to locked checkout totals, netting the tailor after
+                  confirming the platform fee and gateway fee match.
                 </p>
               </div>
             </CardContent>
