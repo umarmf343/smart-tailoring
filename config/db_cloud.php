@@ -163,7 +163,7 @@ function getCloudDatabaseConnection()
     }
 
     // Set connection timeout (important for cloud deployments)
-    mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 30); // Increased for slow connections
+    mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 8); // Keep short to avoid long 500s
 
     // Set read timeout (if supported)
     if (defined('MYSQLI_OPT_READ_TIMEOUT')) {

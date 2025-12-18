@@ -29,6 +29,46 @@ $health = [
     'checks' => []
 ];
 
+// Safety net: always return a JSON body even if a fatal error occurs
+ob_start();
+register_shutdown_function(function () use (&$health) {
+    $error = error_get_last();
+    $fatalTypes = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR];
+
+    if ($error && in_array($error['type'], $fatalTypes, true)) {
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        if (!headers_sent()) {
+            http_response_code(503);
+            header('Content-Type: application/json');
+        }
+
+        $health['status'] = 'error';
+        $health['checks']['fatal'] = [
+            'status' => 'error',
+            'message' => 'Unexpected server error',
+        ];
+
+        echo json_encode($health, JSON_PRETTY_PRINT);
+    } elseif (ob_get_length() === 0) {
+        // Ensure a JSON body is present even if nothing was echoed
+        if (!headers_sent()) {
+            http_response_code(503);
+            header('Content-Type: application/json');
+        }
+
+        $health['status'] = 'error';
+        $health['checks']['fatal'] = [
+            'status' => 'error',
+            'message' => 'Empty response generated',
+        ];
+
+        echo json_encode($health, JSON_PRETTY_PRINT);
+    }
+});
+
 // Check database connection
 try {
     define('DB_ACCESS', true);
@@ -110,3 +150,8 @@ if ($health['status'] === 'error') {
 http_response_code($statusCode);
 
 echo json_encode($health, JSON_PRETTY_PRINT);
+
+// Flush output buffer (safe for shutdown handler)
+if (ob_get_level()) {
+    ob_end_flush();
+}

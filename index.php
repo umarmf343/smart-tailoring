@@ -8,6 +8,33 @@
 // Start session to maintain login state
 session_start();
 
+// Safety net: prevent blank 500s by serving a friendly message on fatal errors
+ob_start();
+register_shutdown_function(function () {
+    $error = error_get_last();
+    $fatalTypes = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR];
+
+    if ($error && in_array($error['type'], $fatalTypes, true)) {
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        if (!headers_sent()) {
+            http_response_code(503);
+            header('Content-Type: text/html; charset=UTF-8');
+        }
+
+        echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Service temporarily unavailable</title>'
+            . '<style>body{font-family:sans-serif;background:#f3f4f6;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}'
+            . '.card{background:#fff;padding:32px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.08);max-width:520px;text-align:center;}'
+            . 'h1{color:#111827;margin-bottom:12px;font-size:24px;}p{color:#4b5563;margin:0 0 10px;}a{color:#4f46e5;text-decoration:none;font-weight:600;}</style>'
+            . '</head><body><div class="card"><h1>We\u2019ll be right back</h1>'
+            . '<p>The service is currently unavailable. Please retry in a moment.</p>'
+            . '<p>If this persists, contact support or refresh the page.</p>'
+            . '</div></body></html>';
+    }
+});
+
 // Load environment and base URL configuration
 require_once __DIR__ . '/config/env_loader.php';
 $appConfig = load_env_config();
