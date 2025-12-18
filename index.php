@@ -143,7 +143,7 @@ $user_type = $is_logged_in ? $_SESSION['user_type'] : '';
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/jpg" href="assets/images/STP-favicon.jpg">
+    <link rel="icon" type="image/svg+xml" href="assets/images/STP-favicon.svg">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
