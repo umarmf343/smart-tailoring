@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { signUp } from "@/lib/auth"
+import { signUp } from "@/lib/auth-client"
 
 export function SignupForm() {
   const router = useRouter()
