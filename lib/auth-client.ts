@@ -35,3 +35,7 @@ export async function signUp(data: {
 }) {
   return postAuth("/api/auth/signup", data)
 }
+
+export async function logout() {
+  return postAuth("/api/auth/logout", {})
+}

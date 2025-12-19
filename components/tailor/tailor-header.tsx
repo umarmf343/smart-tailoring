@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Scissors, UserIcon, LogOut, Bell } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { logout } from "@/lib/auth"
+import { logout } from "@/lib/auth-client"
 import {
   DropdownMenu,
   DropdownMenuContent,

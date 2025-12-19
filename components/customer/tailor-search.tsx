@@ -11,8 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Search, MapPin, Star, Heart, Zap, BadgeCheck } from "lucide-react"
 import Link from "next/link"
-import { getSession } from "@/lib/auth"
-import { use } from "react"
+import type { User } from "@/lib/types"
 import { TailorMap } from "@/components/map/tailor-map"
 import { getBadgeMeta } from "@/lib/badge-utils"
 import type { TailorBadgeType } from "@/lib/types"
@@ -142,8 +141,11 @@ const MOCK_TAILORS = [
   },
 ]
 
-export function TailorSearch() {
-  const user = use(getSession())
+interface TailorSearchProps {
+  user: User
+}
+
+export function TailorSearch({ user }: TailorSearchProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedService, setSelectedService] = useState("all")
   const [sortBy, setSortBy] = useState("distance")
