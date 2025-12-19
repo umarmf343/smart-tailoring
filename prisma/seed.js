@@ -1,7 +1,16 @@
 const { PrismaClient, Prisma } = require("@prisma/client")
-const bcrypt = require("bcryptjs")
+const { randomBytes, scryptSync } = require("crypto")
 
 const prisma = new PrismaClient()
+
+const SALT_LENGTH = 16
+const KEY_LENGTH = 64
+
+function hashPassword(password) {
+  const salt = randomBytes(SALT_LENGTH).toString("hex")
+  const derivedKey = scryptSync(password, salt, KEY_LENGTH)
+  return `${salt}:${derivedKey.toString("hex")}`
+}
 
 async function resetData() {
   await prisma.notification.deleteMany()
@@ -16,7 +25,7 @@ async function resetData() {
 async function main() {
   await resetData()
 
-  const passwordHash = await bcrypt.hash("password123", 10)
+  const passwordHash = hashPassword("password123")
 
   const customer = await prisma.user.create({
     data: {
