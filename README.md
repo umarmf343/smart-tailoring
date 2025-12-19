@@ -35,6 +35,29 @@ Smart Tailoring Management System (Haib Tailor) is a black-and-white themed plat
    pnpm build
    ```
 
+## Database Setup
+The project now uses Prisma with SQLite for local persistence.
+1. Copy the example environment file and point the database at the default SQLite file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Push the schema to create the database and tables:
+   ```bash
+   pnpm db:push
+   ```
+3. Seed demo data for customers, tailors, orders, and payments:
+   ```bash
+   pnpm db:seed
+   ```
+   The seed script is idempotent and resets existing demo data on each run.
+
+## Accounts & Authentication
+- Signup and login now persist to the SQLite database via Prisma with hashed passwords.
+- Seeded demo users (all use the password `password123`):
+  - Admin: `admin@example.com`
+  - Customer: `customer@example.com`
+  - Tailor: `tailor@example.com`
+
 ## Project Structure
 - `app/` – Next.js App Router pages for customers, tailors, admins, auth, and APIs.
 - `components/` – Reusable UI and feature modules (dashboards, messaging, design gallery, maps, payments, etc.).
