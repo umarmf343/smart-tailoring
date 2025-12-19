@@ -121,5 +121,57 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at 12% 20%, color-mix(in srgb, var(--primary) 12%, transparent) 0, transparent 32%),
+      radial-gradient(circle at 86% 8%, color-mix(in srgb, var(--secondary) 18%, transparent) 0, transparent 30%),
+      radial-gradient(circle at 18% 70%, color-mix(in srgb, var(--accent) 10%, transparent) 0, transparent 34%),
+      linear-gradient(180deg, color-mix(in srgb, var(--background) 96%, transparent) 0%, color-mix(in srgb, var(--muted) 72%, transparent) 100%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 18%, transparent);
+    color: var(--primary-foreground);
+  }
+
+  a {
+    @apply underline-offset-4 transition-colors hover:text-primary;
+  }
+}
+
+@layer components {
+  .app-surface {
+    @apply relative isolation-auto overflow-hidden;
+    background: radial-gradient(circle at 20% 15%, color-mix(in srgb, var(--primary) 9%, transparent) 0, transparent 32%),
+      radial-gradient(circle at 80% 10%, color-mix(in srgb, var(--secondary) 14%, transparent) 0, transparent 28%),
+      radial-gradient(circle at 85% 70%, color-mix(in srgb, var(--accent) 12%, transparent) 0, transparent 30%),
+      color-mix(in srgb, var(--background) 96%, var(--muted) 4%);
+  }
+
+  .glass-panel {
+    @apply rounded-3xl border border-border/60 bg-background/80 shadow-xl backdrop-blur-xl;
+  }
+
+  .subtle-grid::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    background-image: linear-gradient(to right, color-mix(in srgb, var(--border) 45%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--border) 45%, transparent) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(circle at 30% 20%, black 0, transparent 60%),
+      radial-gradient(circle at 70% 80%, black 0, transparent 58%);
+    mask-repeat: no-repeat;
+    opacity: 0.25;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+}
+
+@layer utilities {
+  .shadow-ring {
+    box-shadow:
+      0 20px 40px -24px color-mix(in srgb, var(--primary) 30%, transparent),
+      0 10px 24px -18px color-mix(in srgb, var(--foreground) 12%, transparent);
   }
 }
