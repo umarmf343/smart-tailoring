@@ -9,5 +9,5 @@ export default async function TailorSearchPage() {
     redirect("/auth/login")
   }
 
-  return <TailorSearch />
+  return <TailorSearch user={user} />
 }
