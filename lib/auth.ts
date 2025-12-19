@@ -5,11 +5,15 @@ import type { User } from "./types"
 
 type AuthUser = User & { password: string }
 
+function normalizeEmail(email: string) {
+  return email.trim().toLowerCase()
+}
+
 // Mock database - replace with actual database later
 export const MOCK_USERS: AuthUser[] = [
   {
     id: "1",
-    email: "admin@haib.com",
+    email: normalizeEmail("admin@haib.com"),
     phone: "+1234567890",
     name: "Admin User",
     role: "admin",
@@ -19,7 +23,7 @@ export const MOCK_USERS: AuthUser[] = [
   },
   {
     id: "2",
-    email: "customer@haib.com",
+    email: normalizeEmail("customer@haib.com"),
     phone: "+15551234567",
     name: "Amelia Customer",
     role: "customer",
@@ -29,7 +33,7 @@ export const MOCK_USERS: AuthUser[] = [
   },
   {
     id: "3",
-    email: "tailor@haib.com",
+    email: normalizeEmail("tailor@haib.com"),
     phone: "+15557654321",
     name: "Taylor Stitch",
     role: "tailor",
@@ -45,7 +49,8 @@ function sanitizeUser(user: AuthUser): User {
 }
 
 function findUserByEmail(email: string) {
-  return MOCK_USERS.find((user) => user.email.toLowerCase() === email.toLowerCase())
+  const normalizedEmail = normalizeEmail(email)
+  return MOCK_USERS.find((user) => user.email === normalizedEmail)
 }
 
 function findUserById(id: string) {
@@ -79,7 +84,8 @@ export async function signUp(data: {
   role: "customer" | "tailor"
 }) {
   // Mock signup - replace with actual database and password hashing
-  const existingUser = findUserByEmail(data.email)
+  const normalizedEmail = normalizeEmail(data.email)
+  const existingUser = findUserByEmail(normalizedEmail)
 
   if (existingUser) {
     return { success: false, error: "User already exists" }
@@ -87,9 +93,9 @@ export async function signUp(data: {
 
   const newUser: AuthUser = {
     id: Math.random().toString(36).substring(7),
-    email: data.email,
-    phone: data.phone,
-    name: data.name,
+    email: normalizedEmail,
+    phone: data.phone.trim(),
+    name: data.name.trim(),
     role: data.role,
     password: data.password,
     createdAt: new Date(),
