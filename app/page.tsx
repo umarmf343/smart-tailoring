@@ -1,4 +1,7 @@
+"use client"
+
 import Link from "next/link"
+import { useMemo, useState } from "react"
 import {
   ArrowRight,
   BadgeCheck,
@@ -16,6 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const featureHighlights = [
   {
@@ -62,7 +66,39 @@ const stats = [
   { label: "Faster approvals", value: "-38%", hint: "Time saved on admin reviews" },
 ]
 
+const quickRoutes = [
+  {
+    title: "Orders workspace",
+    href: "/orders-system",
+    icon: Clock3,
+    description: "Track SLAs, express flows, and audit timelines from a single console.",
+  },
+  {
+    title: "Payments console",
+    href: "/payments",
+    icon: CreditCard,
+    description: "Wallets, payouts, and fee visibility with responsive dashboards.",
+  },
+  {
+    title: "Design gallery",
+    href: "/designs",
+    icon: Sparkles,
+    description: "Curated looks customers can bookmark before handing to tailors.",
+  },
+]
+
 export default function HomePage() {
+  const [activeSection, setActiveSection] = useState<string>("features")
+
+  const navSections = useMemo(
+    () => [
+      { value: "features", label: "Feature board", description: "Surface key capabilities in a focused panel." },
+      { value: "workflow", label: "Workflow", description: "Step through the journey without endless scrolling." },
+      { value: "insights", label: "Insights", description: "See performance snapshots and trust signals." },
+    ],
+    [],
+  )
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-white to-muted text-foreground">
       <div className="pointer-events-none absolute inset-0 -z-10">
@@ -83,16 +119,17 @@ export default function HomePage() {
             </div>
           </div>
 
-          <nav className="hidden items-center gap-3 text-sm font-medium md:flex">
-            <Link href="#features" className="rounded-lg px-3 py-2 text-muted-foreground transition hover:text-foreground">
-              Features
-            </Link>
-            <Link href="#workflow" className="rounded-lg px-3 py-2 text-muted-foreground transition hover:text-foreground">
-              Workflow
-            </Link>
-            <Link href="#insights" className="rounded-lg px-3 py-2 text-muted-foreground transition hover:text-foreground">
-              Insights
-            </Link>
+          <nav className="hidden items-center gap-2 text-sm font-medium md:flex">
+            {navSections.map((section) => (
+              <Button
+                key={section.value}
+                variant={activeSection === section.value ? "secondary" : "ghost"}
+                className="rounded-lg px-3 py-2"
+                onClick={() => setActiveSection(section.value)}
+              >
+                {section.label}
+              </Button>
+            ))}
           </nav>
 
           <div className="flex items-center gap-3">
@@ -110,15 +147,15 @@ export default function HomePage() {
       </header>
 
       <main className="relative">
-        <section className="container mx-auto px-4 pb-16 pt-20 sm:pt-28">
-          <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <section className="container mx-auto px-4 pb-10 pt-16 sm:pt-24">
+          <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/80 px-4 py-2 shadow-sm backdrop-blur">
+              <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/80 px-4 py-2 shadow-sm backdrop-blur animate-in fade-in slide-in-from-top duration-500">
                 <Badge variant="secondary" className="inline-flex items-center gap-1 border border-border">
                   <Sparkles className="h-3.5 w-3.5" />
                   New
                 </Badge>
-                <span className="text-sm text-muted-foreground">Bespoke experiences, powered by Tailwind</span>
+                <span className="text-sm text-muted-foreground">Guided app-style navigation with Tailwind motion</span>
               </div>
 
               <div className="space-y-6">
@@ -126,8 +163,8 @@ export default function HomePage() {
                   Build a tailor-made journey that feels as crafted as the clothes you deliver.
                 </h2>
                 <p className="text-lg text-muted-foreground text-pretty">
-                  Haib Tailor blends guided onboarding, collaborative workrooms, and clear payments into a single elegant
-                  platform. Customers feel cared for, tailors feel organized, and admins see the full story.
+                  Haib Tailor now opens like a focused workspace. Switch sections with intent, keep attention on the
+                  task, and explore flows without endless scrolling.
                 </p>
               </div>
 
@@ -151,16 +188,16 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
+              <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
+                <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/60 px-3 py-2 shadow-sm">
                   <ShieldCheck className="h-4 w-4 text-foreground" />
-                  Secure payments & approvals
+                  Secure approvals
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/60 px-3 py-2 shadow-sm">
                   <MessageCircle className="h-4 w-4 text-foreground" />
                   Built-in messaging
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/60 px-3 py-2 shadow-sm">
                   <CreditCard className="h-4 w-4 text-foreground" />
                   Wallet & payouts
                 </div>
@@ -171,7 +208,7 @@ export default function HomePage() {
               <div className="absolute -left-6 -top-6 h-20 w-20 rounded-2xl bg-primary/10 blur-2xl" />
               <div className="absolute -right-8 -bottom-8 h-24 w-24 rounded-2xl bg-secondary/70 blur-3xl" />
 
-              <div className="space-y-4 rounded-3xl border border-border bg-background/80 p-6 shadow-xl backdrop-blur-xl">
+              <div className="space-y-4 rounded-3xl border border-border bg-background/80 p-6 shadow-xl backdrop-blur-xl animate-in fade-in slide-in-from-right duration-500">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Live orders</p>
@@ -198,234 +235,222 @@ export default function HomePage() {
                       <p className="text-lg font-semibold">Esa Menswear</p>
                       <Badge variant="outline" className="gap-1 border-dashed">
                         <Star className="h-3.5 w-3.5" />
-                        4.9
+                        4.9★
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground">Specialist · Suits · Lagos</p>
+                    <p className="text-xs text-muted-foreground">Express · 3 day turnaround</p>
                   </div>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-3">
-                  <Card className="shadow-sm">
-                    <CardHeader className="space-y-1 pb-2">
-                      <CardDescription>Progress</CardDescription>
-                      <CardTitle className="text-xl">72%</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-sm text-muted-foreground">
-                      Pattern drafted & fabric sourced
-                    </CardContent>
-                  </Card>
-                  <Card className="shadow-sm">
-                    <CardHeader className="space-y-1 pb-2">
-                      <CardDescription>Messages</CardDescription>
-                      <CardTitle className="text-xl">3 new</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-sm text-muted-foreground">
-                      Approve lining & lapel stitch
-                    </CardContent>
-                  </Card>
-                  <Card className="shadow-sm">
-                    <CardHeader className="space-y-1 pb-2">
-                      <CardDescription>Balance</CardDescription>
-                      <CardTitle className="text-xl">$420</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-sm text-muted-foreground">
-                      Milestone payout auto-released
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="features" className="container mx-auto px-4 pb-16">
-          <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-            <div>
-              <Badge variant="outline" className="border-dashed">
-                Platform pillars
-              </Badge>
-              <h3 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Every role feels effortless</h3>
-              <p className="mt-3 max-w-2xl text-muted-foreground">
-                Customers, tailors, and admins share the same language: fast updates, clear milestones, and proactive
-                nudges that keep the experience memorable.
-              </p>
-            </div>
-            <Link href="/notifications">
-              <Button variant="ghost" className="gap-2">
-                See notifications flow
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-
-          <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featureHighlights.map((feature) => (
-              <Card key={feature.title} className="group relative overflow-hidden border-border/70 shadow-sm">
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-secondary to-muted" />
-                <CardHeader className="space-y-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <feature.icon className="h-5 w-5" />
-                  </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                  <CardDescription className="leading-relaxed">{feature.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2 text-foreground">
-                    <BadgeCheck />
-                    <span>White-glove onboarding</span>
-                  </div>
-                  <div className="mt-2 flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4" />
-                    <span>Secure, auditable steps</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        <section id="workflow" className="container mx-auto px-4 pb-16">
-          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-            <div className="space-y-4">
-              <Badge variant="secondary" className="border border-border/70">
-                Designed for flow
-              </Badge>
-              <h3 className="text-3xl font-semibold sm:text-4xl">From inspiration to delivery, in one clean track</h3>
-              <p className="text-muted-foreground">
-                Keep everyone aligned with milestone-based orders, contextual chat, and payouts that mirror the craft
-                process. The experience feels bespoke even before the first stitch.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link href="/messages">
-                  <Button variant="outline" className="gap-2">
-                    Open messaging workspace
-                    <MessageCircle className="h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link href="/payments">
-                  <Button variant="secondary" className="gap-2">
-                    Payment controls
-                    <CreditCard className="h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            <div className="grid gap-4 rounded-3xl border border-border/70 bg-background/70 p-6 shadow-xl backdrop-blur">
-              {workflowPillars.map((pillar) => (
-                <div
-                  key={pillar.name}
-                  className="group grid gap-3 rounded-2xl border border-border/60 bg-muted/80 px-5 py-4 transition hover:-translate-y-1 hover:border-primary/70 hover:bg-background"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold tracking-wider text-primary">
-                      {pillar.accent}
+                  {stats.map((stat) => (
+                    <div
+                      key={stat.label}
+                      className="rounded-xl border border-border/70 bg-background p-4 shadow-sm animate-in fade-in slide-in-from-bottom duration-500"
+                    >
+                      <p className="text-sm text-muted-foreground">{stat.label}</p>
+                      <p className="text-2xl font-semibold">{stat.value}</p>
+                      <p className="text-xs text-muted-foreground">{stat.hint}</p>
                     </div>
-                    <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Milestone</span>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-lg font-semibold">{pillar.name}</p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{pillar.detail}</p>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                    <ArrowRight className="h-4 w-4" />
-                    Preview this journey
-                  </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </section>
 
-        <section id="insights" className="container mx-auto px-4 pb-20">
-          <div className="rounded-3xl border border-border/80 bg-gradient-to-r from-background via-muted to-background px-6 py-10 shadow-xl sm:px-10">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-              <div className="max-w-2xl space-y-3">
-                <Badge variant="outline" className="border-dashed">
-                  Quietly powerful
-                </Badge>
-                <h3 className="text-3xl font-semibold sm:text-4xl">Operational clarity for every role</h3>
-                <p className="text-muted-foreground">
-                  Dashboards, notifications, and payouts are stitched together so teams never lose the thread. Your
-                  brand voice and motion live inside Tailwind-driven components for a consistent feel.
-                </p>
-                <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2 rounded-full bg-background px-3 py-1 shadow-sm">
-                    <ShieldCheck className="h-4 w-4 text-primary" />
-                    Role-based controls
-                  </div>
-                  <div className="flex items-center gap-2 rounded-full bg-background px-3 py-1 shadow-sm">
-                    <CreditCard className="h-4 w-4 text-primary" />
-                    Transparent payouts
-                  </div>
-                  <div className="flex items-center gap-2 rounded-full bg-background px-3 py-1 shadow-sm">
-                    <BarChart3 className="h-4 w-4 text-primary" />
-                    Live analytics
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid w-full gap-4 sm:grid-cols-3 lg:max-w-xl">
-                {stats.map((stat) => (
-                  <Card key={stat.label} className="border-border/70 bg-background/80 shadow-md">
-                    <CardHeader className="pb-2">
-                      <CardDescription>{stat.label}</CardDescription>
-                      <CardTitle className="text-3xl">{stat.value}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-sm text-muted-foreground">{stat.hint}</CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-border/60 bg-background/60 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <section className="container mx-auto px-4 pb-16">
+          <Card className="rounded-3xl border-border/80 bg-background/70 shadow-xl backdrop-blur-xl">
+            <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-1">
-                <p className="text-sm uppercase tracking-[0.18em] text-muted-foreground">Ready to tailor the web?</p>
-                <p className="text-lg font-semibold">Launch a branded experience in days with Tailwind patterns.</p>
+                <CardTitle className="text-2xl">Navigate the experience</CardTitle>
+                <CardDescription>
+                  Open one panel at a time—no more endless scroll. Everything is tucked behind purposeful clicks.
+                </CardDescription>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <Link href="/auth/signup">
-                  <Button className="gap-2">
-                    Get started
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link href="/designs">
-                  <Button variant="outline">View design gallery</Button>
-                </Link>
-              </div>
-            </div>
-          </div>
+              <TabsList className="w-full justify-start overflow-x-auto lg:w-auto">
+                {navSections.map((section) => (
+                  <TabsTrigger key={section.value} value={section.value} onClick={() => setActiveSection(section.value)}>
+                    {section.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </CardHeader>
+            <CardContent>
+              <Tabs value={activeSection} onValueChange={setActiveSection} className="space-y-6">
+                <TabsContent value="features" className="space-y-4 animate-in fade-in slide-in-from-bottom duration-500">
+                  <div className="grid gap-4 lg:grid-cols-3">
+                    {featureHighlights.map((feature, index) => (
+                      <Card
+                        key={feature.title}
+                        className="border-dashed bg-muted/60 shadow-sm transition hover:-translate-y-1 hover:shadow-lg animate-in fade-in slide-in-from-bottom"
+                        style={{ animationDelay: `${index * 80}ms` }}
+                      >
+                        <CardHeader className="space-y-3">
+                          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-background px-3 py-1 text-xs font-medium">
+                            <feature.icon className="h-4 w-4" />
+                            {feature.title}
+                          </div>
+                          <CardDescription className="text-sm text-muted-foreground">{feature.description}</CardDescription>
+                        </CardHeader>
+                      </Card>
+                    ))}
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Card className="shadow-sm">
+                      <CardHeader>
+                        <CardTitle>Customer & tailor shortcuts</CardTitle>
+                        <CardDescription>Jump into messaging, orders, or payouts without hunting through the page.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="grid gap-3 sm:grid-cols-2">
+                        {quickRoutes.map((route) => (
+                          <Link key={route.title} href={route.href}>
+                            <div className="rounded-xl border border-border/70 bg-background/70 p-4 transition hover:-translate-y-1 hover:border-primary hover:shadow-lg">
+                              <div className="flex items-center gap-2 text-sm font-semibold">
+                                <route.icon className="h-4 w-4 text-primary" />
+                                {route.title}
+                              </div>
+                              <p className="mt-2 text-sm text-muted-foreground">{route.description}</p>
+                            </div>
+                          </Link>
+                        ))}
+                      </CardContent>
+                    </Card>
+
+                    <Card className="shadow-sm">
+                      <CardHeader>
+                        <CardTitle>Trusted delivery</CardTitle>
+                        <CardDescription>Payment locks, approvals, and SLA friendly reminders in one view.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                          <ShieldCheck className="h-4 w-4 text-primary" />
+                          PCI-ready checkouts and wallet splits
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <BadgeCheck className="h-4 w-4 text-primary" />
+                          Verified tailors & curated reviews
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MessageCircle className="h-4 w-4 text-primary" />
+                          Embedded chat + approvals inside every step
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="workflow" className="space-y-6 animate-in fade-in slide-in-from-bottom duration-500">
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {workflowPillars.map((pillar, index) => (
+                      <Card
+                        key={pillar.name}
+                        className="border-dashed bg-background/60 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                        style={{ animationDelay: `${index * 80}ms` }}
+                      >
+                        <CardHeader className="space-y-3">
+                          <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
+                            <span>{pillar.accent}</span>
+                            <Badge variant="outline">Flow</Badge>
+                          </div>
+                          <CardTitle className="text-lg">{pillar.name}</CardTitle>
+                          <CardDescription className="text-sm text-muted-foreground">{pillar.detail}</CardDescription>
+                        </CardHeader>
+                      </Card>
+                    ))}
+                  </div>
+
+                  <div className="grid gap-4 lg:grid-cols-[1.4fr_0.6fr]">
+                    <Card className="shadow-sm">
+                      <CardHeader>
+                        <CardTitle>Guided session</CardTitle>
+                        <CardDescription>
+                          Customers and tailors step through an interactive session instead of scrolling past blocks of
+                          text.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="grid gap-3 sm:grid-cols-2">
+                        {stats.map((stat) => (
+                          <div key={stat.label} className="rounded-xl border border-border/70 bg-muted/50 p-4">
+                            <p className="text-sm text-muted-foreground">{stat.label}</p>
+                            <p className="text-2xl font-semibold">{stat.value}</p>
+                            <p className="text-xs text-muted-foreground">{stat.hint}</p>
+                          </div>
+                        ))}
+                        <div className="rounded-xl border border-dashed border-primary/50 bg-primary/5 p-4 text-sm text-muted-foreground">
+                          Each section now opens with a click—perfect for mobile and tablet navigation.
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="shadow-sm">
+                      <CardHeader>
+                        <CardTitle>Micro-interactions</CardTitle>
+                        <CardDescription>Subtle Tailwind-powered animations keep transitions smooth.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-primary" />
+                          Animate-in panels when switching tabs
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock3 className="h-4 w-4 text-primary" />
+                          Sticky nav that becomes a pill bar on mobile
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MessageCircle className="h-4 w-4 text-primary" />
+                          Section summaries remain visible while details stay tucked away
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="insights" className="space-y-6 animate-in fade-in slide-in-from-bottom duration-500">
+                  <div className="grid gap-4 lg:grid-cols-3">
+                    {stats.map((stat, index) => (
+                      <Card
+                        key={stat.label}
+                        className="border-dashed bg-background/60 shadow-sm"
+                        style={{ animationDelay: `${index * 80}ms` }}
+                      >
+                        <CardHeader>
+                          <CardTitle className="text-3xl">{stat.value}</CardTitle>
+                          <CardDescription>{stat.label}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">{stat.hint}</p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+
+                  <Card className="shadow-sm">
+                    <CardHeader>
+                      <CardTitle>What changes for you</CardTitle>
+                      <CardDescription>
+                        A calmer, app-like surface where customers, tailors, and admins can focus on one area at a time.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      <div className="rounded-xl border border-border/70 bg-muted/60 p-4 text-sm text-muted-foreground">
+                        Faster navigation on phones—section tabs snap into a horizontal scroll bar.
+                      </div>
+                      <div className="rounded-xl border border-border/70 bg-muted/60 p-4 text-sm text-muted-foreground">
+                        Animated transitions keep context visible while the next section loads in place.
+                      </div>
+                      <div className="rounded-xl border border-border/70 bg-muted/60 p-4 text-sm text-muted-foreground">
+                        Cards stack neatly on small screens so nothing spills edge-to-edge.
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
         </section>
       </main>
-
-      <footer className="border-t border-border/60 bg-background/80 py-10 backdrop-blur">
-        <div className="container mx-auto flex flex-col gap-6 px-4 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-lg font-semibold">
-              <Scissors className="h-5 w-5" /> Haib Tailor
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Crafted with Tailwind—giving tailors, customers, and admins a modern place to collaborate.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-            <Link href="/orders-system" className="hover:text-foreground">
-              Orders
-            </Link>
-            <Link href="/payments" className="hover:text-foreground">
-              Payments
-            </Link>
-            <Link href="/notifications" className="hover:text-foreground">
-              Notifications
-            </Link>
-            <Link href="/designs" className="hover:text-foreground">
-              Design gallery
-            </Link>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
