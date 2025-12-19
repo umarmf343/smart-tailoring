@@ -1,60 +1,32 @@
 import "server-only"
 
+import bcrypt from "bcryptjs"
 import { cookies } from "next/headers"
-import type { User } from "./types"
-
-type AuthUser = User & { password: string }
+import { prisma } from "@/lib/prisma"
+import type { User, UserRole } from "./types"
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase()
 }
 
-// Mock database - replace with actual database later
-export const MOCK_USERS: AuthUser[] = [
-  {
-    id: "1",
-    email: normalizeEmail("admin@haib.com"),
-    phone: "+1234567890",
-    name: "Admin User",
-    role: "admin",
-    password: "admin123",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "2",
-    email: normalizeEmail("customer@haib.com"),
-    phone: "+15551234567",
-    name: "Amelia Customer",
-    role: "customer",
-    password: "customer123",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "3",
-    email: normalizeEmail("tailor@haib.com"),
-    phone: "+15557654321",
-    name: "Taylor Stitch",
-    role: "tailor",
-    password: "tailor123",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-]
+function normalizeRole(role: string): UserRole {
+  const normalized = role.toLowerCase()
+  if (normalized === "tailor" || normalized === "admin") return normalized
+  return "customer"
+}
 
-function sanitizeUser(user: AuthUser): User {
-  const { password, ...safeUser } = user
+function sanitizeUser(user: { passwordHash: string } & User): User {
+  const { passwordHash, ...safeUser } = user
   return safeUser
 }
 
-function findUserByEmail(email: string) {
+async function findUserByEmail(email: string) {
   const normalizedEmail = normalizeEmail(email)
-  return MOCK_USERS.find((user) => user.email === normalizedEmail)
+  return prisma.user.findUnique({ where: { email: normalizedEmail } })
 }
 
-function findUserById(id: string) {
-  return MOCK_USERS.find((user) => user.id === id)
+async function findUserById(id: string) {
+  return prisma.user.findUnique({ where: { id } })
 }
 
 export async function createSession(user: User) {
@@ -66,14 +38,23 @@ export async function createSession(user: User) {
   })
 }
 
-function validateCredentials(email: string, password: string): User | null {
-  const user = findUserByEmail(email)
+async function validateCredentials(email: string, password: string): Promise<User | null> {
+  const user = await findUserByEmail(email)
 
-  if (!user || user.password !== password) {
+  if (!user) {
     return null
   }
 
-  return sanitizeUser(user)
+  const isValidPassword = await bcrypt.compare(password, user.passwordHash)
+
+  if (!isValidPassword) {
+    return null
+  }
+
+  return sanitizeUser({
+    ...user,
+    role: normalizeRole(user.role),
+  })
 }
 
 export async function signUp(data: {
@@ -83,36 +64,36 @@ export async function signUp(data: {
   name: string
   role: "customer" | "tailor"
 }) {
-  // Mock signup - replace with actual database and password hashing
   const normalizedEmail = normalizeEmail(data.email)
-  const existingUser = findUserByEmail(normalizedEmail)
+  const existingUser = await findUserByEmail(normalizedEmail)
 
   if (existingUser) {
     return { success: false, error: "User already exists" }
   }
 
-  const newUser: AuthUser = {
-    id: Math.random().toString(36).substring(7),
-    email: normalizedEmail,
-    phone: data.phone.trim(),
-    name: data.name.trim(),
-    role: data.role,
-    password: data.password,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }
+  const passwordHash = await bcrypt.hash(data.password, 10)
 
-  MOCK_USERS.push(newUser)
+  const newUser = await prisma.user.create({
+    data: {
+      email: normalizedEmail,
+      phone: data.phone.trim(),
+      name: data.name.trim(),
+      role: data.role.toUpperCase(),
+      passwordHash,
+    },
+  })
 
-  const safeUser = sanitizeUser(newUser)
+  const safeUser = sanitizeUser({
+    ...newUser,
+    role: normalizeRole(newUser.role),
+  })
   await createSession(safeUser)
 
   return { success: true, user: safeUser }
 }
 
 export async function login(email: string, password: string) {
-  // Mock login - replace with actual authentication
-  const user = validateCredentials(email, password)
+  const user = await validateCredentials(email, password)
 
   if (!user) {
     return { success: false, error: "Invalid credentials" }
@@ -139,8 +120,13 @@ export async function getSession() {
 
   try {
     const session = JSON.parse(sessionCookie.value)
-    const user = findUserById(session.userId)
-    return user ? sanitizeUser(user) : null
+    const user = await findUserById(session.userId)
+    return user
+      ? sanitizeUser({
+          ...user,
+          role: normalizeRole(user.role),
+        })
+      : null
   } catch {
     return null
   }

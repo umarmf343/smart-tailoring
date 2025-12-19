@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  phone        String?
+  role         String   @default("CUSTOMER")
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tailorProfile   TailorProfile?
+  customerProfile CustomerProfile?
+  ordersAsCustomer Order[] @relation("CustomerOrders")
+  ordersAsTailor   Order[] @relation("TailorOrders")
+  messages         Message[]
+  notifications    Notification[]
+  payments         Payment[]
+}
+
+model TailorProfile {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @unique
+  shopName    String
+  bio         String?
+  services    String
+  serviceArea String
+  rating      Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CustomerProfile {
+  id              String   @id @default(cuid())
+  user            User     @relation(fields: [userId], references: [id])
+  userId          String   @unique
+  defaultAddress  String?
+  savedMeasurements String?
+  favoriteTailors  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Order {
+  id             String   @id @default(cuid())
+  customer       User     @relation("CustomerOrders", fields: [customerId], references: [id])
+  customerId     String
+  tailor         User     @relation("TailorOrders", fields: [tailorId], references: [id])
+  tailorId       String
+  service        String
+  status         String   @default("PENDING")
+  price          Decimal   @default(0)
+  notes          String?
+  measurementSet String?
+  estimatedDelivery DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  payments       Payment[]
+  messages       Message[]
+  notifications  Notification[]
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  order       Order    @relation(fields: [orderId], references: [id])
+  orderId     String
+  amount      Decimal
+  currency    String   @default("USD")
+  method      String
+  status      String   @default("PENDING")
+  reference   String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+  sender    User     @relation(fields: [senderId], references: [id])
+  senderId  String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
