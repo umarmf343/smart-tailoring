@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { login } from "@/lib/auth-client"
+import { login, normalizeEmail } from "@/lib/auth-client"
 
 export function LoginForm() {
   const router = useRouter()
@@ -23,7 +23,8 @@ export function LoginForm() {
     setLoading(true)
 
     try {
-      const result = await login(email, password)
+      const sanitizedEmail = normalizeEmail(email)
+      const result = await login(sanitizedEmail, password.trim())
 
       if (result.success && result.user) {
         // Redirect based on role

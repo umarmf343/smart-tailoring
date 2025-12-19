@@ -6,6 +6,10 @@ interface AuthResponse<TUser = unknown> {
   error?: string
 }
 
+export function normalizeEmail(email: string) {
+  return email.trim().toLowerCase()
+}
+
 async function postAuth<TResponse>(path: string, body: Record<string, unknown>): Promise<AuthResponse<TResponse>> {
   const response = await fetch(path, {
     method: "POST",
@@ -23,7 +27,7 @@ async function postAuth<TResponse>(path: string, body: Record<string, unknown>):
 }
 
 export async function login(email: string, password: string) {
-  return postAuth("/api/auth/login", { email, password })
+  return postAuth("/api/auth/login", { email: normalizeEmail(email), password })
 }
 
 export async function signUp(data: {
@@ -33,7 +37,12 @@ export async function signUp(data: {
   name: string
   role: "customer" | "tailor"
 }) {
-  return postAuth("/api/auth/signup", data)
+  return postAuth("/api/auth/signup", {
+    ...data,
+    email: normalizeEmail(data.email),
+    phone: data.phone.trim(),
+    name: data.name.trim(),
+  })
 }
 
 export async function logout() {

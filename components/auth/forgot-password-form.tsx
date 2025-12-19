@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CheckCircle, Mail } from "lucide-react"
+import { normalizeEmail } from "@/lib/auth-client"
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("")
@@ -16,6 +17,8 @@ export function ForgotPasswordForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
+    const sanitizedEmail = normalizeEmail(email)
+    setEmail(sanitizedEmail)
 
     // Mock API call - replace with actual password reset logic
     await new Promise((resolve) => setTimeout(resolve, 1000))
