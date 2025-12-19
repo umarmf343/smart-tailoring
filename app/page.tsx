@@ -261,23 +261,23 @@ export default function HomePage() {
 
         <section className="container mx-auto px-4 pb-16">
           <Card className="rounded-3xl border-border/80 bg-background/70 shadow-xl backdrop-blur-xl">
-            <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <div className="space-y-1">
-                <CardTitle className="text-2xl">Navigate the experience</CardTitle>
-                <CardDescription>
-                  Open one panel at a time—no more endless scroll. Everything is tucked behind purposeful clicks.
-                </CardDescription>
-              </div>
-              <TabsList className="w-full justify-start overflow-x-auto lg:w-auto">
-                {navSections.map((section) => (
-                  <TabsTrigger key={section.value} value={section.value} onClick={() => setActiveSection(section.value)}>
-                    {section.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </CardHeader>
-            <CardContent>
-              <Tabs value={activeSection} onValueChange={setActiveSection} className="space-y-6">
+            <Tabs value={activeSection} onValueChange={setActiveSection} className="space-y-6">
+              <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div className="space-y-1">
+                  <CardTitle className="text-2xl">Navigate the experience</CardTitle>
+                  <CardDescription>
+                    Open one panel at a time—no more endless scroll. Everything is tucked behind purposeful clicks.
+                  </CardDescription>
+                </div>
+                <TabsList className="w-full justify-start overflow-x-auto lg:w-auto">
+                  {navSections.map((section) => (
+                    <TabsTrigger key={section.value} value={section.value} onClick={() => setActiveSection(section.value)}>
+                      {section.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </CardHeader>
+              <CardContent>
                 <TabsContent value="features" className="space-y-4 animate-in fade-in slide-in-from-bottom duration-500">
                   <div className="grid gap-4 lg:grid-cols-3">
                     {featureHighlights.map((feature, index) => (
@@ -446,8 +446,8 @@ export default function HomePage() {
                     </CardContent>
                   </Card>
                 </TabsContent>
-              </Tabs>
-            </CardContent>
+              </CardContent>
+            </Tabs>
           </Card>
         </section>
       </main>
