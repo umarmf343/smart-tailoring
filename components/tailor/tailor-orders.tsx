@@ -1,11 +1,11 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, MessageCircle, CheckCircle } from "lucide-react"
+import { Eye, MessageCircle, CheckCircle, ChevronDown, ChevronUp } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   MEASUREMENT_LIBRARY,
@@ -99,6 +99,12 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
   const [selectedOrder, setSelectedOrder] = useState<(typeof MOCK_ORDERS)[0] | null>(null)
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState("all")
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const [scrollState, setScrollState] = useState({
+    canScrollDown: false,
+    canScrollUp: false,
+    hasOverflow: false,
+  })
 
   const measurementProfile = useMemo(
     () =>
@@ -113,6 +119,45 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
     ? MEASUREMENT_LIBRARY.filter((profile) => profile.garmentType === selectedOrder.garmentType)
     : MEASUREMENT_LIBRARY
   const filteredOrders = statusFilter === "all" ? orders : orders.filter((order) => order.status === statusFilter)
+
+  useEffect(() => {
+    const viewport = scrollAreaRef.current
+    if (!viewport) return
+
+    const updateScrollState = () => {
+      const { scrollTop, scrollHeight, clientHeight } = viewport
+      const hasOverflow = scrollHeight > clientHeight + 1
+      setScrollState({
+        hasOverflow,
+        canScrollUp: hasOverflow && scrollTop > 8,
+        canScrollDown: hasOverflow && scrollTop + clientHeight < scrollHeight - 8,
+      })
+    }
+
+    updateScrollState()
+    viewport.addEventListener("scroll", updateScrollState)
+    window.addEventListener("resize", updateScrollState)
+
+    return () => {
+      viewport.removeEventListener("scroll", updateScrollState)
+      window.removeEventListener("resize", updateScrollState)
+    }
+  }, [selectedOrder])
+
+  useEffect(() => {
+    const viewport = scrollAreaRef.current
+    if (viewport) {
+      viewport.scrollTo({ top: 0 })
+    }
+  }, [selectedOrder])
+
+  const handleScrollButtonClick = (direction: "up" | "down") => {
+    const viewport = scrollAreaRef.current
+    if (!viewport) return
+
+    const delta = direction === "up" ? -260 : 260
+    viewport.scrollBy({ top: delta, behavior: "smooth" })
+  }
 
   return (
     <>
@@ -224,154 +269,181 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
             <DialogTitle>Order Details - {selectedOrder?.id}</DialogTitle>
           </DialogHeader>
           {selectedOrder && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Customer</p>
-                  <p className="font-medium">{selectedOrder.customerName}</p>
+            <div className="relative">
+              <div ref={scrollAreaRef} className="max-h-[70vh] overflow-y-auto pr-10 space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Customer</p>
+                    <p className="font-medium">{selectedOrder.customerName}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Service</p>
+                    <p className="font-medium">{selectedOrder.service}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Status</p>
+                    <Badge className={statusColors[selectedOrder.status]}>{selectedOrder.status}</Badge>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Price</p>
+                    <p className="font-medium">${selectedOrder.price}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Service</p>
-                  <p className="font-medium">{selectedOrder.service}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <Badge className={statusColors[selectedOrder.status]}>{selectedOrder.status}</Badge>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Price</p>
-                  <p className="font-medium">${selectedOrder.price}</p>
-                </div>
-              </div>
 
-              {selectedOrder.express && (
-                <div className="grid grid-cols-2 gap-4 rounded-lg border border-orange-200 dark:border-orange-900 bg-orange-50/60 dark:bg-orange-950/20 p-4">
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold flex items-center gap-2 text-orange-800 dark:text-orange-200">
-                        <Badge className="bg-orange-600 text-white">Express</Badge>
-                        Promise by {selectedOrder.express.promiseAt ? formatDate(selectedOrder.express.promiseAt) : "TBD"}
+                {selectedOrder.express && (
+                  <div className="grid grid-cols-2 gap-4 rounded-lg border border-orange-200 dark:border-orange-900 bg-orange-50/60 dark:bg-orange-950/20 p-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold flex items-center gap-2 text-orange-800 dark:text-orange-200">
+                          <Badge className="bg-orange-600 text-white">Express</Badge>
+                          Promise by {selectedOrder.express.promiseAt ? formatDate(selectedOrder.express.promiseAt) : "TBD"}
+                        </p>
+                      <p className="text-xs text-muted-foreground">
+                        Fee: ${selectedOrder.express.fee} • Status: {selectedOrder.express.risk === "at-risk" ? "At risk" : "On track"}
                       </p>
-                    <p className="text-xs text-muted-foreground">
-                      Fee: ${selectedOrder.express.fee} • Status: {selectedOrder.express.risk === "at-risk" ? "At risk" : "On track"}
-                    </p>
+                    </div>
+                    <div className="space-y-1 text-sm text-muted-foreground">
+                      <p>Notifications: placed → mid-progress → ready-for-pickup with SLA reminders.</p>
+                      <p className="text-xs">Use reassignment if risk flagged and capacity exists.</p>
+                    </div>
                   </div>
-                  <div className="space-y-1 text-sm text-muted-foreground">
-                    <p>Notifications: placed → mid-progress → ready-for-pickup with SLA reminders.</p>
-                    <p className="text-xs">Use reassignment if risk flagged and capacity exists.</p>
-                  </div>
-                </div>
-              )}
+                )}
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-bold">Customer Measurements</h3>
-                  <Select
-                    value={selectedProfileId ?? selectedOrder.measurementProfileId}
-                    onValueChange={setSelectedProfileId}
-                  >
-                    <SelectTrigger className="w-[220px]">
-                      <SelectValue placeholder="Switch measurement set" />
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-bold">Customer Measurements</h3>
+                    <Select
+                      value={selectedProfileId ?? selectedOrder.measurementProfileId}
+                      onValueChange={setSelectedProfileId}
+                    >
+                      <SelectTrigger className="w-[220px]">
+                        <SelectValue placeholder="Switch measurement set" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {garmentMatchedProfiles.map((profile) => (
+                          <SelectItem key={profile.id} value={profile.id}>
+                            {profile.name} ({profile.status.replace("-", " ")})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {measurementProfile ? (
+                    <>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="secondary">{measurementProfile.name}</Badge>
+                        <Badge variant="outline">{describeGarmentType(measurementProfile.garmentType)}</Badge>
+                        <Badge variant="outline">{measurementProfile.unit.toUpperCase()}</Badge>
+                        <Badge
+                          className={
+                            measurementProfile.status === "verified"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                              : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+                          }
+                        >
+                          {measurementProfile.status.replace("-", " ")}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 p-4 bg-muted rounded-lg">
+                        {Object.entries(measurementProfile.measurements).map(([key, value]) => (
+                          <div key={key} className="flex flex-col">
+                            <span className="text-sm capitalize text-muted-foreground">{key.replace(/([A-Z])/g, " $1")}</span>
+                            <span className="font-medium">
+                              {value} {measurementProfile.unit}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              ≈ {formatConvertedMeasurement(value, measurementProfile.unit)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {measurementAlerts.length > 0 && (
+                        <div className="space-y-2">
+                          {measurementAlerts.map((alert, index) => (
+                            <div key={index} className="p-3 border rounded-md bg-amber-50 dark:bg-amber-950/30">
+                              <p className="text-sm font-medium">{alert.message}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="space-y-2">
+                        <p className="text-sm font-semibold">Fit suggestions</p>
+                        <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                          {fitSuggestions.map((suggestion) => (
+                            <li key={suggestion}>{suggestion}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <MeasurementAdjustmentRequest
+                        orderId={selectedOrder.id}
+                        customerName={selectedOrder.customerName}
+                        measurements={measurementProfile.measurements}
+                        unit={measurementProfile.unit}
+                        onRequestSent={() => console.log("Measurement clarification sent")}
+                      />
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No measurement profile attached to this order.</p>
+                  )}
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h3 className="font-bold mb-3">Update Order Status</h3>
+                  <Select defaultValue={selectedOrder.status}>
+                    <SelectTrigger>
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {garmentMatchedProfiles.map((profile) => (
-                        <SelectItem key={profile.id} value={profile.id}>
-                          {profile.name} ({profile.status.replace("-", " ")})
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="confirmed">Confirmed</SelectItem>
+                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="fitting-required">Fitting Required</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                {measurementProfile ? (
-                  <>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="secondary">{measurementProfile.name}</Badge>
-                      <Badge variant="outline">{describeGarmentType(measurementProfile.garmentType)}</Badge>
-                      <Badge variant="outline">{measurementProfile.unit.toUpperCase()}</Badge>
-                      <Badge
-                        className={
-                          measurementProfile.status === "verified"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                            : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
-                        }
-                      >
-                        {measurementProfile.status.replace("-", " ")}
-                      </Badge>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 p-4 bg-muted rounded-lg">
-                      {Object.entries(measurementProfile.measurements).map(([key, value]) => (
-                        <div key={key} className="flex flex-col">
-                          <span className="text-sm capitalize text-muted-foreground">{key.replace(/([A-Z])/g, " $1")}</span>
-                          <span className="font-medium">
-                            {value} {measurementProfile.unit}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            ≈ {formatConvertedMeasurement(value, measurementProfile.unit)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {measurementAlerts.length > 0 && (
-                      <div className="space-y-2">
-                        {measurementAlerts.map((alert, index) => (
-                          <div key={index} className="p-3 border rounded-md bg-amber-50 dark:bg-amber-950/30">
-                            <p className="text-sm font-medium">{alert.message}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="space-y-2">
-                      <p className="text-sm font-semibold">Fit suggestions</p>
-                      <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                        {fitSuggestions.map((suggestion) => (
-                          <li key={suggestion}>{suggestion}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <MeasurementAdjustmentRequest
-                      orderId={selectedOrder.id}
-                      customerName={selectedOrder.customerName}
-                      measurements={measurementProfile.measurements}
-                      unit={measurementProfile.unit}
-                      onRequestSent={() => console.log("Measurement clarification sent")}
-                    />
-                  </>
-                ) : (
-                  <p className="text-sm text-muted-foreground">No measurement profile attached to this order.</p>
-                )}
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" onClick={() => setSelectedOrder(null)}>
+                    Close
+                  </Button>
+                  <Button className="gap-2">
+                    <CheckCircle className="h-4 w-4" />
+                    Update Status
+                  </Button>
+                </div>
               </div>
 
-              <Separator />
-
-              <div>
-                <h3 className="font-bold mb-3">Update Order Status</h3>
-                <Select defaultValue={selectedOrder.status}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="confirmed">Confirmed</SelectItem>
-                    <SelectItem value="in-progress">In Progress</SelectItem>
-                    <SelectItem value="fitting-required">Fitting Required</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => setSelectedOrder(null)}>
-                  Close
-                </Button>
-                <Button className="gap-2">
-                  <CheckCircle className="h-4 w-4" />
-                  Update Status
-                </Button>
-              </div>
+              {scrollState.hasOverflow && (
+                <div className="pointer-events-none absolute inset-y-0 right-2 flex flex-col justify-between gap-2 py-4">
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    className="pointer-events-auto rounded-full shadow-md bg-background/90"
+                    onClick={() => handleScrollButtonClick("up")}
+                    disabled={!scrollState.canScrollUp}
+                    aria-label="Scroll up"
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    className="pointer-events-auto rounded-full shadow-md bg-background/90"
+                    onClick={() => handleScrollButtonClick("down")}
+                    disabled={!scrollState.canScrollDown}
+                    aria-label="Scroll down"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
