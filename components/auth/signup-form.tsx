@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { signUp } from "@/lib/auth-client"
+import { normalizeEmail, signUp } from "@/lib/auth-client"
 
 export function SignupForm() {
   const router = useRouter()
@@ -29,13 +29,18 @@ export function SignupForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
+    const trimmedPassword = formData.password.trim()
+    const trimmedConfirmPassword = formData.confirmPassword.trim()
+    const sanitizedEmail = normalizeEmail(formData.email)
+    const sanitizedPhone = formData.phone.trim()
+    const sanitizedName = formData.name.trim()
 
-    if (formData.password !== formData.confirmPassword) {
+    if (trimmedPassword !== trimmedConfirmPassword) {
       setError("Passwords do not match")
       return
     }
 
-    if (formData.password.length < 8) {
+    if (trimmedPassword.length < 8) {
       setError("Password must be at least 8 characters")
       return
     }
@@ -44,10 +49,10 @@ export function SignupForm() {
 
     try {
       const result = await signUp({
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
-        name: formData.name,
+        email: sanitizedEmail,
+        password: trimmedPassword,
+        phone: sanitizedPhone,
+        name: sanitizedName,
         role: formData.role,
       })
 
