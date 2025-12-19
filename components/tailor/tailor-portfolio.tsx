@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from "@/components/ui/badge"
 import { Plus, X, Upload } from "lucide-react"
 import { FileUpload } from "@/components/upload/file-upload"
+import { formatDate } from "@/lib/date"
 
 interface PortfolioItem {
   id: string
@@ -135,7 +136,7 @@ export function TailorPortfolio() {
           <DialogContent className="max-w-3xl">
             <DialogHeader>
               <DialogTitle>{selectedItem.title}</DialogTitle>
-              <DialogDescription>Added on {selectedItem.date.toLocaleDateString()}</DialogDescription>
+              <DialogDescription>Added on {formatDate(selectedItem.date)}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <Image

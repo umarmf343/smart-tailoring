@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { formatDate } from "@/lib/date"
 import { Heart, Trash2, ShoppingCart } from "lucide-react"
 
 interface SavedDesign {
@@ -75,7 +76,7 @@ export function FavoriteDesigns() {
                 <div className="p-4">
                   <h3 className="font-bold mb-1">{design.name}</h3>
                   {design.notes && <p className="text-sm text-muted-foreground mb-3">{design.notes}</p>}
-                  <p className="text-xs text-muted-foreground mb-3">Saved {design.savedAt.toLocaleDateString()}</p>
+                  <p className="text-xs text-muted-foreground mb-3">Saved {formatDate(design.savedAt)}</p>
                   <div className="flex gap-2">
                     <Button size="sm" className="flex-1 gap-2">
                       <ShoppingCart className="h-4 w-4" />

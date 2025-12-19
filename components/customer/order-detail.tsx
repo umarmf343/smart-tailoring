@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, MessageCircle, Package, CheckCircle, Clock, Sparkles, AlertCircle } from "lucide-react"
+import { formatDate } from "@/lib/date"
 import {
   MEASUREMENT_LIBRARY,
   describeGarmentType,
@@ -68,7 +69,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Order #{MOCK_ORDER.id}</h1>
-            <p className="text-muted-foreground">Placed on {MOCK_ORDER.createdAt.toLocaleDateString()}</p>
+            <p className="text-muted-foreground">Placed on {formatDate(MOCK_ORDER.createdAt)}</p>
           </div>
           <Badge className={statusColors[MOCK_ORDER.status]} style={{ fontSize: "1rem", padding: "0.5rem 1rem" }}>
             {MOCK_ORDER.status.replace("-", " ")}
@@ -105,7 +106,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                     <p className={`font-medium ${step.completed ? "text-foreground" : "text-muted-foreground"}`}>
                       {step.status}
                     </p>
-                    {step.date && <p className="text-sm text-muted-foreground">{step.date.toLocaleDateString()}</p>}
+                    {step.date && <p className="text-sm text-muted-foreground">{formatDate(step.date)}</p>}
                   </div>
                 </div>
               ))}
@@ -136,7 +137,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Estimated Delivery</p>
-                <p className="font-medium">{MOCK_ORDER.estimatedDelivery.toLocaleDateString()}</p>
+                <p className="font-medium">{formatDate(MOCK_ORDER.estimatedDelivery)}</p>
               </div>
             </div>
 

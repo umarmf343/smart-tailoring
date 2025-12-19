@@ -1,5 +1,6 @@
 import { Award, BadgeCheck, ShieldCheck, Sparkles, Star, Zap } from "lucide-react"
 import type { TailorBadge, TailorBadgeType } from "./types"
+import { formatDate } from "./date"
 
 export const BADGE_META: Record<
   TailorBadgeType,
@@ -47,6 +48,6 @@ export function getBadgeMeta(badge: TailorBadge) {
 export function formatBadgeStatus(status: TailorBadge["status"], expiresAt?: Date) {
   if (status === "expired") return "Expired"
   if (status === "pending") return "Pending review"
-  if (expiresAt) return `Active • renews ${expiresAt.toLocaleDateString()}`
+  if (expiresAt) return `Active • renews ${formatDate(expiresAt)}`
   return "Active"
 }

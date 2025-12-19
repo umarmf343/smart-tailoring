@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Search, MoreVertical, Ban, CheckCircle } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { formatDate } from "@/lib/date"
 
 // Mock data
 const MOCK_CUSTOMERS = [
@@ -80,7 +81,7 @@ export function AdminUsers() {
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span>{customer.totalOrders} orders</span>
                   <span>${customer.totalSpent.toLocaleString()} spent</span>
-                  <span>Joined {customer.joinedAt.toLocaleDateString()}</span>
+                  <span>Joined {formatDate(customer.joinedAt)}</span>
                 </div>
               </div>
               <div className="flex gap-2">

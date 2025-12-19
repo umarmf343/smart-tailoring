@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { formatDate } from "@/lib/date"
 import { Calendar, Clock, Plus } from "lucide-react"
 
 interface Appointment {
@@ -96,7 +97,7 @@ export function AvailabilityCalendar() {
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
-                          {apt.date.toLocaleDateString()}
+                          {formatDate(apt.date)}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
