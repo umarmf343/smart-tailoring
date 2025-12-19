@@ -1,23 +1,28 @@
-"use server"
+import { randomBytes, scryptSync, timingSafeEqual } from "crypto"
 
-// Note: bcrypt would normally be installed, but for demo purposes we'll simulate it
+const SALT_LENGTH = 16
+const KEY_LENGTH = 64
+
+function deriveKey(password: string, salt: string) {
+  return scryptSync(password, salt, KEY_LENGTH)
+}
 
 export async function hashPassword(password: string): Promise<string> {
-  // In production, use: const bcrypt = require('bcryptjs')
-  // return await bcrypt.hash(password, 10)
-
-  // Simulated hash for demo
-  const hash = Buffer.from(password).toString("base64")
-  return `$2b$10$${hash}`
+  const salt = randomBytes(SALT_LENGTH).toString("hex")
+  const derivedKey = deriveKey(password, salt)
+  return `${salt}:${derivedKey.toString("hex")}`
 }
 
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  // In production, use: const bcrypt = require('bcryptjs')
-  // return await bcrypt.compare(password, hash)
+  const [salt, storedHash] = hash.split(":")
+  if (!salt || !storedHash) return false
 
-  // Simulated verification for demo
-  const expectedHash = await hashPassword(password)
-  return hash === expectedHash
+  const derivedKey = deriveKey(password, salt)
+  const storedBuffer = Buffer.from(storedHash, "hex")
+
+  if (storedBuffer.length !== derivedKey.length) return false
+
+  return timingSafeEqual(derivedKey, storedBuffer)
 }
 
 export function generateToken(length = 32): string {

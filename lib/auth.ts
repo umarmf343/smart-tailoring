@@ -1,9 +1,9 @@
 import "server-only"
 
-import bcrypt from "bcryptjs"
 import { cookies } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import type { User, UserRole } from "./types"
+import { hashPassword, verifyPassword } from "./security"
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase()
@@ -45,7 +45,7 @@ async function validateCredentials(email: string, password: string): Promise<Use
     return null
   }
 
-  const isValidPassword = await bcrypt.compare(password, user.passwordHash)
+  const isValidPassword = await verifyPassword(password, user.passwordHash)
 
   if (!isValidPassword) {
     return null
@@ -71,7 +71,7 @@ export async function signUp(data: {
     return { success: false, error: "User already exists" }
   }
 
-  const passwordHash = await bcrypt.hash(data.password, 10)
+  const passwordHash = await hashPassword(data.password)
 
   const newUser = await prisma.user.create({
     data: {
