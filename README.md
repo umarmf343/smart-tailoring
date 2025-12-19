@@ -24,6 +24,8 @@ Smart Tailoring Management System (Haib Tailor) is a black-and-white themed plat
    pnpm dev
    ```
    The app will be available at `http://localhost:3000`.
+
+   > **Note:** The default dev command now uses Webpack (`next dev --webpack`) to avoid Turbopack source-map warnings seen with some setups. If you want to try Turbopack, run `pnpm dev:turbo`.
 3. **Lint the project**
    ```bash
    pnpm lint
