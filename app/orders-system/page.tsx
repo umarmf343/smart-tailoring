@@ -1,44 +1,45 @@
+"use client"
+
 import Link from "next/link"
+import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import {
-  ArrowLeft,
-  BarChart3,
-  Bell,
-  Camera,
-  CheckCircle2,
-  CreditCard,
-  GalleryHorizontal,
-  HandCoins,
-  History,
-  ImageUp,
-  Lock,
   AlarmClock,
   AlertTriangle,
+  ArrowLeft,
+  Award,
+  BadgeCheck,
+  BarChart3,
+  Bell,
   BellRing,
   CalendarClock,
+  Camera,
   CircleCheck,
   ClipboardCheck,
   ClipboardList,
-  Flag,
-  Info,
+  CreditCard,
+  GalleryHorizontal,
+  History,
+  ImageUp,
   Inbox,
+  Flag,
+  Lock,
   Mail,
   MessageSquare,
   PackageCheck,
   PhoneCall,
-  Award,
-  BadgeCheck,
-  Star,
-  Zap,
   Send,
   Shield,
   ShieldCheck,
   Sparkles,
-  TimerReset,
+  Star,
   Timer,
+  Zap,
 } from "lucide-react"
 
 const customerOrderFlow = [
@@ -427,40 +428,6 @@ const adminDashboard = [
   },
 ]
 
-const reminderSummary = [
-  {
-    title: "Tailor timeline",
-    steps: ["X hours before deadline reminder", "At deadline prompt", "15m before grace end alert"],
-  },
-  {
-    title: "Customer updates",
-    steps: ["Ready for Pickup push/email", "Not Ready with new ETA", "Pickup confirmation receipt"],
-  },
-  {
-    title: "Complaint flow",
-    steps: ["Customer submits", "Admin investigates/updates", "Customer receives resolution"],
-  },
-]
-
-const uiNotes = [
-  {
-    label: "Dashboard badges",
-    detail: "Use color-coded badges for Ready, Not Ready, Delayed, and Grace to keep status scannable.",
-  },
-  {
-    label: "Gentle nudges",
-    detail: "Tailor reminders appear as subtle toasts/popovers to avoid interrupting work while staying actionable.",
-  },
-  {
-    label: "Confirmation blocks",
-    detail: "When Not Ready is selected, show a mini-form for reason and added days before submitting.",
-  },
-  {
-    label: "Accessibility",
-    detail: "Progress tracker supports screen readers; notifications have concise titles and bodies.",
-  },
-]
-
 const expressFeatureHighlights = [
   {
     title: "Express upgrade",
@@ -554,10 +521,12 @@ const badgeOperations = [
 ]
 
 export default function OrdersSystemPage() {
+  const [activeSection, setActiveSection] = useState("intake")
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b border-border/70 bg-background/80 backdrop-blur">
+        <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <Link href="/" className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             <span className="text-sm font-medium text-muted-foreground">Back to Home</span>
@@ -575,607 +544,498 @@ export default function OrdersSystemPage() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-10 space-y-12">
-        <section className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs uppercase tracking-wide">
-            <Badge variant="outline" className="border-transparent px-0">
-              <Sparkles className="h-3 w-3 mr-1" />
-              Orders System
-            </Badge>
-            End-to-end lifecycle for Haib Tailor
-          </div>
-          <h1 className="text-4xl font-bold leading-tight">Build-ready Orders System blueprint</h1>
-          <p className="text-lg text-muted-foreground">
-            A complete flow covering customers, tailors, and admins—order placement, real-time tracking, payments,
-            messaging, refunds, and analytics—mapped to the Haib Tailor experience.
-          </p>
-          <div className="flex justify-center gap-3">
-            <Link href="/customer/order/new">
-              <Button size="lg">Start a Customer Order</Button>
-            </Link>
-            <Link href="/tailor/dashboard">
-              <Button size="lg" variant="outline" className="bg-transparent">
-                View Tailor Console
-              </Button>
-            </Link>
-          </div>
-        </section>
+      <main className="container mx-auto space-y-10 px-4 py-10">
+        <Card className="rounded-3xl border-border/80 bg-background/70 shadow-xl">
+          <CardHeader className="space-y-4 text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs uppercase tracking-wide">
+              <Badge variant="outline" className="border-transparent px-0 text-primary">
+                <Sparkles className="mr-1 h-3 w-3" />
+                Orders System
+              </Badge>
+              Guided console
+            </div>
+            <div className="space-y-3">
+              <CardTitle className="text-4xl font-bold leading-tight">Orders System control room</CardTitle>
+              <CardDescription className="text-lg">
+                Choose a slice—intake, delivery promises, rich media, or oversight. Each opens in place so you never scroll
+                past walls of content.
+              </CardDescription>
+            </div>
+            <div className="flex flex-wrap justify-center gap-3 text-sm text-muted-foreground">
+              <span className="rounded-full bg-muted px-3 py-1">Mobile-first tab bar</span>
+              <span className="rounded-full bg-muted px-3 py-1">Tailwind animations</span>
+              <span className="rounded-full bg-muted px-3 py-1">App-like focus</span>
+            </div>
+          </CardHeader>
 
-        <section className="grid lg:grid-cols-[1.5fr,1fr] gap-6">
-          <Card>
-            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <CardTitle>Express service for urgent orders</CardTitle>
-                <CardDescription>Upgrade flow, pricing, and visibility</CardDescription>
-              </div>
-              <Badge className="bg-orange-600 text-white">Express</Badge>
-            </CardHeader>
-            <CardContent className="grid md:grid-cols-3 gap-4">
-              {expressFeatureHighlights.map((item) => (
-                <div key={item.title} className="rounded-lg border border-border p-4 h-full">
-                  <div className="flex items-center gap-2 mb-2">
-                    <item.icon className="h-4 w-4 text-orange-600" />
-                    <p className="font-semibold">{item.title}</p>
-                  </div>
-                  <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                    {item.points.map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          <CardContent>
+            <Tabs value={activeSection} onValueChange={setActiveSection} className="space-y-6">
+              <TabsList className="w-full justify-start overflow-x-auto">
+                <TabsTrigger value="intake">Intake & Express</TabsTrigger>
+                <TabsTrigger value="delivery">Delivery & SLAs</TabsTrigger>
+                <TabsTrigger value="media">Media & Approvals</TabsTrigger>
+                <TabsTrigger value="admin">Admin & Trust</TabsTrigger>
+              </TabsList>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Express guardrails</CardTitle>
-              <CardDescription>Capacity, routing, and oversight</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              {expressCapacityRules.map((rule) => (
-                <div key={rule.title} className="flex items-start gap-3">
-                  <rule.icon className="h-4 w-4 text-orange-600 mt-1" />
-                  <div>
-                    <p className="font-semibold text-foreground">{rule.title}</p>
-                    <p>{rule.detail}</p>
-                  </div>
-                </div>
-              ))}
-              <Separator />
-              <p className="text-xs">Admins can override caps, approve fee waivers, and monitor SLA risk from a dedicated express queue.</p>
-            </CardContent>
-          </Card>
-        </section>
+              <TabsContent value="intake" className="space-y-4 animate-in fade-in slide-in-from-bottom duration-500">
+                <Accordion type="single" collapsible defaultValue="express">
+                  <AccordionItem value="express" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Express intake blueprint</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-4 lg:grid-cols-[1.4fr_0.6fr]">
+                        <Card className="shadow-sm">
+                          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <CardTitle>Express service for urgent orders</CardTitle>
+                              <CardDescription>Upgrade flow, pricing, and visibility</CardDescription>
+                            </div>
+                            <Badge className="bg-orange-600 text-white">Express</Badge>
+                          </CardHeader>
+                          <CardContent className="grid gap-4 md:grid-cols-3">
+                            {expressFeatureHighlights.map((item) => (
+                              <div key={item.title} className="rounded-lg border border-border/70 bg-background p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <item.icon className="h-4 w-4 text-orange-600" />
+                                  <p className="font-semibold">{item.title}</p>
+                                </div>
+                                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                                  {item.points.map((point) => (
+                                    <li key={point}>{point}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
 
-        <section className="grid lg:grid-cols-[1.5fr,1fr] gap-6">
-          <Card>
-            <CardHeader className="flex items-center justify-between">
-              <div>
-                <CardTitle>Badge system for tailor credibility</CardTitle>
-                <CardDescription>Badges visible on search, profiles, and order selection</CardDescription>
-              </div>
-              <Badge variant="secondary">Trust & Ranking</Badge>
-            </CardHeader>
-            <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {badgeCatalog.map((badge) => (
-                <div key={badge.label} className="rounded-lg border border-border p-4 h-full">
-                  <div className="flex items-center gap-2 mb-2">
-                    <badge.icon className="h-4 w-4 text-primary" />
-                    <p className="font-semibold">{badge.label}</p>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{badge.description}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                        <Card className="shadow-sm">
+                          <CardHeader>
+                            <CardTitle>Express guardrails</CardTitle>
+                            <CardDescription>Capacity, routing, and oversight</CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-3 text-sm text-muted-foreground">
+                            {expressCapacityRules.map((rule) => (
+                              <div key={rule.title} className="flex items-start gap-3">
+                                <rule.icon className="mt-1 h-4 w-4 text-orange-600" />
+                                <div>
+                                  <p className="font-semibold text-foreground">{rule.title}</p>
+                                  <p>{rule.detail}</p>
+                                </div>
+                              </div>
+                            ))}
+                            <Separator />
+                            <p className="text-xs">Admins can override caps, approve fee waivers, and monitor SLA risk from a dedicated express queue.</p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Badge lifecycle & ranking</CardTitle>
-              <CardDescription>How badges are awarded, renewed, and surfaced</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              {badgeOperations.map((op) => (
-                <div key={op.title} className="p-3 rounded-md border border-border">
-                  <p className="font-semibold text-foreground">{op.title}</p>
-                  <p>{op.detail}</p>
-                </div>
-              ))}
-              <Separator />
-              <p className="text-xs">Badge filters let customers find Verified, Express Specialist, or style-specific experts instantly.</p>
-            </CardContent>
-          </Card>
-        </section>
+                  <AccordionItem value="orders" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Order intake essentials</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {customerOrderFlow.map((block) => (
+                          <Card key={block.title} className="h-full border-dashed shadow-sm">
+                            <CardHeader className="flex flex-row items-start gap-3">
+                              <div className="rounded-full bg-muted p-2 text-muted-foreground">{block.icon}</div>
+                              <div>
+                                <CardTitle>{block.title}</CardTitle>
+                                <CardDescription>Customer-side experience</CardDescription>
+                              </div>
+                            </CardHeader>
+                            <CardContent>
+                              <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
+                                {block.items.map((item) => (
+                                  <li key={item}>{item}</li>
+                                ))}
+                              </ul>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
 
-        <section className="grid lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2">
-            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <CardTitle>Agreed completion time</CardTitle>
-                <CardDescription>Customer-tailer negotiation and lock-in</CardDescription>
-              </div>
-              <Badge variant="secondary">Deadline-aware</Badge>
-            </CardHeader>
-            <CardContent className="grid sm:grid-cols-3 gap-4">
-              {completionTimeFlow.map((block) => (
-                <div key={block.title} className="rounded-lg border border-border p-4 h-full">
-                  <div className="flex items-center gap-2 mb-2">
-                    <block.icon className="h-4 w-4 text-primary" />
-                    <p className="font-semibold">{block.title}</p>
-                  </div>
-                  <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-                    {block.items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Completion guardrails</CardTitle>
-              <CardDescription>How deadlines stay reliable</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              {completionGuardrails.map((rule) => (
-                <div key={rule.label} className="flex items-start gap-3">
-                  <CircleCheck className="h-4 w-4 text-primary mt-1" />
-                  <div>
-                    <p className="font-semibold text-foreground">{rule.label}</p>
-                    <p>{rule.detail}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </section>
+                  <AccordionItem value="status" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Status hand-offs</AccordionTrigger>
+                    <AccordionContent>
+                      <Card className="shadow-sm">
+                        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <CardTitle>Customer ↔ Tailor ↔ Admin</CardTitle>
+                            <CardDescription>Each stage shows both perspectives.</CardDescription>
+                          </div>
+                          <Badge variant="secondary">Timeline</Badge>
+                        </CardHeader>
+                        <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                          {statusWorkflow.map((status) => (
+                            <div key={status.label} className="rounded-xl border border-border/70 bg-muted/50 p-4 text-sm">
+                              <p className="text-xs font-semibold uppercase text-muted-foreground">{status.label}</p>
+                              <p className="mt-2 font-semibold text-foreground">Customer</p>
+                              <p className="text-muted-foreground">{status.customer}</p>
+                              <p className="mt-2 font-semibold text-foreground">Tailor</p>
+                              <p className="text-muted-foreground">{status.tailor}</p>
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </TabsContent>
 
-        <section className="grid lg:grid-cols-[2fr,1fr] gap-6">
-          <Card className="lg:col-span-2">
-            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <CardTitle>Tailor reminders & grace period</CardTitle>
-                <CardDescription>Real-time prompts around the agreed time</CardDescription>
-              </div>
-              <Badge variant="outline">Notifications</Badge>
-            </CardHeader>
-            <CardContent className="grid md:grid-cols-3 gap-4">
-              {tailorReminderPlan.map((item) => (
-                <div key={item.title} className="rounded-lg border border-border p-4 h-full">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4 text-primary" />
-                      <p className="font-semibold">{item.title}</p>
-                    </div>
-                    <Badge variant="secondary">{item.badge}</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{item.description}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Reminder channels</CardTitle>
-              <CardDescription>Reach tailors where they work</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <div className="flex items-start gap-3">
-                <Bell className="h-4 w-4 text-primary mt-1" />
-                <p>In-app toasts with deep links to the order; persistent bell center until acknowledged.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <Mail className="h-4 w-4 text-primary mt-1" />
-                <p>Email reminders include agreed date, grace end, and quick actions.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <PhoneCall className="h-4 w-4 text-primary mt-1" />
-                <p>Optional SMS for urgent deadlines or escalations when grace is nearly exhausted.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <TimerReset className="h-4 w-4 text-primary mt-1" />
-                <p>All reminders log to the audit trail so admins can verify nudges were sent.</p>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
+              <TabsContent value="delivery" className="space-y-4 animate-in fade-in slide-in-from-bottom duration-500">
+                <Accordion type="single" collapsible defaultValue="completion">
+                  <AccordionItem value="completion" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Agreed completion time</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-4 lg:grid-cols-3">
+                        {completionTimeFlow.map((block) => (
+                          <Card key={block.title} className="h-full border-dashed shadow-sm">
+                            <CardHeader className="flex items-center gap-2">
+                              <block.icon className="h-5 w-5 text-primary" />
+                              <CardTitle className="text-lg">{block.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
+                                {block.items.map((item) => (
+                                  <li key={item}>{item}</li>
+                                ))}
+                              </ul>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                        {completionGuardrails.map((rule) => (
+                          <div key={rule.label} className="rounded-xl border border-border/70 bg-muted/50 p-4 text-sm text-muted-foreground">
+                            <div className="mb-1 flex items-center gap-2 font-semibold text-foreground">
+                              <CircleCheck className="h-4 w-4 text-primary" />
+                              {rule.label}
+                            </div>
+                            {rule.detail}
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
 
-        <section className="grid md:grid-cols-2 gap-6">
-          {customerOrderFlow.map((block) => (
-            <Card key={block.title} className="h-full">
-              <CardHeader className="flex flex-row items-start gap-3">
-                <div className="rounded-full bg-muted p-2 text-muted-foreground">{block.icon}</div>
-                <div>
-                  <CardTitle>{block.title}</CardTitle>
-                  <CardDescription>Customer-side experience</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-                  {block.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
-        </section>
+                  <AccordionItem value="reminders" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Reminder plan</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-4 lg:grid-cols-[1.6fr_0.4fr]">
+                        <Card className="shadow-sm">
+                          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <CardTitle>Tailor reminders & grace period</CardTitle>
+                              <CardDescription>Real-time prompts around the agreed time</CardDescription>
+                            </div>
+                            <Badge variant="outline">Notifications</Badge>
+                          </CardHeader>
+                          <CardContent className="grid gap-4 md:grid-cols-3">
+                            {tailorReminderPlan.map((item) => (
+                              <div key={item.title} className="rounded-lg border border-border/70 bg-background p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <item.icon className="h-4 w-4 text-primary" />
+                                    <p className="font-semibold">{item.title}</p>
+                                  </div>
+                                  <Badge variant="secondary">{item.badge}</Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">{item.description}</p>
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
 
-        <section className="grid lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Status workflow</CardTitle>
-                <CardDescription>Shared across customers, tailors, and admins</CardDescription>
-              </div>
-              <Badge variant="outline">Real-time notifications</Badge>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {statusWorkflow.map((step, index) => (
-                <div key={step.label} className="rounded-lg border border-border p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-primary" />
-                      <p className="font-semibold">{index + 1}. {step.label}</p>
-                    </div>
-                    <Badge variant="secondary">{step.label}</Badge>
-                  </div>
-                  <div className="mt-3 grid md:grid-cols-2 gap-3 text-sm text-muted-foreground">
-                    <div className="p-3 rounded-md bg-muted/60">
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Customer</p>
-                      <p>{step.customer}</p>
-                    </div>
-                    <div className="p-3 rounded-md bg-muted/60">
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Tailor</p>
-                      <p>{step.tailor}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                        <Card className="shadow-sm">
+                          <CardHeader>
+                            <CardTitle>Reminder channels</CardTitle>
+                            <CardDescription>Reach tailors where they work</CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-3 text-sm text-muted-foreground">
+                            <div className="flex items-start gap-3">
+                              <Bell className="mt-1 h-4 w-4 text-primary" />
+                              <p>In-app toasts with deep links to the order; persistent bell center until acknowledged.</p>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <Mail className="mt-1 h-4 w-4 text-primary" />
+                              <p>Email reminders include agreed date, grace end, and quick actions.</p>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <PhoneCall className="mt-1 h-4 w-4 text-primary" />
+                              <p>Optional SMS for urgent deadlines or escalations when grace is nearly exhausted.</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Payment guardrails</CardTitle>
-              <CardDescription>Keep payments, invoices, and refunds consistent</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <div className="flex items-start gap-3">
-                <CreditCard className="h-4 w-4 text-primary mt-1" />
-                <p>
-                  Secure gateway integration (Stripe/PayPal) with support for full, deposit, or split payments before
-                  completion.
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <HandCoins className="h-4 w-4 text-primary mt-1" />
-                <p>Automatic invoices and receipts including garment, fabric, measurement set, discounts, and taxes.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <ShieldCheck className="h-4 w-4 text-primary mt-1" />
-                <p>Refunds and cancellations flow through admins/tailors with customer notifications and ledger updates.</p>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
+                  <AccordionItem value="customer" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Customer notifications</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        {customerNotificationPlan.map((item) => (
+                          <Card key={item.status} className="border-dashed shadow-sm">
+                            <CardHeader className="space-y-2">
+                              <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
+                                <span>{item.badge}</span>
+                                <Badge variant="secondary">Push/Email</Badge>
+                              </div>
+                              <CardTitle className="text-lg">{item.status}</CardTitle>
+                              <CardDescription>{item.description}</CardDescription>
+                            </CardHeader>
+                          </Card>
+                        ))}
+                      </div>
+                      <div className="mt-4 grid gap-3 sm:grid-cols-5">
+                        {orderTrackerStages.map((stage) => (
+                          <div key={stage.label} className="rounded-xl border border-border/70 bg-muted/50 p-4 text-sm">
+                            <p className="text-xs font-semibold uppercase text-muted-foreground">{stage.label}</p>
+                            <p className="text-muted-foreground">{stage.detail}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </TabsContent>
 
-        <section className="grid md:grid-cols-3 gap-6">
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>Tailor workspace</CardTitle>
-              <CardDescription>Tools tailors need to deliver reliably</CardDescription>
-            </CardHeader>
-            <CardContent className="grid sm:grid-cols-2 gap-4">
-              {tailorOps.map((item) => (
-                <div key={item.title} className="rounded-lg border border-border p-4">
-                  <p className="font-semibold mb-1">{item.title}</p>
-                  <p className="text-sm text-muted-foreground">{item.description}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Communication</CardTitle>
-              <CardDescription>Messaging + notifications</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <div className="flex items-start gap-3">
-                <MessageSquare className="h-4 w-4 text-primary mt-1" />
-                <p>Contextual messaging threads per order for design clarifications and fitting coordination.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <Sparkles className="h-4 w-4 text-primary mt-1" />
-                <p>Automated notifications on status changes, payment events, measurement updates, and delivery steps.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <ShieldCheck className="h-4 w-4 text-primary mt-1" />
-                <p>Admin-visible history for dispute resolution and SLA monitoring.</p>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
+              <TabsContent value="media" className="space-y-4 animate-in fade-in slide-in-from-bottom duration-500">
+                <Accordion type="single" collapsible defaultValue="requests">
+                  <AccordionItem value="requests" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Image request loop</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-4 md:grid-cols-3">
+                        {serviceImageFlow.map((block) => (
+                          <Card key={block.title} className="border-dashed shadow-sm">
+                            <CardHeader className="flex items-center gap-2">
+                              <div className="rounded-full bg-muted p-2 text-muted-foreground">{block.icon}</div>
+                              <CardTitle className="text-lg">{block.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
+                                {block.items.map((item) => (
+                                  <li key={item}>{item}</li>
+                                ))}
+                              </ul>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
 
-        <section className="grid lg:grid-cols-[1.3fr,1fr] gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Customer-facing updates</CardTitle>
-              <CardDescription>What customers see in real time</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {customerNotificationPlan.map((item) => (
-                <div key={item.status} className="rounded-lg border border-border p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary">{item.badge}</Badge>
-                      <p className="font-semibold">{item.status}</p>
-                    </div>
-                    <CircleCheck className="h-4 w-4 text-primary" />
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Order status tracker</CardTitle>
-              <CardDescription>Customer dashboard states</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              {orderTrackerStages.map((stage, index) => (
-                <div key={stage.label} className="rounded-lg border border-border p-3 flex items-start gap-3">
-                  <div className="h-8 w-8 flex items-center justify-center rounded-full bg-muted text-xs font-semibold">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">{stage.label}</p>
-                    <p>{stage.detail}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </section>
+                  <AccordionItem value="timeline" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Media timeline</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        {imageTimeline.map((item) => (
+                          <div key={item.stage} className="rounded-xl border border-border/70 bg-muted/50 p-4 text-sm text-muted-foreground">
+                            <p className="text-xs font-semibold uppercase text-muted-foreground">{item.stage}</p>
+                            <p className="font-semibold text-foreground">{item.owner}</p>
+                            <p>{item.detail}</p>
+                            <p className="mt-2 text-xs">{item.type} · {item.due}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
 
-        <section className="grid lg:grid-cols-[2fr,1fr] gap-6">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Service status images</CardTitle>
-              <CardDescription>Customer requests, tailor uploads, and a transparent gallery</CardDescription>
-            </CardHeader>
-            <CardContent className="grid sm:grid-cols-3 gap-4">
-              {serviceImageFlow.map((item) => (
-                <div key={item.title} className="rounded-lg border border-border p-4 h-full">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="rounded-full bg-muted p-2 text-muted-foreground">{item.icon}</div>
-                    <p className="font-semibold">{item.title}</p>
-                  </div>
-                  <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-                    {item.items.map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="space-y-1">
-              <CardTitle>Notifications & SLAs</CardTitle>
-              <CardDescription>Keep both sides informed with deadlines</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {imageNotifications.map((rule) => (
-                <div key={rule.title} className="rounded-lg border border-border p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <rule.icon className="h-4 w-4 text-primary" />
-                    <p className="font-semibold">{rule.title}</p>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{rule.description}</p>
-                </div>
-              ))}
-              <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
-                <p className="text-sm font-semibold text-primary mb-1">Timeline expectations</p>
-                <p className="text-sm text-muted-foreground">
-                  Default SLA: respond to an image request within 24 hours. Escalations: 12-hour warning to the tailor,
-                  6-hour admin alert if still pending.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
+                  <AccordionItem value="alerts" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Alerts & safety</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                        <Card className="shadow-sm">
+                          <CardHeader>
+                            <CardTitle>Notification patterns</CardTitle>
+                            <CardDescription>Who hears what, and when</CardDescription>
+                          </CardHeader>
+                          <CardContent className="grid gap-3 sm:grid-cols-3">
+                            {imageNotifications.map((note) => (
+                              <div key={note.title} className="rounded-lg border border-border/70 bg-background p-4 text-sm">
+                                <div className="mb-2 flex items-center gap-2 font-semibold text-foreground">
+                                  <note.icon className="h-4 w-4 text-primary" />
+                                  {note.title}
+                                </div>
+                                <p className="text-muted-foreground">{note.description}</p>
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
 
-        <section className="grid lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Image history & gallery behavior</CardTitle>
-              <CardDescription>Timeline across the order lifecycle</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {imageTimeline.map((entry) => (
-                <div key={entry.stage} className="rounded-lg border border-border p-4">
-                  <div className="flex flex-wrap items-center gap-2 justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary">{entry.type}</Badge>
-                      <p className="font-semibold">{entry.stage}</p>
-                    </div>
-                    <Badge variant="outline">{entry.due}</Badge>
-                  </div>
-                  <div className="mt-3 grid sm:grid-cols-[1fr,3fr] gap-3 text-sm text-muted-foreground">
-                    <div className="rounded-md bg-muted/60 p-3">
-                      <p className="text-xs uppercase tracking-wide mb-1 text-muted-foreground">Owner</p>
-                      <p className="font-medium text-foreground">{entry.owner}</p>
-                    </div>
-                    <div className="rounded-md bg-muted/60 p-3">
-                      <p className="text-xs uppercase tracking-wide mb-1 text-muted-foreground">Expectation</p>
-                      <p>{entry.detail}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Quality, security, and governance</CardTitle>
-              <CardDescription>Privacy-safe, reliable image sharing</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              {imageSafety.map((policy) => (
-                <div key={policy.title} className="flex items-start gap-3">
-                  <policy.icon className="h-4 w-4 text-primary mt-1" />
-                  <div>
-                    <p className="font-semibold text-foreground">{policy.title}</p>
-                    <p>{policy.description}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </section>
+                        <Card className="shadow-sm">
+                          <CardHeader>
+                            <CardTitle>Safety rails</CardTitle>
+                            <CardDescription>Privacy, governance, and performance</CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-3 text-sm text-muted-foreground">
+                            {imageSafety.map((item) => (
+                              <div key={item.title} className="flex items-start gap-3">
+                                <item.icon className="mt-1 h-4 w-4 text-primary" />
+                                <div>
+                                  <p className="font-semibold text-foreground">{item.title}</p>
+                                  <p>{item.description}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </TabsContent>
 
-        <section className="grid lg:grid-cols-[1.2fr,1fr] gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Complaint system</CardTitle>
-              <CardDescription>Direct line to admins for issues</CardDescription>
-            </CardHeader>
-            <CardContent className="grid sm:grid-cols-3 gap-4">
-              {complaintFlow.map((step) => (
-                <div key={step.title} className="rounded-lg border border-border p-4 h-full">
-                  <div className="flex items-center gap-2 mb-2">
-                    <step.icon className="h-4 w-4 text-primary" />
-                    <p className="font-semibold">{step.title}</p>
-                  </div>
-                  <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-                    {step.points.map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Admin dashboard</CardTitle>
-              <CardDescription>Oversight for orders and complaints</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              {adminDashboard.map((item) => (
-                <div key={item.label} className="flex items-start gap-3 rounded-lg border border-border p-3">
-                  <item.icon className="h-4 w-4 text-primary mt-1" />
-                  <div>
-                    <p className="font-semibold text-foreground">{item.label}</p>
-                    <p>{item.description}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </section>
+              <TabsContent value="admin" className="space-y-4 animate-in fade-in slide-in-from-bottom duration-500">
+                <Accordion type="single" collapsible defaultValue="badges">
+                  <AccordionItem value="badges" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Badges & trust</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-4 lg:grid-cols-[1.5fr_0.5fr]">
+                        <Card className="shadow-sm">
+                          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <CardTitle>Badge system for tailor credibility</CardTitle>
+                              <CardDescription>Badges visible on search, profiles, and order selection</CardDescription>
+                            </div>
+                            <Badge variant="secondary">Trust & Ranking</Badge>
+                          </CardHeader>
+                          <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            {badgeCatalog.map((badge) => (
+                              <div key={badge.label} className="rounded-lg border border-border/70 bg-background p-4">
+                                <div className="mb-2 flex items-center gap-2">
+                                  <badge.icon className="h-4 w-4 text-primary" />
+                                  <p className="font-semibold">{badge.label}</p>
+                                </div>
+                                <p className="text-sm text-muted-foreground">{badge.description}</p>
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
 
-        <section className="grid lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Admin oversight</CardTitle>
-              <CardDescription>Global control of orders, payments, and reviews</CardDescription>
-            </CardHeader>
-            <CardContent className="grid sm:grid-cols-2 gap-4">
-              {adminControls.map((item) => (
-                <div key={item.title} className="rounded-lg border border-border p-4">
-                  <p className="font-semibold mb-1">{item.title}</p>
-                  <p className="text-sm text-muted-foreground">{item.description}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics focus</CardTitle>
-              <CardDescription>Operational visibility</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <div className="flex items-start gap-3">
-                <BarChart3 className="h-4 w-4 text-primary mt-1" />
-                <p>Reports on order volume, revenue, commissions, SLAs, and popular garments/fabrics.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <Timer className="h-4 w-4 text-primary mt-1" />
-                <p>Tailor performance metrics: completion time, revisions, satisfaction, and response speed.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <ShieldCheck className="h-4 w-4 text-primary mt-1" />
-                <p>Audit logs for measurements, payments, refunds, and status overrides.</p>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
+                        <Card className="shadow-sm">
+                          <CardHeader>
+                            <CardTitle>Badge lifecycle</CardTitle>
+                            <CardDescription>How badges unlock and expire</CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-3 text-sm text-muted-foreground">
+                            {badgeOperations.map((op) => (
+                              <div key={op.title} className="rounded-md border border-border/70 bg-muted/50 p-3">
+                                <p className="font-semibold text-foreground">{op.title}</p>
+                                <p>{op.detail}</p>
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
 
-        <section>
-          <Card>
-            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <CardTitle>Future improvements</CardTitle>
-                <CardDescription>Optional roadmap-ready enhancements</CardDescription>
-              </div>
-              <Badge variant="secondary">Exploratory</Badge>
-            </CardHeader>
-            <Separator />
-            <CardContent className="pt-6">
-              <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-                {futureIdeas.map((idea) => (
-                  <li key={idea}>{idea}</li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </section>
+                  <AccordionItem value="admin-console" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Admin console</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                        {adminControls.map((item) => (
+                          <Card key={item.title} className="border-dashed shadow-sm">
+                            <CardHeader className="space-y-2">
+                              <CardTitle className="text-lg">{item.title}</CardTitle>
+                              <CardDescription>{item.description}</CardDescription>
+                            </CardHeader>
+                          </Card>
+                        ))}
+                      </div>
 
-        <section className="grid lg:grid-cols-[1.2fr,1fr] gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Reminder & notification summary</CardTitle>
-              <CardDescription>End-to-end alert flow</CardDescription>
-            </CardHeader>
-            <CardContent className="grid sm:grid-cols-3 gap-4">
-              {reminderSummary.map((block) => (
-                <div key={block.title} className="rounded-lg border border-border p-4 h-full">
-                  <p className="font-semibold mb-2 flex items-center gap-2">
-                    <Timer className="h-4 w-4 text-primary" />
-                    {block.title}
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-                    {block.steps.map((step) => (
-                      <li key={step}>{step}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>UI/UX considerations</CardTitle>
-              <CardDescription>Keep notifications useful, not noisy</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              {uiNotes.map((note) => (
-                <div key={note.label} className="flex items-start gap-3 rounded-lg border border-border p-3">
-                  <Info className="h-4 w-4 text-primary mt-1" />
-                  <div>
-                    <p className="font-semibold text-foreground">{note.label}</p>
-                    <p>{note.detail}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </section>
+                      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        {adminDashboard.map((item) => (
+                          <div key={item.label} className="rounded-xl border border-border/70 bg-muted/50 p-4 text-sm">
+                            <div className="mb-2 flex items-center gap-2 font-semibold text-foreground">
+                              <item.icon className="h-4 w-4 text-primary" />
+                              {item.label}
+                            </div>
+                            <p className="text-muted-foreground">{item.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="complaints" className="border-border/60">
+                    <AccordionTrigger className="text-left text-lg font-semibold">Complaints & future</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
+                        <Card className="shadow-sm">
+                          <CardHeader>
+                            <CardTitle>Complaint handling</CardTitle>
+                            <CardDescription>Structured triage and resolution</CardDescription>
+                          </CardHeader>
+                          <CardContent className="grid gap-3 sm:grid-cols-3">
+                            {complaintFlow.map((flow) => (
+                              <div key={flow.title} className="rounded-lg border border-border/70 bg-background p-4 text-sm">
+                                <div className="mb-2 flex items-center gap-2 font-semibold text-foreground">
+                                  <flow.icon className="h-4 w-4 text-primary" />
+                                  {flow.title}
+                                </div>
+                                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                                  {flow.points.map((point) => (
+                                    <li key={point}>{point}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </CardContent>
+                        </Card>
+
+                        <Card className="shadow-sm">
+                          <CardHeader>
+                            <CardTitle>In-flight ideas</CardTitle>
+                            <CardDescription>Backlog ready for experiments</CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-2 text-sm text-muted-foreground">
+                            {futureIdeas.map((idea) => (
+                              <div key={idea} className="rounded-md border border-border/70 bg-muted/50 p-3">
+                                {idea}
+                              </div>
+                            ))}
+                            <Separator />
+                            <div className="rounded-md border border-dashed border-primary/50 bg-primary/5 p-3 text-xs text-primary">
+                              Tailor console staples: {tailorOps.map((op) => op.title).join(" · ")}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <Card className="border-dashed border-primary/40 bg-primary/5 shadow-sm">
+          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle>Ready to explore live?</CardTitle>
+              <CardDescription>Use the tab bar above or hop to payments and design galleries.</CardDescription>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/payments">
+                <Button variant="outline" className="bg-background">
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Payments
+                </Button>
+              </Link>
+              <Link href="/designs">
+                <Button variant="secondary">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Design gallery
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+        </Card>
       </main>
     </div>
   )
