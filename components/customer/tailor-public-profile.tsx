@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { formatDate } from "@/lib/date"
 import { MapPin, Clock, Star, Heart, MessageCircle, ShoppingBag, Zap, ShieldCheck } from "lucide-react"
 import { getBadgeMeta } from "@/lib/badge-utils"
 
@@ -274,7 +275,7 @@ export function TailorPublicProfile({ tailorId, user }: TailorPublicProfileProps
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <p className="font-medium">{review.customerName}</p>
-                          <p className="text-sm text-muted-foreground">{review.date.toLocaleDateString()}</p>
+                          <p className="text-sm text-muted-foreground">{formatDate(review.date)}</p>
                         </div>
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -312,7 +313,7 @@ export function TailorPublicProfile({ tailorId, user }: TailorPublicProfileProps
                           <p className="font-semibold text-sm">{meta.label ?? badge.label}</p>
                           <p className="text-xs text-muted-foreground">{meta.description ?? badge.description}</p>
                           <p className="text-xs text-muted-foreground">
-                            Awarded {badge.awardedAt.toLocaleDateString()} • {badge.source === "manual" ? "Verified by admin" : "Auto-awarded"}
+                            Awarded {formatDate(badge.awardedAt)} • {badge.source === "manual" ? "Verified by admin" : "Auto-awarded"}
                           </p>
                         </div>
                       </div>

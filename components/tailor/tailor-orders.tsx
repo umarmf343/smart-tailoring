@@ -14,6 +14,7 @@ import {
   generateMeasurementAlerts,
   getFitSuggestions,
 } from "@/lib/measurement-system"
+import { formatDate } from "@/lib/date"
 import { MeasurementAdjustmentRequest } from "./measurement-adjustment-request"
 import { Separator } from "@/components/ui/separator"
 
@@ -161,15 +162,15 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
                     </div>
                     <p className="text-sm text-muted-foreground">Customer: {order.customerName}</p>
                     <p className="text-sm text-muted-foreground">
-                      Order #{order.id} • Placed {order.createdAt.toLocaleDateString()}
+                      Order #{order.id} • Placed {formatDate(order.createdAt)}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Est. Delivery: {order.estimatedDelivery.toLocaleDateString()}
+                      Est. Delivery: {formatDate(order.estimatedDelivery)}
                     </p>
                     {order.express?.requested && (
                       <p className="text-sm text-orange-700 dark:text-orange-300 flex items-center gap-2">
                         <Badge className="bg-orange-600 text-white">Express</Badge>
-                        Promise: {order.express.promiseAt?.toLocaleDateString()} • {" "}
+                        Promise: {order.express.promiseAt ? formatDate(order.express.promiseAt) : "TBD"} • {" "}
                         {order.express.risk === "at-risk" ? "At risk — update customer" : "On track"}
                       </p>
                     )}
@@ -245,11 +246,11 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
 
               {selectedOrder.express && (
                 <div className="grid grid-cols-2 gap-4 rounded-lg border border-orange-200 dark:border-orange-900 bg-orange-50/60 dark:bg-orange-950/20 p-4">
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold flex items-center gap-2 text-orange-800 dark:text-orange-200">
-                      <Badge className="bg-orange-600 text-white">Express</Badge>
-                      Promise by {selectedOrder.express.promiseAt?.toLocaleDateString()}
-                    </p>
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold flex items-center gap-2 text-orange-800 dark:text-orange-200">
+                        <Badge className="bg-orange-600 text-white">Express</Badge>
+                        Promise by {selectedOrder.express.promiseAt ? formatDate(selectedOrder.express.promiseAt) : "TBD"}
+                      </p>
                     <p className="text-xs text-muted-foreground">
                       Fee: ${selectedOrder.express.fee} • Status: {selectedOrder.express.risk === "at-risk" ? "At risk" : "On track"}
                     </p>

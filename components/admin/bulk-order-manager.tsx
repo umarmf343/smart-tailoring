@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { formatDate } from "@/lib/date"
 import { Package, Users, Building2, Plus } from "lucide-react"
 
 interface BulkOrder {
@@ -88,7 +89,7 @@ export function BulkOrderManager() {
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-lg">${order.price.toLocaleString()}</p>
-                    <p className="text-sm text-muted-foreground">{order.createdAt.toLocaleDateString()}</p>
+                    <p className="text-sm text-muted-foreground">{formatDate(order.createdAt)}</p>
                   </div>
                 </div>
 

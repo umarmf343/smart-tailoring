@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { formatDate } from "@/lib/date"
 import { DollarSign, AlertCircle, CheckCircle } from "lucide-react"
 
 interface RefundRequest {
@@ -100,7 +101,7 @@ export function RefundManager() {
                     <span className="text-muted-foreground">Requested:</span> ${request.requestedAmount} of $
                     {request.orderAmount}
                   </p>
-                  <p className="text-muted-foreground">Submitted: {request.createdAt.toLocaleDateString()}</p>
+                  <p className="text-muted-foreground">Submitted: {formatDate(request.createdAt)}</p>
                 </div>
               </div>
 

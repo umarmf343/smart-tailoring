@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { formatDate } from "@/lib/date"
 import { Download, FileText } from "lucide-react"
 
 interface InvoiceData {
@@ -34,7 +35,7 @@ export function InvoiceGenerator({ data }: InvoiceGeneratorProps) {
 INVOICE
 --------------------
 Order #: ${data.orderId}
-Date: ${data.orderDate.toLocaleDateString()}
+Date: ${formatDate(data.orderDate)}
 
 CUSTOMER INFORMATION:
 ${data.customerName}
@@ -99,7 +100,7 @@ Thank you for your business!
           </div>
           <div className="flex justify-between mb-2">
             <p className="text-sm font-medium">Date:</p>
-            <p className="text-sm">{data.orderDate.toLocaleDateString()}</p>
+            <p className="text-sm">{formatDate(data.orderDate)}</p>
           </div>
           <div className="flex justify-between mb-2">
             <p className="text-sm font-medium">Payment Method:</p>

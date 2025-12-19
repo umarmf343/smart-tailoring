@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { formatDate } from "@/lib/date"
 import { Search, Eye } from "lucide-react"
 
 // Mock data
@@ -106,7 +107,7 @@ export function AdminOrders() {
                 <p className="text-sm">
                   <span className="text-muted-foreground">Tailor:</span> {order.tailorName}
                 </p>
-                <p className="text-sm text-muted-foreground">Placed {order.createdAt.toLocaleDateString()}</p>
+                <p className="text-sm text-muted-foreground">Placed {formatDate(order.createdAt)}</p>
               </div>
               <div className="text-right space-y-2">
                 <div>

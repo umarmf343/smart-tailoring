@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { formatDate } from "@/lib/date"
 import { Eye, RefreshCw } from "lucide-react"
 import Link from "next/link"
 
@@ -76,7 +77,7 @@ export function OrderHistory({ limit }: OrderHistoryProps) {
                 </div>
                 <p className="text-sm text-muted-foreground">{order.tailorName}</p>
                 <p className="text-sm text-muted-foreground">
-                  Order #{order.id} • {order.createdAt.toLocaleDateString()}
+                  Order #{order.id} • {formatDate(order.createdAt)}
                 </p>
               </div>
               <div className="text-right space-y-2">

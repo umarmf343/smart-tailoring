@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { getBadgeMeta } from "@/lib/badge-utils"
+import { formatDate } from "@/lib/date"
 
 // Mock data
 const MOCK_TAILORS = [
@@ -168,7 +169,7 @@ function TailorList({ tailors, showApprovalActions }: { tailors: typeof MOCK_TAI
                 <span>${tailor.totalRevenue.toLocaleString()} revenue</span>
               </div>
             )}
-            <p className="text-sm text-muted-foreground">Joined {tailor.joinedAt.toLocaleDateString()}</p>
+            <p className="text-sm text-muted-foreground">Joined {formatDate(tailor.joinedAt)}</p>
           </div>
           <div className="flex gap-2">
             {showApprovalActions ? (

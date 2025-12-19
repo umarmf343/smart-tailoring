@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { formatDate } from "@/lib/date"
 import { Star, Trash2 } from "lucide-react"
 
 // Mock data
@@ -67,7 +68,7 @@ export function AdminReviews() {
                       />
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground">{review.date.toLocaleDateString()}</p>
+                  <p className="text-sm text-muted-foreground">{formatDate(review.date)}</p>
                 </div>
               </div>
 

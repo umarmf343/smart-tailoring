@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { formatDate } from "@/lib/date"
 import { Wallet, Plus, ArrowUpRight, ArrowDownRight } from "lucide-react"
 
 // Mock data
@@ -101,7 +102,7 @@ export function WalletManager() {
                   </div>
                   <div>
                     <p className="font-medium">{transaction.description}</p>
-                    <p className="text-sm text-muted-foreground">{transaction.date.toLocaleDateString()}</p>
+                    <p className="text-sm text-muted-foreground">{formatDate(transaction.date)}</p>
                   </div>
                 </div>
                 <div

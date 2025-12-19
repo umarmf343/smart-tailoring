@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { formatDate } from "@/lib/date"
 import { Star, MessageCircle } from "lucide-react"
 import { useState } from "react"
 
@@ -108,7 +109,7 @@ export function TailorReviews() {
                         />
                       ))}
                     </div>
-                    <p className="text-sm text-muted-foreground">{review.date.toLocaleDateString()}</p>
+                    <p className="text-sm text-muted-foreground">{formatDate(review.date)}</p>
                   </div>
                 </div>
 
