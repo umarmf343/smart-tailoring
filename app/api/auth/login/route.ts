@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { cookies } from "next/headers"
+
+import { login } from "@/lib/auth"
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,30 +11,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Email and password required" }, { status: 400 })
     }
 
-    // Mock user verification - replace with actual database query
-    const mockUser = {
-      id: "1",
-      email: "admin@haib.com",
-      name: "Admin User",
-      role: "admin" as const,
+    const result = await login(email, password)
+
+    if (!result.success) {
+      return NextResponse.json(result, { status: 401 })
     }
 
-    if (email !== mockUser.email) {
-      return NextResponse.json({ success: false, error: "Invalid credentials" }, { status: 401 })
-    }
-
-    // Verify password (in production, compare with hashed password)
-    // const isValid = await verifyPassword(password, user.passwordHash)
-
-    const session = { userId: mockUser.id, role: mockUser.role }
-    const cookieStore = await cookies()
-    cookieStore.set("session", JSON.stringify(session), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 7,
-    })
-
-    return NextResponse.json({ success: true, user: mockUser })
+    return NextResponse.json(result)
   } catch (error) {
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })
   }
