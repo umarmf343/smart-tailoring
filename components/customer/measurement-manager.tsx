@@ -424,9 +424,9 @@ function MeasurementForm({
 
       <Card className="bg-muted/70">
         <CardHeader>
-          <CardTitle className="text-base">Live garment preview</CardTitle>
+          <CardTitle className="text-base">Tailor’s live garment preview</CardTitle>
           <CardDescription>
-            See the silhouette for the selected garment and the measurements update as you enter each detail.
+            I’ll keep the silhouette and selected garment label in view while you enter measurements in real time.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-[220px_minmax(0,1fr)]">
@@ -434,6 +434,9 @@ function MeasurementForm({
             <GarmentSilhouette garmentType={formState.garmentType} />
           </div>
           <div className="space-y-3">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Selected garment: {describeGarmentType(formState.garmentType)}
+            </div>
             <div className="grid gap-2 sm:grid-cols-2 text-sm">
               {fields.map((field) => {
                 const value = formState.measurements[field.key]
