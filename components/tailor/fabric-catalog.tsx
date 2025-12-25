@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Plus, Edit, Trash2 } from "lucide-react"
 
 interface Fabric {
@@ -103,6 +103,7 @@ export function FabricCatalog() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add New Fabric</DialogTitle>
+                  <DialogDescription>Record fabric details for your inventory.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">

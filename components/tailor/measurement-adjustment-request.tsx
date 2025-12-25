@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertCircle, ChevronDown, ChevronUp, MessageCircle } from "lucide-react"
 import { formatConvertedMeasurement } from "@/lib/measurement-system"
 
@@ -104,9 +104,9 @@ export function MeasurementAdjustmentRequest({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Request Measurement Adjustment</DialogTitle>
-          <p className="text-sm text-muted-foreground">
+          <DialogDescription>
             Ask {customerName} to clarify or adjust measurements for Order #{orderId}
-          </p>
+          </DialogDescription>
         </DialogHeader>
         <div className="relative">
           <div ref={scrollAreaRef} className="space-y-4 max-h-[70vh] overflow-y-auto pr-10">

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Eye, MessageCircle, CheckCircle, ChevronDown, ChevronUp } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   MEASUREMENT_LIBRARY,
   describeGarmentType,
@@ -267,6 +267,7 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Order Details - {selectedOrder?.id}</DialogTitle>
+            <DialogDescription>Review the order summary, measurements, and production notes.</DialogDescription>
           </DialogHeader>
           {selectedOrder && (
             <div className="relative">
