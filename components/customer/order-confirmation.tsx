@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, MessageCircle, Package } from "lucide-react"
 import Link from "next/link"
+import { formatNaira } from "@/lib/currency"
 
 interface OrderConfirmationProps {
   user: User
@@ -40,19 +41,19 @@ export function OrderConfirmation({ user }: OrderConfirmationProps) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tailor:</span>
-                  <span className="font-medium">Master Tailor Co.</span>
+                  <span className="font-medium">Aso Oke Atelier</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Service:</span>
-                  <span className="font-medium">Custom Suit</span>
+                  <span className="font-medium">Agbada Set</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Total Paid:</span>
-                  <span className="font-bold text-lg">$450</span>
+                  <span className="font-bold text-lg">{formatNaira(180000)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Estimated Delivery:</span>
-                  <span className="font-medium">February 1, 2025</span>
+                  <span className="font-medium">February 10, 2025</span>
                 </div>
               </div>
 

@@ -43,6 +43,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { formatNaira } from "@/lib/currency"
 
 const paymentMethods = [
   {
@@ -227,24 +228,24 @@ const compliance = [
 
 const feeExamples = [
   {
-    scenario: "Checkout — customer pays $100",
-    customerPays: "$100",
-    adminFee: "$10 (10%) auto-deducted",
-    tailorGets: "$90",
+    scenario: "Checkout — customer pays ₦100,000",
+    customerPays: formatNaira(100000),
+    adminFee: `${formatNaira(10000)} (10%) auto-deducted`,
+    tailorGets: formatNaira(90000),
     note: "Split payment routes the fee to the platform subaccount at charge time.",
   },
   {
-    scenario: "Tailor withdraws $90 earnings",
-    customerPays: "$90",
-    adminFee: "$9 (10%) held on payout",
-    tailorGets: "$81",
+    scenario: "Tailor withdraws ₦90,000 earnings",
+    customerPays: formatNaira(90000),
+    adminFee: `${formatNaira(9000)} (10%) held on payout`,
+    tailorGets: formatNaira(81000),
     note: "Withdrawal engine re-applies the platform fee before initiating the transfer.",
   },
   {
-    scenario: "Escrow release for $250 job",
-    customerPays: "$250",
-    adminFee: "$25 (10%)",
-    tailorGets: "$225",
+    scenario: "Escrow release for ₦250,000 job",
+    customerPays: formatNaira(250000),
+    adminFee: `${formatNaira(25000)} (10%)`,
+    tailorGets: formatNaira(225000),
     note: "Escrow unlock verifies the original fee and nets the tailor automatically.",
   },
 ]

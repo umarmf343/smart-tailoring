@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { MapPin, Plus, X } from "lucide-react"
+import { formatNaira } from "@/lib/currency"
 
 interface ServiceArea {
   id: string
@@ -16,9 +17,9 @@ interface ServiceArea {
 }
 
 const MOCK_SERVICE_AREAS: ServiceArea[] = [
-  { id: "1", zipCode: "10001", city: "Manhattan", deliveryFee: 10 },
-  { id: "2", zipCode: "10002", city: "Manhattan", deliveryFee: 10 },
-  { id: "3", zipCode: "11201", city: "Brooklyn", deliveryFee: 15 },
+  { id: "1", zipCode: "101233", city: "Victoria Island, Lagos", deliveryFee: 3500 },
+  { id: "2", zipCode: "900211", city: "Wuse 2, Abuja", deliveryFee: 4500 },
+  { id: "3", zipCode: "400241", city: "GRA, Enugu", deliveryFee: 4000 },
 ]
 
 export function ServiceAreaManager() {
@@ -71,10 +72,10 @@ export function ServiceAreaManager() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="zipCode">ZIP Code</Label>
+                    <Label htmlFor="zipCode">Postal Code</Label>
                     <Input
                       id="zipCode"
-                      placeholder="10001"
+                      placeholder="101233"
                       value={newArea.zipCode}
                       onChange={(e) => setNewArea({ ...newArea, zipCode: e.target.value })}
                     />
@@ -83,14 +84,14 @@ export function ServiceAreaManager() {
                     <Label htmlFor="city">City/Area</Label>
                     <Input
                       id="city"
-                      placeholder="Manhattan"
+                      placeholder="Victoria Island"
                       value={newArea.city}
                       onChange={(e) => setNewArea({ ...newArea, city: e.target.value })}
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="deliveryFee">Delivery Fee ($)</Label>
+                  <Label htmlFor="deliveryFee">Delivery Fee (₦)</Label>
                   <Input
                     id="deliveryFee"
                     type="number"
@@ -122,7 +123,7 @@ export function ServiceAreaManager() {
                     <Badge variant="secondary">{area.zipCode}</Badge>
                     <p className="font-medium text-sm">{area.city}</p>
                   </div>
-                  <p className="text-xs text-muted-foreground">Delivery Fee: ${area.deliveryFee}</p>
+                  <p className="text-xs text-muted-foreground">Delivery Fee: {formatNaira(area.deliveryFee)}</p>
                 </div>
                 <Button size="sm" variant="ghost" onClick={() => removeServiceArea(area.id)}>
                   <X className="h-4 w-4" />

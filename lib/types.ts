@@ -50,7 +50,7 @@ export interface Measurement {
   id: string
   customerId: string
   name: string // e.g., "Formal Suit", "Casual Wear"
-  garmentType: "shirt" | "dress" | "pants" | "blazer"
+  garmentType: "shirt" | "dress" | "pants" | "blazer" | "agbada" | "kaftan" | "senator" | "buba" | "iro"
   measurements: {
     chest?: number
     bust?: number
@@ -70,6 +70,13 @@ export interface Measurement {
     kneeCircumference?: number
     ankleCircumference?: number
     jacketLength?: number
+    agbadaLength?: number
+    kaftanLength?: number
+    senatorLength?: number
+    bubaLength?: number
+    wrapperLength?: number
+    neckDepth?: number
+    capCircumference?: number
     // Add more as needed
     [key: string]: number | undefined
   }

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { formatDate } from "@/lib/date"
+import { formatNaira } from "@/lib/currency"
 import { Package, Users, Building2, Plus } from "lucide-react"
 
 interface BulkOrder {
@@ -26,23 +27,23 @@ interface BulkOrder {
 const MOCK_BULK_ORDERS: BulkOrder[] = [
   {
     id: "BULK-001",
-    companyName: "Tech Corp Inc.",
-    contactPerson: "John Smith",
-    itemType: "Corporate Uniforms",
+    companyName: "Lagos Fintech Hub",
+    contactPerson: "Nneka Obi",
+    itemType: "Corporate Native Sets",
     quantity: 50,
     status: "in-progress",
-    assignedTailor: "Master Tailor Co.",
-    price: 12500,
+    assignedTailor: "Lagos Heritage Tailors",
+    price: 1250000,
     createdAt: new Date("2025-01-15"),
   },
   {
     id: "BULK-002",
-    companyName: "Hotel Grand",
-    contactPerson: "Sarah Johnson",
-    itemType: "Staff Uniforms",
+    companyName: "Abuja Events Hall",
+    contactPerson: "Musa Abdullahi",
+    itemType: "Aso Ebi Staff Sets",
     quantity: 75,
     status: "pending",
-    price: 18750,
+    price: 1875000,
     createdAt: new Date("2025-01-18"),
   },
 ]
@@ -88,7 +89,7 @@ export function BulkOrderManager() {
                     <p className="text-sm text-muted-foreground">Order #{order.id}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-lg">${order.price.toLocaleString()}</p>
+                    <p className="font-bold text-lg">{formatNaira(order.price)}</p>
                     <p className="text-sm text-muted-foreground">{formatDate(order.createdAt)}</p>
                   </div>
                 </div>

@@ -1,5 +1,7 @@
 "use server"
 
+import { formatNaira } from "@/lib/currency"
+
 export async function sendEmail(to: string, subject: string, html: string) {
   // In production, use Nodemailer or email service provider
   // const nodemailer = require('nodemailer')
@@ -36,7 +38,7 @@ export async function sendOrderConfirmationEmail(email: string, orderDetails: an
       <p>Thank you for your order!</p>
       <p><strong>Order ID:</strong> ${orderDetails.id}</p>
       <p><strong>Service:</strong> ${orderDetails.service}</p>
-      <p><strong>Total:</strong> $${orderDetails.price}</p>
+      <p><strong>Total:</strong> ${formatNaira(orderDetails.price)}</p>
       <p>Your tailor will be in touch soon!</p>
     </div>
   `

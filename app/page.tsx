@@ -19,23 +19,24 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { formatNaira } from "@/lib/currency"
 
 const heroStats = [
-  { label: "Requests resolved", value: "92%", hint: "Handled inside the product, not by email" },
-  { label: "Average rollout", value: "10 days", hint: "Go live with messaging, payments, and reviews" },
-  { label: "Customer CSAT", value: "4.8/5", hint: "Guided flows keep shoppers moving" },
+  { label: "Requests resolved", value: "92%", hint: "Handled inside the product, not by WhatsApp" },
+  { label: "Average rollout", value: "10 days", hint: "Launch Lagos-to-Abuja with payments and reviews" },
+  { label: "Customer CSAT", value: "4.8/5", hint: "Guided flows keep fittings on track" },
 ]
 
 const featurePillars = [
   {
     title: "Single, guided experience",
     description: "Vertical navigation, tabs, and timelines live in the app so customers never bounce around.",
-    points: ["Mobile-first layouts", "Context-aware prompts", "Built-in success states"],
+    points: ["Mobile-first layouts", "Aso-ebi ready prompts", "Built-in success states"],
   },
   {
     title: "Tailor-first operations",
     description: "Capacity, pickup windows, and workshop verification ship as ready-made components.",
-    points: ["Smart capacity blocks", "Identity & workshop badges", "Portfolio-ready cards"],
+    points: ["Smart capacity blocks", "Verified atelier badges", "Portfolio-ready cards"],
   },
   {
     title: "Payments with trust",
@@ -184,11 +185,11 @@ export default function HomePage() {
 
             <div className="space-y-6">
               <h2 className="text-balance text-4xl font-bold leading-tight sm:text-5xl">
-                Built-in experiences—not a cluttered landing page.
+                Nigerian tailoring journeys—without the clutter.
               </h2>
               <p className="text-lg text-muted-foreground text-pretty">
-                Haib Tailor keeps discovery, ordering, messaging, and payouts in one guided workspace. No extra tabs,
-                no scattered UI—just an app that already knows the tailoring journey.
+                Haib Tailor keeps discovery, ordering, messaging, and payouts in one guided workspace. From agbada to
+                aso-ebi, every milestone is already mapped.
               </p>
             </div>
 
@@ -283,17 +284,17 @@ export default function HomePage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16">
-          <div className="mb-6 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-            <Badge variant="outline" className="border-dashed">
-              Trusted by boutiques and ateliers
-            </Badge>
-            <div className="flex flex-wrap items-center gap-4 text-foreground/70">
-              <span>Esa Menswear</span>
-              <span>Greta Atelier</span>
-              <span>Blue Linen</span>
-              <span>Velvet Row</span>
+            <div className="mb-6 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+              <Badge variant="outline" className="border-dashed">
+                Trusted by Nigerian ateliers
+              </Badge>
+              <div className="flex flex-wrap items-center gap-4 text-foreground/70">
+                <span>Eko Menswear</span>
+                <span>Abuja Atelier</span>
+                <span>Adire House</span>
+                <span>Velvet Row</span>
+              </div>
             </div>
-          </div>
 
           <div id="product" className="space-y-8">
             <div className="space-y-2">
@@ -480,7 +481,7 @@ export default function HomePage() {
               <div className="grid gap-2 text-sm text-muted-foreground">
                 <div className="flex items-center justify-between rounded-lg border border-border/70 bg-background p-3">
                   <span>Escrow hold · Delivery verified</span>
-                  <Badge variant="outline" className="border-dashed">$240</Badge>
+                  <Badge variant="outline" className="border-dashed">{formatNaira(240000)}</Badge>
                 </div>
                 <div className="flex items-center justify-between rounded-lg border border-border/70 bg-background p-3">
                   <span>Tailor payout · Same day</span>
@@ -491,7 +492,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center justify-between rounded-lg border border-border/70 bg-background p-3">
                   <span>Tips + loyalty unlocked</span>
-                  <Badge variant="outline" className="border-dashed">$65</Badge>
+                  <Badge variant="outline" className="border-dashed">{formatNaira(15000)}</Badge>
                 </div>
               </div>
             </CardContent>

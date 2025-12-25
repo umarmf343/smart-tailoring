@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatDate } from "@/lib/date"
+import { formatNaira } from "@/lib/currency"
 import { Eye, RefreshCw } from "lucide-react"
 import Link from "next/link"
 
@@ -15,27 +16,27 @@ interface OrderHistoryProps {
 const MOCK_ORDERS = [
   {
     id: "ORD-001",
-    tailorName: "Master Tailor Co.",
-    service: "Custom Suit",
+    tailorName: "Lagos Heritage Tailors",
+    service: "Agbada Set",
     status: "in-progress" as const,
-    price: 450,
+    price: 180000,
     createdAt: new Date("2025-01-10"),
     estimatedDelivery: new Date("2025-01-25"),
   },
   {
     id: "ORD-002",
-    tailorName: "Elite Stitches",
-    service: "Dress Alteration",
+    tailorName: "Abuja Threadworks",
+    service: "Senator Suit",
     status: "completed" as const,
-    price: 80,
+    price: 125000,
     createdAt: new Date("2025-01-05"),
   },
   {
     id: "ORD-003",
-    tailorName: "Precision Tailoring",
-    service: "Shirt Customization",
+    tailorName: "Enugu Stitch House",
+    service: "Buba & Wrapper",
     status: "delivered" as const,
-    price: 120,
+    price: 98000,
     createdAt: new Date("2024-12-28"),
   },
 ]
@@ -81,7 +82,7 @@ export function OrderHistory({ limit }: OrderHistoryProps) {
                 </p>
               </div>
               <div className="text-right space-y-2">
-                <p className="font-bold">${order.price}</p>
+                <p className="font-bold">{formatNaira(order.price)}</p>
                 <div className="flex gap-2">
                   <Link href={`/customer/order/${order.id}`}>
                     <Button size="sm" variant="outline" className="gap-2 bg-transparent">

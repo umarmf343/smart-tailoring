@@ -13,13 +13,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 export function PlatformSettings() {
   const [settings, setSettings] = useState({
     siteName: "Haib Tailor",
-    siteDescription: "Custom Tailoring Made Simple",
+    siteDescription: "Nigerian tailoring made seamless",
     supportEmail: "support@haibtailor.com",
     enableRegistration: true,
     requireEmailVerification: true,
     defaultCommissionRate: 15,
-    minOrderAmount: 50,
-    maxOrderAmount: 5000,
+    minOrderAmount: 25000,
+    maxOrderAmount: 1500000,
     enableReviews: true,
     enableMessaging: true,
   })
@@ -135,22 +135,22 @@ export function PlatformSettings() {
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="minOrder">Minimum Order Amount ($)</Label>
-                  <Input
-                    id="minOrder"
-                    type="number"
-                    value={settings.minOrderAmount}
-                    onChange={(e) => setSettings({ ...settings, minOrderAmount: Number.parseInt(e.target.value) })}
+                <Label htmlFor="minOrder">Minimum Order Amount (₦)</Label>
+                <Input
+                  id="minOrder"
+                  type="number"
+                  value={settings.minOrderAmount}
+                  onChange={(e) => setSettings({ ...settings, minOrderAmount: Number.parseInt(e.target.value) })}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="maxOrder">Maximum Order Amount ($)</Label>
-                  <Input
-                    id="maxOrder"
-                    type="number"
-                    value={settings.maxOrderAmount}
-                    onChange={(e) => setSettings({ ...settings, maxOrderAmount: Number.parseInt(e.target.value) })}
+                <Label htmlFor="maxOrder">Maximum Order Amount (₦)</Label>
+                <Input
+                  id="maxOrder"
+                  type="number"
+                  value={settings.maxOrderAmount}
+                  onChange={(e) => setSettings({ ...settings, maxOrderAmount: Number.parseInt(e.target.value) })}
                   />
                 </div>
               </div>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Gift, Copy, CheckCircle, Users } from "lucide-react"
+import { formatNaira } from "@/lib/currency"
 
 interface ReferralProgramProps {
   userId: string
@@ -18,7 +19,7 @@ export function ReferralProgram({
   userId,
   referralCode = "HAIB2025",
   referralCount = 3,
-  totalEarned = 60,
+  totalEarned = 15000,
 }: ReferralProgramProps) {
   const [copied, setCopied] = useState(false)
   const referralLink = `https://haibtailor.com/signup?ref=${referralCode}`
@@ -36,7 +37,7 @@ export function ReferralProgram({
           <Gift className="h-5 w-5" />
           Referral Program
         </CardTitle>
-        <CardDescription>Earn $20 for each friend who signs up and completes their first order</CardDescription>
+        <CardDescription>Earn {formatNaira(5000)} for each friend who completes their first order</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Stats */}
@@ -53,7 +54,7 @@ export function ReferralProgram({
               <Gift className="h-4 w-4 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">Total Earned</p>
             </div>
-            <p className="text-2xl font-bold">${totalEarned}</p>
+            <p className="text-2xl font-bold">{formatNaira(totalEarned)}</p>
           </div>
         </div>
 
@@ -96,7 +97,7 @@ export function ReferralProgram({
             {[
               { step: "1", text: "Share your referral code or link with friends" },
               { step: "2", text: "They sign up using your code" },
-              { step: "3", text: "When they complete their first order, you both get $20!" },
+              { step: "3", text: `When they complete their first order, you both get ${formatNaira(5000)}!` },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-3">
                 <Badge className="h-6 w-6 flex items-center justify-center p-0 rounded-full">{item.step}</Badge>
@@ -112,9 +113,9 @@ export function ReferralProgram({
             <p className="font-medium">Recent Referrals</p>
             <div className="space-y-2">
               {[
-                { name: "Sarah M.", date: "Jan 15, 2025", earned: "$20" },
-                { name: "Michael K.", date: "Jan 10, 2025", earned: "$20" },
-                { name: "Emma L.", date: "Jan 5, 2025", earned: "$20" },
+                { name: "Sade O.", date: "Jan 15, 2025", earned: formatNaira(5000) },
+                { name: "Michael A.", date: "Jan 10, 2025", earned: formatNaira(5000) },
+                { name: "Emeka L.", date: "Jan 5, 2025", earned: formatNaira(5000) },
               ]
                 .slice(0, referralCount)
                 .map((referral) => (

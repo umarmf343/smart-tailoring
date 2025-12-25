@@ -13,6 +13,7 @@ import { WalletManager } from "./wallet-manager"
 import { Search, Package, Ruler, Users, Wallet } from "lucide-react"
 import Link from "next/link"
 import { MEASUREMENT_LIBRARY, generateMeasurementAlerts } from "@/lib/measurement-system"
+import { formatNaira } from "@/lib/currency"
 
 interface CustomerDashboardProps {
   user: User
@@ -86,7 +87,7 @@ export function CustomerDashboard({ user }: CustomerDashboardProps) {
                   <Wallet className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">$250</div>
+                  <div className="text-2xl font-bold">{formatNaira(250000)}</div>
                   <p className="text-xs text-muted-foreground">Available funds</p>
                 </CardContent>
               </Card>

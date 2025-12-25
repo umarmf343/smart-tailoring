@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Badge } from "@/components/ui/badge"
 import { AlertCircle, CheckCircle, CreditCard, Sparkles, Wallet } from "lucide-react"
+import { formatNaira } from "@/lib/currency"
 import {
   MEASUREMENT_LIBRARY,
   describeGarmentType,
@@ -29,17 +30,23 @@ interface OrderPlacementProps {
 // Mock tailor data
 const MOCK_TAILOR = {
   id: "1",
-  businessName: "Master Tailor Co.",
+  businessName: "Aso Oke Atelier",
   services: [
-    { name: "Custom Suit", price: 450, description: "Full bespoke suit with consultation" },
-    { name: "Shirt Making", price: 120, description: "Custom fitted shirts" },
-    { name: "Alterations", price: 50, description: "Basic alterations" },
+    { name: "Agbada Set", price: 180000, description: "Three-piece agbada with embroidery and inner kaftan" },
+    { name: "Kaftan & Trousers", price: 95000, description: "Classic kaftan with fitted trousers" },
+    { name: "Senator Suit", price: 120000, description: "Modern senator suit with sharp tailoring" },
+    { name: "Buba & Wrapper", price: 110000, description: "Traditional buba with iro and gele styling" },
+    { name: "Aso Ebi Group Order", price: 250000, description: "Coordinated family or bridal party set" },
+    { name: "Alterations", price: 20000, description: "Resizing, tapering, and finishing adjustments" },
   ],
 }
 
 const SERVICE_GARMENT_MAP: Record<string, GarmentType> = {
-  "Custom Suit": "blazer",
-  "Shirt Making": "shirt",
+  "Agbada Set": "agbada",
+  "Kaftan & Trousers": "kaftan",
+  "Senator Suit": "senator",
+  "Buba & Wrapper": "buba",
+  "Aso Ebi Group Order": "buba",
   Alterations: "pants",
 }
 
@@ -52,7 +59,14 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
   const [orderData, setOrderData] = useState({
     service: "",
     measurementId: "",
-    fabricChoice: "",
+    occasion: "",
+    outfitStyle: "",
+    fabricType: "",
+    embroideryStyle: "",
+    sleeveStyle: "",
+    necklineStyle: "",
+    fitPreference: "",
+    deliveryLocation: "",
     customDesign: "",
     specialInstructions: "",
   })
@@ -65,7 +79,7 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
   const selectedMeasurementProfile = measurementProfiles.find((profile) => profile.id === orderData.measurementId)
   const selectedMeasurementAlerts = selectedMeasurementProfile ? generateMeasurementAlerts(selectedMeasurementProfile) : []
   const price = selectedService?.price || 0
-  const walletBalance = 250
+  const walletBalance = 75000
 
   function handleNext() {
     if (step < 3) setStep(step + 1)
@@ -122,7 +136,7 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Select Service & Provide Details</CardTitle>
-                <CardDescription>Choose the tailoring service you need</CardDescription>
+                <CardDescription>Choose the Nigerian tailoring service you need</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
@@ -137,7 +151,7 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
                     <SelectContent>
                       {MOCK_TAILOR.services.map((service) => (
                         <SelectItem key={service.name} value={service.name}>
-                          {service.name} - ${service.price}
+                          {service.name} - {formatNaira(service.price)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -145,21 +159,164 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
                   {selectedService && <p className="text-sm text-muted-foreground">{selectedService.description}</p>}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="fabric">Fabric Choice (Optional)</Label>
-                  <Input
-                    id="fabric"
-                    placeholder="e.g., Navy Blue Wool, Linen"
-                    value={orderData.fabricChoice}
-                    onChange={(e) => setOrderData({ ...orderData, fabricChoice: e.target.value })}
-                  />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="occasion">Occasion</Label>
+                    <Select
+                      value={orderData.occasion}
+                      onValueChange={(value) => setOrderData({ ...orderData, occasion: value })}
+                    >
+                      <SelectTrigger id="occasion">
+                        <SelectValue placeholder="Select occasion" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["Wedding", "Naming ceremony", "Festival", "Office wear", "Friday traditional"].map(
+                          (occasion) => (
+                            <SelectItem key={occasion} value={occasion}>
+                              {occasion}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="outfitStyle">Outfit Style</Label>
+                    <Select
+                      value={orderData.outfitStyle}
+                      onValueChange={(value) => setOrderData({ ...orderData, outfitStyle: value })}
+                    >
+                      <SelectTrigger id="outfitStyle">
+                        <SelectValue placeholder="Select style" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["Agbada", "Kaftan", "Senator", "Buba & Wrapper", "Iro & Buba", "Isi Agu"].map((style) => (
+                          <SelectItem key={style} value={style}>
+                            {style}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fabricType">Fabric Type</Label>
+                    <Select
+                      value={orderData.fabricType}
+                      onValueChange={(value) => setOrderData({ ...orderData, fabricType: value })}
+                    >
+                      <SelectTrigger id="fabricType">
+                        <SelectValue placeholder="Select fabric" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["Ankara", "Aso Oke", "Lace", "Adire", "George", "Guinea", "Damask"].map((fabric) => (
+                          <SelectItem key={fabric} value={fabric}>
+                            {fabric}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="embroideryStyle">Embroidery Style</Label>
+                    <Select
+                      value={orderData.embroideryStyle}
+                      onValueChange={(value) => setOrderData({ ...orderData, embroideryStyle: value })}
+                    >
+                      <SelectTrigger id="embroideryStyle">
+                        <SelectValue placeholder="Select embroidery" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["Minimal threadwork", "Heavy chest panel", "Beads & stones", "No embroidery"].map(
+                          (style) => (
+                            <SelectItem key={style} value={style}>
+                              {style}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="sleeveStyle">Sleeve Style</Label>
+                    <Select
+                      value={orderData.sleeveStyle}
+                      onValueChange={(value) => setOrderData({ ...orderData, sleeveStyle: value })}
+                    >
+                      <SelectTrigger id="sleeveStyle">
+                        <SelectValue placeholder="Select sleeve" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["Straight", "Wide agbada sleeve", "Cuffed", "Short sleeve"].map((style) => (
+                          <SelectItem key={style} value={style}>
+                            {style}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="necklineStyle">Neckline Style</Label>
+                    <Select
+                      value={orderData.necklineStyle}
+                      onValueChange={(value) => setOrderData({ ...orderData, necklineStyle: value })}
+                    >
+                      <SelectTrigger id="necklineStyle">
+                        <SelectValue placeholder="Select neckline" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["Round", "V-neck", "Buttoned placket", "Open chest panel"].map((style) => (
+                          <SelectItem key={style} value={style}>
+                            {style}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fitPreference">Fit Preference</Label>
+                    <Select
+                      value={orderData.fitPreference}
+                      onValueChange={(value) => setOrderData({ ...orderData, fitPreference: value })}
+                    >
+                      <SelectTrigger id="fitPreference">
+                        <SelectValue placeholder="Select fit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["Classic", "Relaxed", "Slim", "Extra flowing"].map((fit) => (
+                          <SelectItem key={fit} value={fit}>
+                            {fit}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="deliveryLocation">Delivery Location</Label>
+                    <Select
+                      value={orderData.deliveryLocation}
+                      onValueChange={(value) => setOrderData({ ...orderData, deliveryLocation: value })}
+                    >
+                      <SelectTrigger id="deliveryLocation">
+                        <SelectValue placeholder="Select delivery option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["Pickup in Lagos", "Home delivery (Lagos)", "Interstate delivery", "Pickup in Abuja"].map(
+                          (option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="design">Custom Design Details (Optional)</Label>
                   <Textarea
                     id="design"
-                    placeholder="Describe any specific design preferences..."
+                    placeholder="Describe embroidery placement, lining, or beadwork preferences..."
                     value={orderData.customDesign}
                     onChange={(e) => setOrderData({ ...orderData, customDesign: e.target.value })}
                     rows={3}
@@ -366,7 +523,7 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
                   </div>
                   <div className="flex items-center justify-between text-xl font-bold">
                     <span>Total:</span>
-                    <span>${price}</span>
+                    <span>{formatNaira(price)}</span>
                   </div>
                 </div>
 
@@ -382,7 +539,9 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
                         Wallet Balance
                       </Label>
                       <div className="flex items-center justify-between mt-2">
-                        <span className="text-sm text-muted-foreground">Available balance: ${walletBalance}</span>
+                        <span className="text-sm text-muted-foreground">
+                          Available balance: {formatNaira(walletBalance)}
+                        </span>
                         {walletBalance < price && <Badge variant="destructive">Insufficient funds</Badge>}
                       </div>
                     </div>
@@ -429,7 +588,7 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
                     className="gap-2"
                   >
                     <CheckCircle className="h-4 w-4" />
-                    Place Order - ${price}
+                    Place Order - {formatNaira(price)}
                   </Button>
                 </div>
               </CardContent>

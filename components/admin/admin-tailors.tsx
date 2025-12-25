@@ -11,19 +11,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { getBadgeMeta } from "@/lib/badge-utils"
 import { formatDate } from "@/lib/date"
+import { formatNaira } from "@/lib/currency"
 
 // Mock data
 const MOCK_TAILORS = [
   {
     id: "1",
-    businessName: "Master Tailor Co.",
-    ownerName: "James Wilson",
-    email: "james@mastertailor.com",
-    phone: "+1 555-0201",
-    location: "Downtown, New York",
+    businessName: "Lagos Heritage Tailors",
+    ownerName: "Aisha Balogun",
+    email: "aisha@lagosheritage.ng",
+    phone: "+234 802 555 0201",
+    location: "Victoria Island, Lagos",
     rating: 4.8,
     totalOrders: 143,
-    totalRevenue: 48500,
+    totalRevenue: 4850000,
     joinedAt: new Date("2024-01-15"),
     status: "approved" as const,
     expressSettings: { enabled: true, expressSlaDays: 3, standardSlaDays: 8, feeRate: 0.25, weeklyCap: 6, weeklyInUse: 4, concurrentCap: 3, concurrentInUse: 2 },
@@ -50,11 +51,11 @@ const MOCK_TAILORS = [
   },
   {
     id: "2",
-    businessName: "Heritage Tailors",
-    ownerName: "Sarah Chen",
-    email: "sarah@heritage.com",
-    phone: "+1 555-0202",
-    location: "Queens, New York",
+    businessName: "Ibadan Royal Cuts",
+    ownerName: "Kunle Adeyemi",
+    email: "kunle@royalcuts.ng",
+    phone: "+234 803 555 0202",
+    location: "Ibadan, Oyo",
     rating: 0,
     totalOrders: 0,
     totalRevenue: 0,
@@ -166,7 +167,7 @@ function TailorList({ tailors, showApprovalActions }: { tailors: typeof MOCK_TAI
               <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
                 <span>Rating: {tailor.rating}/5</span>
                 <span>{tailor.totalOrders} orders</span>
-                <span>${tailor.totalRevenue.toLocaleString()} revenue</span>
+                <span>{formatNaira(tailor.totalRevenue)} revenue</span>
               </div>
             )}
             <p className="text-sm text-muted-foreground">Joined {formatDate(tailor.joinedAt)}</p>
