@@ -194,69 +194,96 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
                 <CardDescription>Choose a saved profile and review alerts before sending to the tailor</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <RadioGroup
-                  value={orderData.measurementId}
-                  onValueChange={(value) => setOrderData({ ...orderData, measurementId: value })}
-                >
-                  {measurementProfiles.map((measurement) => {
-                    const alerts = generateMeasurementAlerts(measurement)
-                    const recommended =
-                      recommendedGarmentType ? measurement.garmentType === recommendedGarmentType : false
-                    return (
-                      <div
-                        key={measurement.id}
-                        className="flex items-start space-x-3 border border-border rounded-lg p-4"
-                      >
-                        <RadioGroupItem value={measurement.id} id={measurement.id} className="mt-1" />
-                        <div className="flex-1">
-                          <Label htmlFor={measurement.id} className="font-medium cursor-pointer">
-                            {measurement.name}
-                          </Label>
-                          <div className="flex flex-wrap gap-2 mt-1">
-                            <Badge variant="secondary">{describeGarmentType(measurement.garmentType)}</Badge>
-                            <Badge variant="outline">{measurement.unit.toUpperCase()}</Badge>
-                            <Badge
-                              variant={measurement.status === "verified" ? "default" : "outline"}
-                              className={measurement.status === "verified" ? "" : "border-amber-500/40 text-amber-700"}
-                            >
-                              {measurement.status.replace("-", " ")}
+                <div className="space-y-2">
+                  <Label htmlFor="measurement-profile">Measurement profile</Label>
+                  <Select
+                    value={orderData.measurementId}
+                    onValueChange={(value) => setOrderData({ ...orderData, measurementId: value })}
+                  >
+                    <SelectTrigger id="measurement-profile">
+                      <SelectValue placeholder="Select a saved profile" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {measurementProfiles.map((measurement) => (
+                        <SelectItem key={measurement.id} value={measurement.id}>
+                          {measurement.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {!selectedMeasurementProfile && (
+                  <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
+                    Choose a saved profile to review the measurements that will be sent to the tailor.
+                  </div>
+                )}
+
+                {selectedMeasurementProfile && (() => {
+                  const alerts = generateMeasurementAlerts(selectedMeasurementProfile)
+                  const recommended =
+                    recommendedGarmentType
+                      ? selectedMeasurementProfile.garmentType === recommendedGarmentType
+                      : false
+                  return (
+                    <div className="space-y-4">
+                      <Card className="bg-muted/70">
+                        <CardHeader>
+                          <CardTitle className="text-base">{selectedMeasurementProfile.name}</CardTitle>
+                          <CardDescription className="flex flex-wrap gap-2">
+                            <Badge variant="secondary">
+                              {describeGarmentType(selectedMeasurementProfile.garmentType)}
                             </Badge>
-                            {recommended && <Badge className="bg-primary/10 text-primary">Recommended for service</Badge>}
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 mt-3">
-                            {Object.entries(measurement.measurements).map(([key, value]) => (
-                              <div key={key} className="flex justify-between text-sm">
-                                <span className="text-muted-foreground capitalize">
-                                  {key.replace(/([A-Z])/g, " $1")}:
-                                </span>
-                                <span className="font-medium">
-                                  {value} {measurement.unit}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {formatConvertedMeasurement(value, measurement.unit)}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                          {alerts.length > 0 && (
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {alerts.map((alert, index) => (
-                                <Badge
-                                  key={index}
-                                  variant="outline"
-                                  className="border-amber-500/40 text-amber-700 dark:text-amber-200"
-                                >
-                                  <AlertCircle className="h-3 w-3 mr-1" />
-                                  {alert.message}
-                                </Badge>
-                              ))}
+                            <Badge variant="outline">{selectedMeasurementProfile.unit.toUpperCase()}</Badge>
+                            <Badge
+                              variant={selectedMeasurementProfile.status === "verified" ? "default" : "outline"}
+                              className={
+                                selectedMeasurementProfile.status === "verified"
+                                  ? ""
+                                  : "border-amber-500/40 text-amber-700"
+                              }
+                            >
+                              {selectedMeasurementProfile.status.replace("-", " ")}
+                            </Badge>
+                            {recommended && (
+                              <Badge className="bg-primary/10 text-primary">Recommended for service</Badge>
+                            )}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-2 gap-2 text-sm">
+                          {Object.entries(selectedMeasurementProfile.measurements).map(([key, value]) => (
+                            <div key={key} className="flex justify-between border rounded-md p-2 bg-background">
+                              <span className="text-muted-foreground capitalize">
+                                {key.replace(/([A-Z])/g, " $1")}
+                              </span>
+                              <span className="font-medium">
+                                {value} {selectedMeasurementProfile.unit}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {formatConvertedMeasurement(value, selectedMeasurementProfile.unit)}
+                              </span>
                             </div>
-                          )}
+                          ))}
+                        </CardContent>
+                      </Card>
+
+                      {alerts.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {alerts.map((alert, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="border-amber-500/40 text-amber-700 dark:text-amber-200"
+                            >
+                              <AlertCircle className="h-3 w-3 mr-1" />
+                              {alert.message}
+                            </Badge>
+                          ))}
                         </div>
-                      </div>
-                    )
-                  })}
-                </RadioGroup>
+                      )}
+                    </div>
+                  )
+                })()}
 
                 {recommendedGarmentType && (
                   <Card className="bg-muted/70">
