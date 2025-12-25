@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { TrendingUp, DollarSign, Package, Users } from "lucide-react"
+import { formatNaira } from "@/lib/currency"
 
 export function TailorAnalytics() {
   return (
@@ -32,7 +33,7 @@ export function TailorAnalytics() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold mb-2">$12,450</div>
+            <div className="text-3xl font-bold mb-2">{formatNaira(1245000)}</div>
             <p className="text-sm text-muted-foreground flex items-center gap-1">
               <TrendingUp className="h-4 w-4 text-green-600" />
               <span className="text-green-600">+12.5%</span> from last period
@@ -74,7 +75,7 @@ export function TailorAnalytics() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold mb-2">$289</div>
+            <div className="text-3xl font-bold mb-2">{formatNaira(89000)}</div>
             <p className="text-sm text-muted-foreground flex items-center gap-1">
               <TrendingUp className="h-4 w-4 text-green-600" />
               <span className="text-green-600">+3.8%</span> from last period
@@ -91,15 +92,15 @@ export function TailorAnalytics() {
         <CardContent>
           <div className="space-y-4">
             {[
-              { service: "Custom Suits", orders: 18, revenue: 8100, percentage: 42 },
-              { service: "Alterations", orders: 15, revenue: 1200, percentage: 35 },
-              { service: "Shirt Making", orders: 10, revenue: 3150, percentage: 23 },
+              { service: "Agbada Sets", orders: 18, revenue: 810000, percentage: 42 },
+              { service: "Senator Suits", orders: 15, revenue: 720000, percentage: 35 },
+              { service: "Kaftan", orders: 10, revenue: 315000, percentage: 23 },
             ].map((item) => (
               <div key={item.service} className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium">{item.service}</span>
                   <span className="text-muted-foreground">
-                    {item.orders} orders • ${item.revenue.toLocaleString()}
+                    {item.orders} orders • {formatNaira(item.revenue)}
                   </span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">

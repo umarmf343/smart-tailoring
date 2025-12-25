@@ -10,6 +10,7 @@ import { TailorProfile } from "./tailor-profile"
 import { TailorAnalytics } from "./tailor-analytics"
 import { TailorReviews } from "./tailor-reviews"
 import { Package, DollarSign, Star, TrendingUp, Zap, BadgeCheck } from "lucide-react"
+import { formatNaira } from "@/lib/currency"
 
 interface TailorDashboardProps {
   user: User
@@ -56,7 +57,7 @@ export function TailorDashboard({ user }: TailorDashboardProps) {
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">$3,450</div>
+                  <div className="text-2xl font-bold">{formatNaira(345000)}</div>
                   <p className="text-xs text-muted-foreground">+12% from last month</p>
                 </CardContent>
               </Card>

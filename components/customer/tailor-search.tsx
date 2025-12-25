@@ -15,20 +15,21 @@ import type { User } from "@/lib/types"
 import { TailorMap } from "@/components/map/tailor-map"
 import { getBadgeMeta } from "@/lib/badge-utils"
 import type { TailorBadgeType } from "@/lib/types"
+import { formatNaira } from "@/lib/currency"
 
 // Mock tailors data
 const MOCK_TAILORS = [
   {
     id: "1",
-    businessName: "Master Tailor Co.",
-    location: { address: "123 Main St, Downtown, New York", latitude: 40.7128, longitude: -74.006 },
+    businessName: "Lagos Heritage Tailors",
+    location: { address: "12 Adeola Odeku, Victoria Island, Lagos", latitude: 6.4281, longitude: 3.4219 },
     rating: 4.8,
     reviewCount: 156,
-    specialties: ["Suits", "Formal Wear", "Wedding Attire"],
-    services: ["Custom Suits", "Alterations", "Shirt Making"],
-    basePrice: 400,
-    distance: "0.5 miles",
-    express: { enabled: true, expressSlaDays: 3, feeRate: 0.25, minimumFee: 30, weeklyCap: 5, weeklyInUse: 2 },
+    specialties: ["Agbada", "Aso Oke", "Wedding Attire"],
+    services: ["Agbada Sets", "Kaftan & Trousers", "Alterations"],
+    basePrice: 95000,
+    distance: "2.0 km",
+    express: { enabled: true, expressSlaDays: 3, feeRate: 0.25, minimumFee: 15000, weeklyCap: 5, weeklyInUse: 2 },
     badges: [
       {
         id: "b1",
@@ -61,15 +62,15 @@ const MOCK_TAILORS = [
   },
   {
     id: "2",
-    businessName: "Elite Stitches",
-    location: { address: "456 Oak Ave, Brooklyn, New York", latitude: 40.6782, longitude: -73.9442 },
+    businessName: "Abuja Threadworks",
+    location: { address: "22 Aminu Kano Cres, Wuse 2, Abuja", latitude: 9.0765, longitude: 7.3986 },
     rating: 4.9,
     reviewCount: 203,
-    specialties: ["Dresses", "Alterations", "Bridal"],
-    services: ["Dress Making", "Alterations", "Custom Design"],
-    basePrice: 350,
-    distance: "1.2 miles",
-    express: { enabled: true, expressSlaDays: 2, feeRate: 0.3, minimumFee: 35, weeklyCap: 3, weeklyInUse: 1 },
+    specialties: ["Buba & Wrapper", "Lace", "Bridal"],
+    services: ["Buba & Wrapper", "Aso Ebi", "Alterations"],
+    basePrice: 110000,
+    distance: "3.5 km",
+    express: { enabled: true, expressSlaDays: 2, feeRate: 0.3, minimumFee: 20000, weeklyCap: 3, weeklyInUse: 1 },
     badges: [
       {
         id: "b1",
@@ -94,14 +95,14 @@ const MOCK_TAILORS = [
   },
   {
     id: "3",
-    businessName: "Precision Tailoring",
-    location: { address: "789 Park Blvd, Manhattan, New York", latitude: 40.7589, longitude: -73.9851 },
+    businessName: "Enugu Stitch House",
+    location: { address: "18 Presidential Rd, Enugu", latitude: 6.4402, longitude: 7.4943 },
     rating: 4.7,
     reviewCount: 98,
-    specialties: ["Shirts", "Casual Wear", "Business Attire"],
-    services: ["Shirt Customization", "Pants Tailoring", "Jackets"],
-    basePrice: 250,
-    distance: "2.3 miles",
+    specialties: ["Senator", "Corporate Native", "Casual Wear"],
+    services: ["Senator Suit", "Kaftan", "Pants Tailoring"],
+    basePrice: 85000,
+    distance: "5.8 km",
     express: { enabled: false, expressSlaDays: 0, feeRate: 0, weeklyCap: 0, weeklyInUse: 0 },
     badges: [
       {
@@ -117,15 +118,15 @@ const MOCK_TAILORS = [
   },
   {
     id: "4",
-    businessName: "Heritage Tailors",
-    location: { address: "321 Elm St, Queens, New York", latitude: 40.7282, longitude: -73.7949 },
+    businessName: "Ibadan Royal Cuts",
+    location: { address: "47 Ring Rd, Ibadan", latitude: 7.3775, longitude: 3.947 },
     rating: 4.6,
     reviewCount: 84,
-    specialties: ["Traditional Wear", "Ethnic Clothing"],
-    services: ["Custom Traditional Wear", "Alterations", "Embroidery"],
-    basePrice: 300,
-    distance: "3.1 miles",
-    express: { enabled: true, expressSlaDays: 4, feeRate: 0.2, minimumFee: 25, weeklyCap: 4, weeklyInUse: 3 },
+    specialties: ["Traditional Wear", "Adire Styles"],
+    services: ["Traditional Wear", "Embroidery", "Alterations"],
+    basePrice: 78000,
+    distance: "7.2 km",
+    express: { enabled: true, expressSlaDays: 4, feeRate: 0.2, minimumFee: 12000, weeklyCap: 4, weeklyInUse: 3 },
     badges: [
       {
         id: "b1",
@@ -149,7 +150,7 @@ export function TailorSearch({ user }: TailorSearchProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedService, setSelectedService] = useState("all")
   const [sortBy, setSortBy] = useState("distance")
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000])
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 250000])
   const [ratingFilter, setRatingFilter] = useState(0)
   const [expressOnly, setExpressOnly] = useState(false)
   const [badgeFilter, setBadgeFilter] = useState<TailorBadgeType | "all">("all")
@@ -198,7 +199,7 @@ export function TailorSearch({ user }: TailorSearchProps) {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Find Tailors Near You</h1>
-          <p className="text-muted-foreground">Discover expert tailors in your area</p>
+          <p className="text-muted-foreground">Discover expert tailors across Nigeria</p>
         </div>
 
         {/* Search and Filter Section */}
@@ -224,10 +225,11 @@ export function TailorSearch({ user }: TailorSearchProps) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Services</SelectItem>
-                    <SelectItem value="suits">Suits</SelectItem>
-                    <SelectItem value="dresses">Dresses</SelectItem>
+                    <SelectItem value="agbada">Agbada</SelectItem>
+                    <SelectItem value="kaftan">Kaftan</SelectItem>
+                    <SelectItem value="senator">Senator</SelectItem>
+                    <SelectItem value="buba">Buba & Wrapper</SelectItem>
                     <SelectItem value="alterations">Alterations</SelectItem>
-                    <SelectItem value="shirts">Shirts</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -249,7 +251,7 @@ export function TailorSearch({ user }: TailorSearchProps) {
             <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-border">
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  Price Range: ${priceRange[0]} - ${priceRange[1]}
+                  Price Range: {formatNaira(priceRange[0])} - {formatNaira(priceRange[1])}
                 </label>
                 <div className="flex gap-2 items-center">
                   <Input
@@ -262,7 +264,7 @@ export function TailorSearch({ user }: TailorSearchProps) {
                   <Input
                     type="number"
                     value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value) || 1000])}
+                    onChange={(e) => setPriceRange([priceRange[0], Number.parseInt(e.target.value) || 250000])}
                     className="w-24"
                   />
                 </div>
@@ -375,7 +377,7 @@ export function TailorSearch({ user }: TailorSearchProps) {
                   )}
                   <div className="text-sm">
                     <span className="text-muted-foreground">Starting from</span>
-                    <span className="font-bold ml-1">${tailor.basePrice}</span>
+                    <span className="font-bold ml-1">{formatNaira(tailor.basePrice)}</span>
                   </div>
                 </div>
 
@@ -421,7 +423,7 @@ export function TailorSearch({ user }: TailorSearchProps) {
                       <p className="text-sm font-semibold">{tailor.express.expressSlaDays}-day delivery</p>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      +{Math.round(tailor.express.feeRate * 100)}% fee (min ${tailor.express.minimumFee ?? 0}) applied at checkout.
+                      +{Math.round(tailor.express.feeRate * 100)}% fee (min {formatNaira(tailor.express.minimumFee ?? 0)}) applied at checkout.
                       Weekly capacity: {tailor.express.weeklyInUse}/{tailor.express.weeklyCap} slots.
                     </p>
                   </div>

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatDate } from "@/lib/date"
+import { formatNaira } from "@/lib/currency"
 import { MapPin, Clock, Star, Heart, MessageCircle, ShoppingBag, Zap, ShieldCheck } from "lucide-react"
 import { getBadgeMeta } from "@/lib/badge-utils"
 
@@ -20,19 +21,19 @@ interface TailorPublicProfileProps {
 // Mock tailor data
 const MOCK_TAILOR = {
   id: "1",
-  businessName: "Master Tailor Co.",
+  businessName: "Lagos Heritage Tailors",
   rating: 4.8,
   reviewCount: 156,
-  location: "123 Main St, Downtown, New York, NY 10001",
-  businessHours: "Mon-Fri: 9AM-6PM, Sat: 10AM-4PM",
+  location: "12 Adeola Odeku, Victoria Island, Lagos",
+  businessHours: "Mon-Sat: 9AM-7PM, Sun: 1PM-5PM",
   description:
-    "Master Tailor Co. has been providing premium custom tailoring services for over 20 years. We specialize in bespoke suits, formal wear, and wedding attire with meticulous attention to detail and craftsmanship.",
-  specialties: ["Suits", "Formal Wear", "Wedding Attire", "Alterations"],
+    "Lagos Heritage Tailors delivers premium Nigerian tailoring with agbada, senator, and aso-ebi expertise. We blend tradition with modern fits and meticulous finishing for weddings, festivals, and corporate wear.",
+  specialties: ["Agbada", "Aso Oke", "Wedding Attire", "Alterations"],
   services: [
-    { name: "Custom Suit", price: 450, description: "Full bespoke suit with consultation" },
-    { name: "Shirt Making", price: 120, description: "Custom fitted shirts" },
-    { name: "Alterations", price: 50, description: "Basic alterations" },
-    { name: "Wedding Attire", price: 600, description: "Complete wedding outfit" },
+    { name: "Agbada Set", price: 180000, description: "Three-piece agbada with embroidery and inner kaftan" },
+    { name: "Senator Suit", price: 120000, description: "Modern senator suit with sharp tailoring" },
+    { name: "Buba & Wrapper", price: 110000, description: "Traditional buba with iro and gele styling" },
+    { name: "Wedding Attire", price: 240000, description: "Complete wedding attire in aso-oke or lace" },
   ],
   portfolio: [
     { id: "1", imageUrl: "/placeholder.svg?height=300&width=300" },
@@ -43,16 +44,16 @@ const MOCK_TAILOR = {
   reviews: [
     {
       id: "1",
-      customerName: "John D.",
+      customerName: "Chinedu O.",
       rating: 5,
-      comment: "Excellent work! The suit fits perfectly and the attention to detail is outstanding.",
+      comment: "Excellent work! The agbada fit perfectly and the embroidery was flawless.",
       date: new Date("2025-01-10"),
     },
     {
       id: "2",
-      customerName: "Jane S.",
+      customerName: "Zainab B.",
       rating: 4,
-      comment: "Great service, very professional. My dress turned out beautifully.",
+      comment: "Great service and timely delivery. The buba and wrapper were beautiful.",
       date: new Date("2025-01-08"),
     },
   ],
@@ -61,7 +62,7 @@ const MOCK_TAILOR = {
     expressSlaDays: 3,
     standardSlaDays: 8,
     feeRate: 0.25,
-    minimumFee: 30,
+    minimumFee: 15000,
     weeklyCap: 5,
     weeklyInUse: 2,
   },
@@ -185,7 +186,7 @@ export function TailorPublicProfile({ tailorId, user }: TailorPublicProfileProps
                       <Badge className="bg-orange-600 text-white">{MOCK_TAILOR.express.expressSlaDays}-day</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      +{Math.round(MOCK_TAILOR.express.feeRate * 100)}% fee (min ${MOCK_TAILOR.express.minimumFee ?? 0}) with {MOCK_TAILOR.express.weeklyCap - MOCK_TAILOR.express.weeklyInUse} of {MOCK_TAILOR.express.weeklyCap} weekly express slots remaining.
+                      +{Math.round(MOCK_TAILOR.express.feeRate * 100)}% fee (min {formatNaira(MOCK_TAILOR.express.minimumFee ?? 0)}) with {MOCK_TAILOR.express.weeklyCap - MOCK_TAILOR.express.weeklyInUse} of {MOCK_TAILOR.express.weeklyCap} weekly express slots remaining.
                     </p>
                   </CardContent>
                 </Card>
@@ -226,7 +227,7 @@ export function TailorPublicProfile({ tailorId, user }: TailorPublicProfileProps
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-2">
                           <h3 className="font-bold text-lg">{service.name}</h3>
-                          <span className="font-bold text-xl">${service.price}</span>
+                          <span className="font-bold text-xl">{formatNaira(service.price)}</span>
                         </div>
                         <p className="text-sm text-muted-foreground">{service.description}</p>
                       </CardContent>
@@ -330,7 +331,10 @@ export function TailorPublicProfile({ tailorId, user }: TailorPublicProfileProps
                   <div className="flex items-center gap-2 font-semibold text-orange-700 dark:text-orange-300">
                     <Zap className="h-4 w-4" /> {MOCK_TAILOR.express.expressSlaDays}-day express window
                   </div>
-                  <p>Standard turnaround: {MOCK_TAILOR.express.standardSlaDays} days. Express surcharge: {Math.round(MOCK_TAILOR.express.feeRate * 100)}% (min ${MOCK_TAILOR.express.minimumFee ?? 0}).</p>
+                  <p>
+                    Standard turnaround: {MOCK_TAILOR.express.standardSlaDays} days. Express surcharge:{" "}
+                    {Math.round(MOCK_TAILOR.express.feeRate * 100)}% (min {formatNaira(MOCK_TAILOR.express.minimumFee ?? 0)}).
+                  </p>
                   <p>
                     Weekly capacity: {MOCK_TAILOR.express.weeklyInUse}/{MOCK_TAILOR.express.weeklyCap} slots in use. We automatically reserve a slot when you place an order.
                   </p>

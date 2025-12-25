@@ -7,38 +7,39 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatDate } from "@/lib/date"
+import { formatNaira } from "@/lib/currency"
 import { Search, Eye } from "lucide-react"
 
 // Mock data
 const MOCK_ORDERS = [
   {
     id: "ORD-001",
-    customerName: "John Doe",
-    tailorName: "Master Tailor Co.",
-    service: "Custom Suit",
+    customerName: "Chinedu Okafor",
+    tailorName: "Lagos Heritage Tailors",
+    service: "Agbada Set",
     status: "in-progress" as const,
-    price: 450,
-    commission: 45,
+    price: 180000,
+    commission: 18000,
     createdAt: new Date("2025-01-10"),
   },
   {
     id: "ORD-002",
-    customerName: "Jane Smith",
-    tailorName: "Elite Stitches",
-    service: "Dress Alteration",
+    customerName: "Zainab Bello",
+    tailorName: "Abuja Threadworks",
+    service: "Buba & Wrapper",
     status: "completed" as const,
-    price: 80,
-    commission: 8,
+    price: 110000,
+    commission: 11000,
     createdAt: new Date("2025-01-05"),
   },
   {
     id: "ORD-003",
-    customerName: "Mike Johnson",
-    tailorName: "Precision Tailoring",
-    service: "Shirt Customization",
+    customerName: "Tolu Adebayo",
+    tailorName: "Enugu Stitch House",
+    service: "Senator Suit",
     status: "pending" as const,
-    price: 120,
-    commission: 12,
+    price: 125000,
+    commission: 12500,
     createdAt: new Date("2025-01-15"),
   },
 ]
@@ -112,11 +113,11 @@ export function AdminOrders() {
               <div className="text-right space-y-2">
                 <div>
                   <p className="text-sm text-muted-foreground">Order Total</p>
-                  <p className="font-bold">${order.price}</p>
+                  <p className="font-bold">{formatNaira(order.price)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Commission</p>
-                  <p className="font-medium text-green-600">${order.commission}</p>
+                  <p className="font-medium text-green-600">{formatNaira(order.commission)}</p>
                 </div>
                 <Button size="sm" variant="outline" className="gap-2 mt-2 bg-transparent">
                   <Eye className="h-4 w-4" />

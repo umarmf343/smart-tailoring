@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DollarSign, Percent } from "lucide-react"
+import { formatNaira } from "@/lib/currency"
 
 interface CommissionSettingsState {
   defaultRate: number
@@ -20,10 +21,10 @@ interface CommissionSettingsState {
 export function CommissionSettings() {
   const [settings, setSettings] = useState<CommissionSettingsState>({
     defaultRate: 10,
-    minimumCommission: 5,
+    minimumCommission: 5000,
     customRates: [
-      { tailorId: "1", tailorName: "Master Tailor Co.", rate: 8 },
-      { tailorId: "2", tailorName: "Elite Stitches", rate: 12 },
+      { tailorId: "1", tailorName: "Lagos Heritage Tailors", rate: 8 },
+      { tailorId: "2", tailorName: "Abuja Threadworks", rate: 12 },
     ],
   })
   const [isEditing, setIsEditing] = useState(false)
@@ -75,7 +76,7 @@ export function CommissionSettings() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="minimumCommission">Minimum Commission ($)</Label>
+              <Label htmlFor="minimumCommission">Minimum Commission (₦)</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -133,7 +134,7 @@ export function CommissionSettings() {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Order Value:</span>
-              <span className="font-medium">$450</span>
+              <span className="font-medium">{formatNaira(180000)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Commission Rate:</span>
@@ -141,11 +142,11 @@ export function CommissionSettings() {
             </div>
             <div className="flex justify-between border-t border-border pt-2">
               <span className="font-medium">Platform Commission:</span>
-              <span className="font-bold">${((450 * settings.defaultRate) / 100).toFixed(2)}</span>
+              <span className="font-bold">{formatNaira((180000 * settings.defaultRate) / 100, 2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Tailor Receives:</span>
-              <span className="font-bold">${(450 * (1 - settings.defaultRate / 100)).toFixed(2)}</span>
+              <span className="font-bold">{formatNaira(180000 * (1 - settings.defaultRate / 100), 2)}</span>
             </div>
           </div>
         </div>

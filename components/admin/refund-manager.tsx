@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { formatDate } from "@/lib/date"
 import { DollarSign, AlertCircle, CheckCircle } from "lucide-react"
+import { formatNaira } from "@/lib/currency"
 
 interface RefundRequest {
   id: string
@@ -27,10 +28,10 @@ const MOCK_REFUND_REQUESTS: RefundRequest[] = [
   {
     id: "REF-001",
     orderId: "ORD-005",
-    customerName: "John Doe",
-    tailorName: "Master Tailor Co.",
-    orderAmount: 450,
-    requestedAmount: 450,
+    customerName: "Chinedu Okafor",
+    tailorName: "Lagos Heritage Tailors",
+    orderAmount: 180000,
+    requestedAmount: 180000,
     reason: "Incorrect measurements, garment does not fit",
     status: "pending",
     createdAt: new Date("2025-01-17"),
@@ -38,10 +39,10 @@ const MOCK_REFUND_REQUESTS: RefundRequest[] = [
   {
     id: "REF-002",
     orderId: "ORD-006",
-    customerName: "Jane Smith",
-    tailorName: "Elite Stitches",
-    orderAmount: 120,
-    requestedAmount: 60,
+    customerName: "Zainab Bello",
+    tailorName: "Abuja Threadworks",
+    orderAmount: 120000,
+    requestedAmount: 60000,
     reason: "Partial refund for delayed delivery",
     status: "approved",
     createdAt: new Date("2025-01-15"),
@@ -98,8 +99,8 @@ export function RefundManager() {
                     <span className="text-muted-foreground">Tailor:</span> {request.tailorName}
                   </p>
                   <p>
-                    <span className="text-muted-foreground">Requested:</span> ${request.requestedAmount} of $
-                    {request.orderAmount}
+                    <span className="text-muted-foreground">Requested:</span> {formatNaira(request.requestedAmount)} of{" "}
+                    {formatNaira(request.orderAmount)}
                   </p>
                   <p className="text-muted-foreground">Submitted: {formatDate(request.createdAt)}</p>
                 </div>
@@ -135,7 +136,7 @@ export function RefundManager() {
                               <span className="text-muted-foreground">Customer:</span> {request.customerName}
                             </p>
                             <p>
-                              <span className="text-muted-foreground">Order Amount:</span> ${request.orderAmount}
+                              <span className="text-muted-foreground">Order Amount:</span> {formatNaira(request.orderAmount)}
                             </p>
                           </div>
                         </div>
@@ -146,7 +147,7 @@ export function RefundManager() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="refundAmount">Refund Amount ($)</Label>
+                          <Label htmlFor="refundAmount">Refund Amount (₦)</Label>
                           <Input
                             id="refundAmount"
                             type="number"

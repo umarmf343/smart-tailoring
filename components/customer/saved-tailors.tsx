@@ -10,27 +10,27 @@ import Link from "next/link"
 const MOCK_TAILORS = [
   {
     id: "1",
-    businessName: "Master Tailor Co.",
-    location: "Downtown, New York",
+    businessName: "Lagos Heritage Tailors",
+    location: "Victoria Island, Lagos",
     rating: 4.8,
     reviewCount: 156,
-    specialties: ["Suits", "Formal Wear"],
+    specialties: ["Agbada", "Senator", "Aso Oke"],
   },
   {
     id: "2",
-    businessName: "Elite Stitches",
-    location: "Brooklyn, New York",
+    businessName: "Abuja Threadworks",
+    location: "Wuse 2, Abuja",
     rating: 4.9,
     reviewCount: 203,
-    specialties: ["Dresses", "Alterations"],
+    specialties: ["Kaftan", "Corporate Native", "Alterations"],
   },
   {
     id: "3",
-    businessName: "Precision Tailoring",
-    location: "Manhattan, New York",
+    businessName: "Enugu Stitch House",
+    location: "Independence Layout, Enugu",
     rating: 4.7,
     reviewCount: 98,
-    specialties: ["Shirts", "Casual Wear"],
+    specialties: ["Buba & Wrapper", "Lace", "Aso Ebi"],
   },
 ]
 

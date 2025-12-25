@@ -81,7 +81,7 @@ export function TailorMap({ tailors, onTailorSelect, height = "400px" }: TailorM
             },
           ],
         },
-        center: userLocation ? [userLocation.lng, userLocation.lat] : [-74.006, 40.7128],
+        center: userLocation ? [userLocation.lng, userLocation.lat] : [3.3792, 6.5244],
         zoom: 12,
       })
 

@@ -3,21 +3,22 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { TrendingUp, DollarSign, Package, Calendar, PieChart } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
+import { formatNaira } from "@/lib/currency"
 
 const spendingData = [
-  { month: "Jan", amount: 450 },
-  { month: "Feb", amount: 280 },
-  { month: "Mar", amount: 620 },
-  { month: "Apr", amount: 340 },
-  { month: "May", amount: 580 },
-  { month: "Jun", amount: 720 },
+  { month: "Jan", amount: 75000 },
+  { month: "Feb", amount: 58000 },
+  { month: "Mar", amount: 120000 },
+  { month: "Apr", amount: 92000 },
+  { month: "May", amount: 145000 },
+  { month: "Jun", amount: 185000 },
 ]
 
 const categoryData = [
-  { category: "Suits", count: 5, amount: 2250 },
-  { category: "Alterations", count: 8, amount: 400 },
-  { category: "Shirts", count: 3, amount: 360 },
-  { category: "Dresses", count: 2, amount: 700 },
+  { category: "Agbada", count: 3, amount: 420000 },
+  { category: "Kaftan", count: 4, amount: 260000 },
+  { category: "Senator", count: 2, amount: 240000 },
+  { category: "Buba & Wrapper", count: 2, amount: 180000 },
 ]
 
 export function CustomerAnalytics() {
@@ -39,7 +40,7 @@ export function CustomerAnalytics() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalSpent}</div>
+            <div className="text-2xl font-bold">{formatNaira(totalSpent)}</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
               <TrendingUp className="h-3 w-3" />
               +12% from last period
@@ -64,7 +65,7 @@ export function CustomerAnalytics() {
             <PieChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${avgOrderValue.toFixed(0)}</div>
+            <div className="text-2xl font-bold">{formatNaira(avgOrderValue)}</div>
             <p className="text-xs text-muted-foreground">Per order</p>
           </CardContent>
         </Card>
@@ -130,8 +131,8 @@ export function CustomerAnalytics() {
                   <p className="text-sm text-muted-foreground">{item.count} orders</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold">${item.amount}</p>
-                  <p className="text-sm text-muted-foreground">${(item.amount / item.count).toFixed(0)} avg</p>
+                  <p className="font-bold">{formatNaira(item.amount)}</p>
+                  <p className="text-sm text-muted-foreground">{formatNaira(item.amount / item.count)}</p>
                 </div>
               </div>
             ))}

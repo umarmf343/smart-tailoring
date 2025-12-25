@@ -8,36 +8,37 @@ import { Badge } from "@/components/ui/badge"
 import { Search, MoreVertical, Ban, CheckCircle } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { formatDate } from "@/lib/date"
+import { formatNaira } from "@/lib/currency"
 
 // Mock data
 const MOCK_CUSTOMERS = [
   {
     id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+1 555-0101",
+    name: "Chinedu Okafor",
+    email: "chinedu.okafor@example.com",
+    phone: "+234 803 555 0101",
     totalOrders: 8,
-    totalSpent: 2340,
+    totalSpent: 450000,
     joinedAt: new Date("2024-06-15"),
     status: "active" as const,
   },
   {
     id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    phone: "+1 555-0102",
+    name: "Zainab Bello",
+    email: "zainab.bello@example.com",
+    phone: "+234 812 555 0102",
     totalOrders: 5,
-    totalSpent: 1850,
+    totalSpent: 320000,
     joinedAt: new Date("2024-08-20"),
     status: "active" as const,
   },
   {
     id: "3",
-    name: "Mike Johnson",
-    email: "mike@example.com",
-    phone: "+1 555-0103",
+    name: "Tolu Adebayo",
+    email: "tolu.adebayo@example.com",
+    phone: "+234 901 555 0103",
     totalOrders: 12,
-    totalSpent: 4200,
+    totalSpent: 780000,
     joinedAt: new Date("2024-03-10"),
     status: "active" as const,
   },
@@ -80,7 +81,7 @@ export function AdminUsers() {
                 <p className="text-sm text-muted-foreground">{customer.phone}</p>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span>{customer.totalOrders} orders</span>
-                  <span>${customer.totalSpent.toLocaleString()} spent</span>
+                  <span>{formatNaira(customer.totalSpent)} spent</span>
                   <span>Joined {formatDate(customer.joinedAt)}</span>
                 </div>
               </div>

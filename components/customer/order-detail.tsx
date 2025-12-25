@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, MessageCircle, Package, CheckCircle, Clock, Sparkles, AlertCircle } from "lucide-react"
 import { formatDate } from "@/lib/date"
+import { formatNaira } from "@/lib/currency"
 import {
   MEASUREMENT_LIBRARY,
   describeGarmentType,
@@ -23,17 +24,17 @@ interface OrderDetailProps {
 // Mock order data
 const MOCK_ORDER = {
   id: "ORD-001",
-  tailorName: "Master Tailor Co.",
+  tailorName: "Lagos Heritage Tailors",
   tailorId: "1",
-  service: "Custom Suit",
-  measurementProfileId: "ms-formal-suit",
+  service: "Agbada Set",
+  measurementProfileId: "ms-agbada-classic",
   status: "in-progress" as const,
-  price: 450,
+  price: 180000,
   createdAt: new Date("2025-01-10"),
-  estimatedDelivery: new Date("2025-01-25"),
-  fabricChoice: "Navy Blue Wool",
-  customDesign: "Classic two-button with notch lapels",
-  specialInstructions: "Extra padding on shoulders, slightly tapered waist",
+  estimatedDelivery: new Date("2025-02-10"),
+  fabricChoice: "Aso Oke (deep navy)",
+  customDesign: "Gold embroidery chest panel with wide agbada sleeves",
+  specialInstructions: "Leave extra ease for dancing during reception",
   timeline: [
     { status: "Order Placed", date: new Date("2025-01-10"), completed: true },
     { status: "In Progress", date: new Date("2025-01-12"), completed: true },
@@ -138,7 +139,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Price</p>
-                <p className="font-medium text-lg">${MOCK_ORDER.price}</p>
+                <p className="font-medium text-lg">{formatNaira(MOCK_ORDER.price)}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Estimated Delivery</p>

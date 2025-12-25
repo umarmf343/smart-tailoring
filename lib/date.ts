@@ -9,7 +9,7 @@ type DateInput = Date | string | number
 export function formatDate(
   dateInput: DateInput,
   options: Intl.DateTimeFormatOptions = DEFAULT_DATE_FORMAT,
-  locale = "en-US"
+  locale = "en-NG"
 ): string {
   const date = dateInput instanceof Date ? dateInput : new Date(dateInput)
 

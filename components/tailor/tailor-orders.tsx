@@ -17,6 +17,7 @@ import {
 import { formatDate } from "@/lib/date"
 import { MeasurementAdjustmentRequest } from "./measurement-adjustment-request"
 import { Separator } from "@/components/ui/separator"
+import { formatNaira } from "@/lib/currency"
 
 interface TailorOrdersProps {
   limit?: number
@@ -26,54 +27,54 @@ interface TailorOrdersProps {
 const MOCK_ORDERS = [
   {
     id: "ORD-001",
-    customerName: "John Doe",
-    service: "Custom Suit",
-    garmentType: "blazer" as const,
+    customerName: "Chinedu Okafor",
+    service: "Agbada Set",
+    garmentType: "agbada" as const,
     status: "in-progress" as const,
-    price: 450,
+    price: 180000,
     createdAt: new Date("2025-01-10"),
-    estimatedDelivery: new Date("2025-01-25"),
+    estimatedDelivery: new Date("2025-02-10"),
     express: {
       requested: true,
-      fee: 90,
-      promiseAt: new Date("2025-01-18"),
+      fee: 25000,
+      promiseAt: new Date("2025-02-02"),
       risk: "on-track" as const,
     },
-    measurementProfileId: "ms-formal-suit",
+    measurementProfileId: "ms-agbada-classic",
   },
   {
     id: "ORD-002",
-    customerName: "Jane Smith",
-    service: "Dress Alteration",
-    garmentType: "dress" as const,
+    customerName: "Zainab Bello",
+    service: "Buba & Wrapper",
+    garmentType: "buba" as const,
     status: "pending" as const,
-    price: 80,
+    price: 110000,
     createdAt: new Date("2025-01-15"),
-    estimatedDelivery: new Date("2025-01-20"),
+    estimatedDelivery: new Date("2025-02-05"),
     express: {
       requested: false,
       fee: 0,
       promiseAt: undefined,
       risk: "none" as const,
     },
-    measurementProfileId: "ms-wedding-dress",
+    measurementProfileId: "ms-buba-wrapper",
   },
   {
     id: "ORD-003",
-    customerName: "Mike Johnson",
-    service: "Shirt Customization",
-    garmentType: "pants" as const,
+    customerName: "Tolu Adebayo",
+    service: "Senator Suit",
+    garmentType: "senator" as const,
     status: "fitting-required" as const,
-    price: 120,
+    price: 125000,
     createdAt: new Date("2025-01-12"),
-    estimatedDelivery: new Date("2025-01-22"),
+    estimatedDelivery: new Date("2025-02-08"),
     express: {
       requested: true,
-      fee: 30,
-      promiseAt: new Date("2025-01-16"),
+      fee: 18000,
+      promiseAt: new Date("2025-02-04"),
       risk: "at-risk" as const,
     },
-    measurementProfileId: "ms-cycling-pants",
+    measurementProfileId: "ms-senator-set",
   },
 ]
 
@@ -222,9 +223,11 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
                     </p>
                   </div>
                   <div className="text-right space-y-2">
-                    <p className="font-bold">${order.price}</p>
+                    <p className="font-bold">{formatNaira(order.price)}</p>
                     {order.express?.requested && (
-                      <p className="text-xs text-orange-700 dark:text-orange-300">Express fee: ${order.express.fee}</p>
+                      <p className="text-xs text-orange-700 dark:text-orange-300">
+                        Express fee: {formatNaira(order.express.fee)}
+                      </p>
                     )}
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline" onClick={() => setSelectedOrder(order)} className="gap-2">
@@ -276,7 +279,7 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Price</p>
-                    <p className="font-medium">${selectedOrder.price}</p>
+                    <p className="font-medium">{formatNaira(selectedOrder.price)}</p>
                   </div>
                 </div>
 
@@ -288,7 +291,8 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
                           Promise by {selectedOrder.express.promiseAt ? formatDate(selectedOrder.express.promiseAt) : "TBD"}
                         </p>
                       <p className="text-xs text-muted-foreground">
-                        Fee: ${selectedOrder.express.fee} • Status: {selectedOrder.express.risk === "at-risk" ? "At risk" : "On track"}
+                        Fee: {formatNaira(selectedOrder.express.fee)} • Status:{" "}
+                        {selectedOrder.express.risk === "at-risk" ? "At risk" : "On track"}
                       </p>
                     </div>
                     <div className="space-y-1 text-sm text-muted-foreground">

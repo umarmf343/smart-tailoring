@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { TrendingUp, Users, DollarSign, Package, Star } from "lucide-react"
+import { formatNaira } from "@/lib/currency"
 
 export function AdminAnalytics() {
   return (
@@ -32,7 +33,7 @@ export function AdminAnalytics() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold mb-2">$89,420</div>
+            <div className="text-3xl font-bold mb-2">{formatNaira(8942000)}</div>
             <p className="text-sm text-muted-foreground flex items-center gap-1">
               <TrendingUp className="h-4 w-4 text-green-600" />
               <span className="text-green-600">+15.3%</span> from last period
@@ -92,16 +93,16 @@ export function AdminAnalytics() {
           <CardContent>
             <div className="space-y-4">
               {[
-                { category: "Custom Suits", revenue: 42500, commission: 4250, percentage: 48 },
-                { category: "Alterations", revenue: 18900, commission: 1890, percentage: 21 },
-                { category: "Dress Making", revenue: 16200, commission: 1620, percentage: 18 },
-                { category: "Shirt Making", revenue: 11820, commission: 1182, percentage: 13 },
+                { category: "Agbada Sets", revenue: 4250000, commission: 425000, percentage: 42 },
+                { category: "Senator Suits", revenue: 2890000, commission: 289000, percentage: 26 },
+                { category: "Aso Ebi Orders", revenue: 2020000, commission: 202000, percentage: 20 },
+                { category: "Alterations", revenue: 980000, commission: 98000, percentage: 12 },
               ].map((item) => (
                 <div key={item.category} className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium">{item.category}</span>
                     <span className="text-muted-foreground">
-                      ${item.revenue.toLocaleString()} (${item.commission} commission)
+                      {formatNaira(item.revenue)} ({formatNaira(item.commission)} commission)
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
@@ -145,9 +146,9 @@ export function AdminAnalytics() {
         <CardContent>
           <div className="space-y-4">
             {[
-              { name: "Master Tailor Co.", orders: 43, revenue: 18900, rating: 4.8 },
-              { name: "Elite Stitches", orders: 38, revenue: 15600, rating: 4.9 },
-              { name: "Precision Tailoring", orders: 35, revenue: 12300, rating: 4.7 },
+              { name: "Lagos Heritage Tailors", orders: 43, revenue: 1890000, rating: 4.8 },
+              { name: "Abuja Threadworks", orders: 38, revenue: 1560000, rating: 4.9 },
+              { name: "Enugu Stitch House", orders: 35, revenue: 1230000, rating: 4.7 },
             ].map((tailor, i) => (
               <div key={tailor.name} className="flex items-center justify-between p-3 border border-border rounded-lg">
                 <div className="flex items-center gap-4">
@@ -164,7 +165,7 @@ export function AdminAnalytics() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-lg">${tailor.revenue.toLocaleString()}</p>
+                  <p className="font-bold text-lg">{formatNaira(tailor.revenue)}</p>
                   <p className="text-sm text-muted-foreground">Revenue</p>
                 </div>
               </div>

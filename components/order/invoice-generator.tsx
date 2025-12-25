@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { formatNaira } from "@/lib/currency"
 import { formatDate } from "@/lib/date"
 import { Download, FileText } from "lucide-react"
 
@@ -47,13 +48,13 @@ ${data.tailorName}
 ${data.tailorAddress}
 
 SERVICES:
-${data.service} - $${data.price}
+${data.service} - ${formatNaira(data.price)}
 
 PAYMENT DETAILS:
 Payment Method: ${data.paymentMethod}
 Transaction ID: ${data.transactionId}
 
-TOTAL: $${data.price}
+TOTAL: ${formatNaira(data.price)}
 
 Thank you for your business!
     `
@@ -116,7 +117,7 @@ Thank you for your business!
           <div className="space-y-2">
             <div className="flex justify-between">
               <p className="text-sm">{data.service}</p>
-              <p className="text-sm font-medium">${data.price}</p>
+              <p className="text-sm font-medium">{formatNaira(data.price)}</p>
             </div>
           </div>
         </div>
@@ -124,7 +125,7 @@ Thank you for your business!
         <div className="border-t-2 border-border pt-4">
           <div className="flex justify-between items-center">
             <p className="text-lg font-bold">Total Amount:</p>
-            <p className="text-2xl font-bold">${data.price}</p>
+            <p className="text-2xl font-bold">{formatNaira(data.price)}</p>
           </div>
         </div>
 

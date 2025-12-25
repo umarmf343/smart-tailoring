@@ -12,6 +12,7 @@ import { AdminAnalytics } from "./admin-analytics"
 import { AdminReviews } from "./admin-reviews"
 import { Users, Package, DollarSign, AlertTriangle } from "lucide-react"
 import { MeasurementOversight } from "./measurement-oversight"
+import { formatNaira } from "@/lib/currency"
 
 interface AdminDashboardProps {
   user: User
@@ -70,7 +71,7 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">$89,420</div>
+                  <div className="text-2xl font-bold">{formatNaira(8942000)}</div>
                   <p className="text-xs text-muted-foreground">+15.3% from last month</p>
                 </CardContent>
               </Card>
@@ -95,10 +96,10 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
                 <CardContent>
                   <div className="space-y-4">
                     {[
-                      { user: "John Doe", action: "placed an order", time: "2 minutes ago" },
-                      { user: "Elite Stitches", action: "completed an order", time: "15 minutes ago" },
-                      { user: "Jane Smith", action: "left a review", time: "1 hour ago" },
-                      { user: "Heritage Tailors", action: "updated profile", time: "2 hours ago" },
+                      { user: "Chinedu Okafor", action: "placed an order", time: "2 minutes ago" },
+                      { user: "Abuja Threadworks", action: "completed an order", time: "15 minutes ago" },
+                      { user: "Zainab Bello", action: "left a review", time: "1 hour ago" },
+                      { user: "Ibadan Royal Cuts", action: "updated profile", time: "2 hours ago" },
                     ].map((activity, i) => (
                       <div key={i} className="flex items-center gap-3 text-sm">
                         <div className="h-2 w-2 rounded-full bg-primary" />

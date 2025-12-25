@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { formatDate } from "@/lib/date"
+import { formatNaira } from "@/lib/currency"
 import { Wallet, Plus, ArrowUpRight, ArrowDownRight } from "lucide-react"
 
 // Mock data
@@ -13,29 +14,29 @@ const MOCK_TRANSACTIONS = [
   {
     id: "1",
     type: "credit" as const,
-    amount: 100,
+    amount: 50000,
     description: "Added funds",
     date: new Date("2025-01-15"),
   },
   {
     id: "2",
     type: "debit" as const,
-    amount: 450,
-    description: "Payment to Master Tailor Co.",
+    amount: 120000,
+    description: "Payment to Lagos Heritage Tailors",
     date: new Date("2025-01-10"),
   },
   {
     id: "3",
     type: "credit" as const,
-    amount: 200,
-    description: "Refund from Elite Stitches",
+    amount: 35000,
+    description: "Refund from Abuja Threadworks",
     date: new Date("2025-01-05"),
   },
 ]
 
 export function WalletManager() {
   const [showAddFunds, setShowAddFunds] = useState(false)
-  const balance = 250
+  const balance = 250000
 
   return (
     <div className="space-y-6">
@@ -48,7 +49,7 @@ export function WalletManager() {
           <CardDescription>Manage your payment balance</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-4xl font-bold mb-6">${balance.toFixed(2)}</div>
+          <div className="text-4xl font-bold mb-6">{formatNaira(balance, 2)}</div>
 
           {showAddFunds ? (
             <form
@@ -60,7 +61,7 @@ export function WalletManager() {
             >
               <div className="space-y-2">
                 <Label htmlFor="amount">Amount to Add</Label>
-                <Input id="amount" type="number" placeholder="50.00" step="0.01" min="1" required />
+                <Input id="amount" type="number" placeholder="5000.00" step="0.01" min="1" required />
               </div>
               <div className="flex gap-2">
                 <Button type="submit">Add Funds</Button>
@@ -108,7 +109,8 @@ export function WalletManager() {
                 <div
                   className={`font-bold ${transaction.type === "credit" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
                 >
-                  {transaction.type === "credit" ? "+" : "-"}${transaction.amount.toFixed(2)}
+                  {transaction.type === "credit" ? "+" : "-"}
+                  {formatNaira(transaction.amount, 2)}
                 </div>
               </div>
             ))}

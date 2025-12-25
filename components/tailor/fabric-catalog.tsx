@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Plus, Edit, Trash2 } from "lucide-react"
+import { formatNaira } from "@/lib/currency"
 
 interface Fabric {
   id: string
@@ -24,30 +25,30 @@ interface Fabric {
 const MOCK_FABRICS: Fabric[] = [
   {
     id: "1",
-    name: "Navy Blue Wool",
-    type: "Wool",
-    color: "Navy Blue",
-    price: 150,
+    name: "Aso Oke Classic",
+    type: "Aso Oke",
+    color: "Midnight Blue",
+    price: 18000,
     inStock: true,
-    description: "Premium Italian wool, perfect for formal suits",
+    description: "Handwoven aso oke, ideal for agbada and bride/groom sets",
   },
   {
     id: "2",
-    name: "Charcoal Grey Linen",
-    type: "Linen",
-    color: "Charcoal Grey",
-    price: 120,
+    name: "Ankara Print",
+    type: "Ankara",
+    color: "Sunrise Gold",
+    price: 9000,
     inStock: true,
-    description: "Lightweight linen blend, ideal for summer wear",
+    description: "Vibrant Ankara print for buba, iro, and kaftan sets",
   },
   {
     id: "3",
-    name: "Black Silk",
-    type: "Silk",
-    color: "Black",
-    price: 200,
+    name: "Guinea Brocade",
+    type: "Guinea",
+    color: "Royal Purple",
+    price: 15000,
     inStock: false,
-    description: "Luxurious silk fabric for evening wear",
+    description: "Soft guinea brocade for senator suits and premium kaftans",
   },
 ]
 
@@ -139,7 +140,7 @@ export function FabricCatalog() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="price">Price per yard ($)</Label>
+                    <Label htmlFor="price">Price per yard (₦)</Label>
                     <Input
                       id="price"
                       type="number"
@@ -196,7 +197,7 @@ export function FabricCatalog() {
                   <p className="text-sm text-muted-foreground mb-3">{fabric.description}</p>
 
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-lg">${fabric.price}/yard</span>
+                    <span className="font-bold text-lg">{formatNaira(fabric.price)}/yard</span>
                     <Button size="sm" variant="outline" onClick={() => handleToggleStock(fabric.id)}>
                       {fabric.inStock ? "Mark Out of Stock" : "Mark In Stock"}
                     </Button>

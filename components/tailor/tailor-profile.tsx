@@ -8,10 +8,11 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { MapPin, Clock, DollarSign, X } from "lucide-react"
+import { formatNaira } from "@/lib/currency"
 
 export function TailorProfile() {
   const [isEditing, setIsEditing] = useState(false)
-  const [specialties, setSpecialties] = useState(["Suits", "Formal Wear", "Wedding Attire"])
+  const [specialties, setSpecialties] = useState(["Agbada", "Aso Oke", "Wedding Attire"])
   const [newSpecialty, setNewSpecialty] = useState("")
 
   function addSpecialty() {
@@ -52,7 +53,7 @@ export function TailorProfile() {
                 <Label htmlFor="businessName">Business Name</Label>
                 <Input
                   id="businessName"
-                  defaultValue="Master Tailor Co."
+                  defaultValue="Lagos Heritage Tailors"
                   disabled={!isEditing}
                   className={!isEditing ? "bg-muted" : ""}
                 />
@@ -62,7 +63,7 @@ export function TailorProfile() {
                 <Input
                   id="phone"
                   type="tel"
-                  defaultValue="+1 (555) 123-4567"
+                  defaultValue="+234 802 123 4567"
                   disabled={!isEditing}
                   className={!isEditing ? "bg-muted" : ""}
                 />
@@ -76,7 +77,7 @@ export function TailorProfile() {
               </Label>
               <Input
                 id="address"
-                defaultValue="123 Main St, Downtown, New York, NY 10001"
+                defaultValue="12 Adeola Odeku, Victoria Island, Lagos"
                 disabled={!isEditing}
                 className={!isEditing ? "bg-muted" : ""}
               />
@@ -89,7 +90,7 @@ export function TailorProfile() {
               </Label>
               <Input
                 id="businessHours"
-                defaultValue="Mon-Fri: 9AM-6PM, Sat: 10AM-4PM"
+                defaultValue="Mon-Sat: 9AM-7PM, Sun: 1PM-5PM"
                 disabled={!isEditing}
                 className={!isEditing ? "bg-muted" : ""}
               />
@@ -100,7 +101,7 @@ export function TailorProfile() {
               <Textarea
                 id="description"
                 rows={4}
-                defaultValue="Master Tailor Co. has been providing premium custom tailoring services for over 20 years. We specialize in bespoke suits, formal wear, and wedding attire."
+                defaultValue="Lagos Heritage Tailors delivers premium Nigerian tailoring with agbada, senator, and aso-ebi expertise for weddings and corporate wear."
                 disabled={!isEditing}
                 className={!isEditing ? "bg-muted" : ""}
               />
@@ -167,9 +168,9 @@ export function TailorProfile() {
         <CardContent>
           <div className="space-y-4">
             {[
-              { service: "Custom Suit", price: 450, description: "Full bespoke suit with consultation" },
-              { service: "Shirt Making", price: 120, description: "Custom fitted shirts" },
-              { service: "Alterations", price: 50, description: "Basic alterations starting price" },
+              { service: "Agbada Set", price: 180000, description: "Three-piece agbada with embroidery and inner kaftan" },
+              { service: "Senator Suit", price: 120000, description: "Modern senator suit with sharp tailoring" },
+              { service: "Alterations", price: 20000, description: "Basic alterations starting price" },
             ].map((item) => (
               <div key={item.service} className="flex items-center justify-between p-4 border border-border rounded-lg">
                 <div>
@@ -177,7 +178,7 @@ export function TailorProfile() {
                   <p className="text-sm text-muted-foreground">{item.description}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold">${item.price}</p>
+                  <p className="font-bold">{formatNaira(item.price)}</p>
                   <Button size="sm" variant="ghost">
                     Edit
                   </Button>
