@@ -107,11 +107,8 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
   })
 
   const measurementProfile = useMemo(
-    () =>
-      MEASUREMENT_LIBRARY.find(
-        (profile) => profile.id === (selectedProfileId ?? selectedOrder?.measurementProfileId),
-      ),
-    [selectedOrder, selectedProfileId],
+    () => MEASUREMENT_LIBRARY.find((profile) => profile.id === selectedProfileId),
+    [selectedProfileId],
   )
   const measurementAlerts = measurementProfile ? generateMeasurementAlerts(measurementProfile) : []
   const fitSuggestions = measurementProfile ? getFitSuggestions(measurementProfile) : []
@@ -230,15 +227,7 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
                       <p className="text-xs text-orange-700 dark:text-orange-300">Express fee: ${order.express.fee}</p>
                     )}
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setSelectedOrder(order)
-                          setSelectedProfileId(order.measurementProfileId)
-                        }}
-                        className="gap-2"
-                      >
+                      <Button size="sm" variant="outline" onClick={() => setSelectedOrder(order)} className="gap-2">
                         <Eye className="h-4 w-4" />
                         View
                       </Button>
@@ -312,10 +301,7 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="font-bold">Customer Measurements</h3>
-                    <Select
-                      value={selectedProfileId ?? selectedOrder.measurementProfileId}
-                      onValueChange={setSelectedProfileId}
-                    >
+                    <Select value={selectedProfileId ?? ""} onValueChange={setSelectedProfileId}>
                       <SelectTrigger className="w-[220px]">
                         <SelectValue placeholder="Switch measurement set" />
                       </SelectTrigger>
@@ -388,7 +374,9 @@ export function TailorOrders({ limit }: TailorOrdersProps) {
                       />
                     </>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No measurement profile attached to this order.</p>
+                    <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+                      Select a measurement profile to review details before sending adjustments.
+                    </div>
                   )}
                 </div>
 
