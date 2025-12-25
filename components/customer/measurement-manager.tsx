@@ -56,10 +56,10 @@ const initialForm: MeasurementFormState = {
 export function MeasurementManager() {
   const [measurementProfiles, setMeasurementProfiles] = useState<Measurement[]>(MEASUREMENT_LIBRARY)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(MEASUREMENT_LIBRARY[0]?.id ?? null)
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null)
 
   const selectedProfile = useMemo(
-    () => measurementProfiles.find((profile) => profile.id === selectedProfileId) ?? measurementProfiles[0],
+    () => measurementProfiles.find((profile) => profile.id === selectedProfileId),
     [measurementProfiles, selectedProfileId],
   )
 
@@ -138,18 +138,40 @@ export function MeasurementManager() {
           </Card>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-4">
-          {measurementProfiles.map((profile) => (
-            <MeasurementCard
-              key={profile.id}
-              profile={profile}
-              selected={profile.id === selectedProfile?.id}
-              onSelect={() => setSelectedProfileId(profile.id)}
-            />
-          ))}
-        </div>
+        <div className="space-y-4">
+          <div className="max-w-md space-y-2">
+            <Label htmlFor="measurement-profile">Measurement profile</Label>
+            <Select value={selectedProfileId ?? ""} onValueChange={(value) => setSelectedProfileId(value)}>
+              <SelectTrigger id="measurement-profile">
+                <SelectValue placeholder="Select a profile to view" />
+              </SelectTrigger>
+              <SelectContent>
+                {measurementProfiles.map((profile) => (
+                  <SelectItem key={profile.id} value={profile.id}>
+                    {profile.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {selectedProfile && <MeasurementDetail profile={selectedProfile} />}
+          {!selectedProfile && (
+            <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
+              Choose a measurement profile to preview details and validation alerts.
+            </div>
+          )}
+
+          {selectedProfile && (
+            <>
+              <MeasurementCard
+                profile={selectedProfile}
+                selected
+                onSelect={() => setSelectedProfileId(selectedProfile.id)}
+              />
+              <MeasurementDetail profile={selectedProfile} />
+            </>
+          )}
+        </div>
 
         <Card className="border-dashed">
           <CardHeader>
