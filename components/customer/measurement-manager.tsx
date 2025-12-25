@@ -323,6 +323,7 @@ function MeasurementForm({
   onClose: () => void
 }) {
   const [formState, setFormState] = useState<MeasurementFormState>(initialForm)
+  const [activeField, setActiveField] = useState<string | null>(null)
 
   const fields = getFieldsForGarment(formState.garmentType)
 
@@ -421,6 +422,45 @@ function MeasurementForm({
         </div>
       </div>
 
+      <Card className="bg-muted/70">
+        <CardHeader>
+          <CardTitle className="text-base">Live garment preview</CardTitle>
+          <CardDescription>
+            See the silhouette for the selected garment and the measurements update as you enter each detail.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-[220px_minmax(0,1fr)]">
+          <div className="flex items-center justify-center rounded-lg border bg-background p-4">
+            <GarmentSilhouette garmentType={formState.garmentType} />
+          </div>
+          <div className="space-y-3">
+            <div className="grid gap-2 sm:grid-cols-2 text-sm">
+              {fields.map((field) => {
+                const value = formState.measurements[field.key]
+                return (
+                  <div
+                    key={field.key}
+                    className={`flex items-center justify-between rounded-md border px-3 py-2 transition ${
+                      activeField === field.key ? "border-primary bg-primary/5" : "bg-background"
+                    }`}
+                  >
+                    <span className="font-medium">{field.label}</span>
+                    <span className="text-muted-foreground">
+                      {value !== undefined ? `${value} ${formState.unit}` : "—"}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {activeField
+                ? `Editing ${fields.find((field) => field.key === activeField)?.label ?? "measurement"}`
+                : "Select a field to highlight it in the preview list."}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid md:grid-cols-2 gap-4">
         {fields.map((field) => (
           <div key={field.key} className="space-y-1">
@@ -434,6 +474,8 @@ function MeasurementForm({
               step="0.1"
               value={formState.measurements[field.key] ?? ""}
               onChange={(event) => updateMeasurement(field.key, event.target.value ? Number(event.target.value) : undefined)}
+              onFocus={() => setActiveField(field.key)}
+              onBlur={() => setActiveField(null)}
               placeholder="Add value"
             />
             {formState.measurements[field.key] !== undefined && (
@@ -485,5 +527,49 @@ function MeasurementForm({
         </Button>
       </DialogFooter>
     </form>
+  )
+}
+
+function GarmentSilhouette({ garmentType }: { garmentType: GarmentType }) {
+  const silhouette = {
+    shirt: (
+      <>
+        <path d="M60 30 L90 10 H110 L140 30 L175 20 L190 60 L160 80 L160 210 H40 V80 L10 60 L25 20 Z" />
+        <rect x="75" y="80" width="50" height="80" rx="8" fill="currentColor" fillOpacity="0.2" />
+      </>
+    ),
+    dress: (
+      <>
+        <path d="M90 18 L110 18 L135 55 L165 200 L35 200 L65 55 Z" />
+        <path d="M90 18 L85 50 L115 50 L110 18 Z" fill="currentColor" fillOpacity="0.2" />
+      </>
+    ),
+    pants: (
+      <>
+        <path d="M60 20 H140 L155 210 H110 L100 120 L90 210 H45 Z" />
+        <path d="M100 120 L120 210" stroke="currentColor" strokeOpacity="0.25" strokeWidth="10" />
+      </>
+    ),
+    blazer: (
+      <>
+        <path d="M60 30 L90 10 H110 L140 30 L175 25 L190 70 L160 90 L160 210 H40 V90 L10 70 L25 25 Z" />
+        <path d="M100 50 L70 120 H130 Z" fill="currentColor" fillOpacity="0.2" />
+      </>
+    ),
+  }[garmentType]
+
+  return (
+    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+      <svg
+        viewBox="0 0 200 240"
+        className="h-40 w-40 text-amber-600/80 dark:text-amber-300/80"
+        aria-hidden="true"
+      >
+        <g fill="currentColor">{silhouette}</g>
+      </svg>
+      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {describeGarmentType(garmentType)}
+      </span>
+    </div>
   )
 }
