@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Eye, Heart } from "lucide-react"
 
 interface Design {
@@ -134,6 +134,7 @@ export function DesignGallery() {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>{selectedDesign?.name}</DialogTitle>
+            <DialogDescription>{selectedDesign?.description}</DialogDescription>
           </DialogHeader>
           {selectedDesign && (
             <div className="grid md:grid-cols-2 gap-6">

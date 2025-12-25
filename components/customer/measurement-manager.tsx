@@ -7,7 +7,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, ShieldCheck, Ruler, Lightbulb, Info, Sparkles } from "lucide-react"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -77,13 +85,13 @@ export function MeasurementManager() {
                 Add Measurement
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Create or Update a Measurement Profile</DialogTitle>
-                <p className="text-sm text-muted-foreground">
+                <DialogDescription>
                   Choose your garment type, enter values with your preferred unit, and preview conversions and validation
                   alerts in real time.
-                </p>
+                </DialogDescription>
               </DialogHeader>
               <MeasurementForm
                 onClose={() => setIsDialogOpen(false)}

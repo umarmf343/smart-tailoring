@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { formatDate } from "@/lib/date"
 import { DollarSign, AlertCircle, CheckCircle } from "lucide-react"
 
@@ -122,6 +122,7 @@ export function RefundManager() {
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>Process Refund Request</DialogTitle>
+                        <DialogDescription>Review the request details and record a decision.</DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div className="p-4 bg-muted rounded-lg space-y-2">
