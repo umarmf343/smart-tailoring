@@ -39,6 +39,28 @@ const MOCK_TAILOR = {
     { name: "Aso Ebi Group Order", price: 250000, description: "Coordinated family or bridal party set" },
     { name: "Alterations", price: 20000, description: "Resizing, tapering, and finishing adjustments" },
   ],
+  styleGallery: [
+    {
+      name: "Senator Modern",
+      imageUrl: "/placeholder.jpg",
+      description: "Sharp neckline and tailored sleeves.",
+    },
+    {
+      name: "Agbada Luxe",
+      imageUrl: "/placeholder.jpg",
+      description: "Layered drape with ornate embroidery.",
+    },
+    {
+      name: "Kaftan Classic",
+      imageUrl: "/placeholder.jpg",
+      description: "Minimalist embroidery with slim fit.",
+    },
+    {
+      name: "Isi Agu Statement",
+      imageUrl: "/placeholder.jpg",
+      description: "Bold patterns with rich lining.",
+    },
+  ],
 }
 
 const SERVICE_GARMENT_MAP: Record<string, GarmentType> = {
@@ -159,6 +181,44 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
                   {selectedService && <p className="text-sm text-muted-foreground">{selectedService.description}</p>}
                 </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="outfitStyle">Outfit Style</Label>
+                  <div
+                    id="outfitStyle"
+                    className="flex gap-4 overflow-x-auto pb-2 pr-2 [-webkit-overflow-scrolling:touch] scroll-smooth snap-x snap-mandatory"
+                  >
+                    {MOCK_TAILOR.styleGallery.map((style) => {
+                      const isSelected = orderData.outfitStyle === style.name
+                      return (
+                        <button
+                          key={style.name}
+                          type="button"
+                          onClick={() => setOrderData({ ...orderData, outfitStyle: style.name })}
+                          aria-pressed={isSelected}
+                          className={`flex w-48 shrink-0 snap-start flex-col rounded-lg border p-2 text-left transition ${
+                            isSelected
+                              ? "border-primary ring-2 ring-primary/30"
+                              : "border-border hover:border-primary/60"
+                          }`}
+                        >
+                          <div className="relative h-28 w-full overflow-hidden rounded-md bg-muted">
+                            <img
+                              src={style.imageUrl}
+                              alt={style.name}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                          <span className="mt-2 text-sm font-medium">{style.name}</span>
+                          <span className="text-xs text-muted-foreground">{style.description}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Scroll to browse the tailor&apos;s uploaded style gallery.
+                  </p>
+                </div>
+
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="occasion">Occasion</Label>
@@ -177,24 +237,6 @@ export function OrderPlacement({ user }: OrderPlacementProps) {
                             </SelectItem>
                           ),
                         )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="outfitStyle">Outfit Style</Label>
-                    <Select
-                      value={orderData.outfitStyle}
-                      onValueChange={(value) => setOrderData({ ...orderData, outfitStyle: value })}
-                    >
-                      <SelectTrigger id="outfitStyle">
-                        <SelectValue placeholder="Select style" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {["Agbada", "Kaftan", "Senator", "Buba & Wrapper", "Iro & Buba", "Isi Agu"].map((style) => (
-                          <SelectItem key={style} value={style}>
-                            {style}
-                          </SelectItem>
-                        ))}
                       </SelectContent>
                     </Select>
                   </div>
